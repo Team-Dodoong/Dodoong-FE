@@ -1,0 +1,22 @@
+/* 색상 변수 사용 예시
+   color: var(--Main); */
+
+:root {
+  --Main: #ff8e3d;
+  --Sub: #fff7e6;
+  --Gray_-1: #f8f8f8;
+  --Gray_0: #f5f5f5;
+  --Gray_1: #f1f1f1;
+  --Gray_2: #e8e8e8;
+  --Gray_3: #cecece;
+  --Gray_4: #c1c1c1;
+  --Gray_5: #a7a7a7;
+  --Gray_6: #828282;
+  --Gray_7: #5e5e5e;
+  --Gray_8: #3d3d3d;
+  --Gray_9: #1e1e1e;
+  --Black: #000000;
+  --White: #ffffff;
+  --Blue: #0066ff;
+  --Red: #ff6471;
+}

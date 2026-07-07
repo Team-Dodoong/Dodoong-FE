@@ -1,4 +1,5 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css");
+@import "./styles/Colors.css";
 
 * {
   margin: 0;
@@ -41,12 +42,4 @@ a {
 ul,
 ol {
   list-style: none;
-}
-
-:root {
-  /* color */
-  --main: #ff8e3d;
-  --g0: #f5f5f5;
-  --white: #ffffff;
-  --black: #000000;
 }
