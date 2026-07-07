@@ -46,7 +46,7 @@ export const Icon = styled.img`
   height: 24px;
   object-fit: contain;
   /*
-    활성화되면 주황색(#ff7a00)에 가까운 색상 값을 필터로 계산해 적용합니다.
+    활성화되면 주황색(#ff7a00)에 가까운 색상 값을 필터로 계산해 적용
     비활성화 상태일 때는 약간 흐린 회색으로 유지
   */
   filter: ${(props) => 

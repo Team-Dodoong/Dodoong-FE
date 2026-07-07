@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import * as S from './BottomNav.style';
 
-// 1. 가져오는 에셋 변수명을 깔끔하게 통일 (Url 제거)
+// 1. 피그마에서 에셋 가져오기
 import HomeIcon from '../../assets/icon-home.svg';
 import QuestIcon from '../../assets/icon-quest.svg';
 import CharacterIcon from '../../assets/icon-character.svg';
@@ -29,7 +29,7 @@ const BottomNav = () => {
             $isActive={activeTab === item.id} 
             onClick={() => setActiveTab(item.id)}
           >
-            {/* 3. 배열 속성명에 맞게 item.icon으로 정확하게 전달 */}
+            {/* 3. 배열 속성명에 맞게 item.icon으로 전달 */}
             <S.Icon 
               src={item.icon} 
               alt={item.label}
@@ -43,6 +43,6 @@ const BottomNav = () => {
       </S.NavList>
     </S.NavContainer>
   );
-}; // 함수를 닫는 중괄호(})가 누락되어 있어 추가했습니다!
+}; 
 
 export default BottomNav;
