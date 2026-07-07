@@ -9,8 +9,4 @@ export const Container = styled.div`
   min-height: 100vh;
 `;
 
-export const LockIcon = styled.img`
-  width: 5rem;
-  height: 5rem;
-  background-color: var(--black);
-`;
+

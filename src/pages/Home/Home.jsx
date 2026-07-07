@@ -1,6 +1,5 @@
 import React from "react";
 import * as S from "../Home/Home.style";
-import LockIcon from "../../assets/Home/icon_lock.svg";
 
 
 
@@ -23,13 +22,12 @@ export default function Home() {
       <div>Home</div>
       <br />
       <div>
-        color는 index.css 파일에 :root에서 등록하여 사용하면 편리합니다.
+        color는 styles/Colors.css 파일에 :root에서 등록하여 사용하면 편리합니다.
         <br />
         피그마에서 디자이너님의 color system 보고 등록해서 사용하세요! <br />
         <br />
-        -사용 시 var(--g1), var(--main) 처럼 사용
+        -사용 시 var(--Gray_1), var(--Main) 처럼 사용
       </div>
-      <S.LockIcon src={LockIcon} alt="비밀방" />
     </S.Container>
   );
 }
