@@ -3,6 +3,8 @@ import * as S from "../Home/Home.style";
 
 
 
+
+
 // 스타일 파일을 S로 임포트 해와 아래처럼 사용하면 편리합니다.
 // 아이콘과 같은 요소는 피그마에서 svg로 export 하여 사용합니다.
 // svg 파일은 assets 폴더에서 페이지별로 관리하면 좋습니다.
