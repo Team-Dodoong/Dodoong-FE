@@ -8,7 +8,7 @@ export const SearchWrapper = styled.div`
   align-items: center;
   height: 41px;
   padding: 0.75rem 1.25rem;
-  background: var() (--Gray_0);
+  background: var(--Gray_0);
   border-radius: 2.5rem;
 `;
 
