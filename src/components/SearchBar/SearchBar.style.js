@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import Search from "../../assets/ic_search_24.svg?react";
-import { Regular_14 } from "../../styles/Fonts";
+import { Regular_12 } from "../../styles/Fonts";
 
 export const SearchWrapper = styled.div`
   width: 100%;
