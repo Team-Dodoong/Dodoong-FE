@@ -1,25 +1,32 @@
 import styled from "styled-components";
+import Search from "../../assets/ic_search_24.svg?react";
+import { Regular_14 } from "../../styles/Fonts";
 
 export const SearchWrapper = styled.div`
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  width: 100%;
-  height: 2.75rem;
-  padding: 0 1rem;
-  background: #f5f5f5;
-  border-radius: 999px;
+  height: 41px;
+  padding: 0.75rem 1.25rem;
+  background: var() (--Gray_0);
+  border-radius: 2.5rem;
 `;
 
 export const Input = styled.input`
+  ${Regular_12};
   flex: 1;
   border: none;
   outline: none;
   background: transparent;
-  font-size: 0.875rem;
-  color: #333;
+  color: var(--Black);
 
   &::placeholder {
-    color: #aaaaaa;
+    color: var(--Gray_5);
   }
+`;
+
+export const SearchIcon = styled(Search)`
+  width: 1.0625rem;
+  height: 1.0625rem;
+  color: #616161;
 `;
