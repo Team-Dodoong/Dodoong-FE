@@ -19,10 +19,11 @@ export const Regular_14 = css`
   font-size: 14px;
   line-height: 140%;
   font-weight: 400;
+  letter-spacing: -4%;
   font-style: normal;
 `;
 
-export const Regular_16 = css`
+export const R_16 = css`
   font-family: "Pretendard Variable";
   font-size: 16px;
   line-height: 140%;
@@ -38,10 +39,19 @@ export const Medium_12 = css`
   font-style: normal;
 `;
 
+export const Medium_12_Tag = css`
+  font-family: Pretendard-Medium;
+  font-size: 12px;
+  letter-spacing: -4%;
+  font-weight: 500;
+  font-style: normal;
+`;
+
 export const Medium_14 = css`
   font-family: Pretendard-Medium;
   font-size: 14px;
   line-height: 140%;
+  letter-spacing: -4%;
   font-weight: 500;
   font-style: normal;
 `;
@@ -58,6 +68,7 @@ export const SemiBold_12 = css`
   font-family: Pretendard-SemiBold;
   font-size: 12px;
   line-height: 120%;
+  letter-spacing: -4%;
   font-weight: 600;
   font-style: normal;
 `;
@@ -74,6 +85,7 @@ export const SemiBold_16 = css`
   font-family: Pretendard-SemiBold;
   font-size: 16px;
   line-height: 140%;
+  letter-spacing: -4%;
   font-weight: 600;
   font-style: normal;
 `;
@@ -82,6 +94,7 @@ export const Bold_14 = css`
   font-family: Pretendard-Bold;
   font-size: 14px;
   line-height: 140%;
+  letter-spacing: -4%;
   font-weight: 700;
   font-style: normal;
 `;
@@ -90,6 +103,7 @@ export const Bold_16 = css`
   font-family: Pretendard-Bold;
   font-size: 16px;
   line-height: 140%;
+  letter-spacing: -2.5%;
   font-weight: 700;
   font-style: normal;
 `;
@@ -98,6 +112,7 @@ export const Bold_18 = css`
   font-family: Pretendard-Bold;
   font-size: 18px;
   line-height: 140%;
+  letter-spacing: -4%;
   font-weight: 700;
   font-style: normal;
 `;
