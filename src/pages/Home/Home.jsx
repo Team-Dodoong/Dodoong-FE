@@ -1,7 +1,7 @@
 import React from "react";
 import * as S from "../Home/Home.style";
 import CtaButton from '../../components/Button/CtaButton';
-
+import PasswordInput from '../../components/Input/Input';
 
 
 
@@ -30,20 +30,7 @@ export default function Home() {
         <br />
         -사용 시 var(--Gray_1), var(--Main) 처럼 사용
       </div>
-
-      {/* Todo Item / CTA 형태 */}
-      <CtaButton 
-        text="동의 후 계속하기" 
-        variant="todo" 
-        onClick={() => alert('Todo CTA 클릭')} 
-        />
       
-      {/* Bottom CTA 형태 */}
-      <CtaButton 
-        text="동의 후 계속하기" 
-        variant="bottom" 
-        onClick={() => alert('Bottom CTA 클릭')} 
-        />
     </S.Container>
   );
 }

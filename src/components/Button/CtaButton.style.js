@@ -8,12 +8,8 @@ export const Container = styled.div`
   box-sizing: border-box;
   width: 100%;
 
-  margin-top: ${props => props.$variant === 'todo' ? '3rem' : '0'}; // 3rem은 예시, 각 페이지에 맞게 수정
-  padding: ${props => props.$variant === 'todo' ? '0 1.25rem' : '0'}; /* 좌우 여백 추가 */
-
-
-  // 기본 상태 (variant="todo"일 때) 
-  background-color: transparent;
+  margin-top: 0; 
+  padding: 0;
 
   // Bottom 상태 (variant="bottom"일 때)
   ${props => props.$variant === 'bottom' && `
@@ -49,7 +45,7 @@ export const BlackButton = styled.button`
 
   // 내부 텍스트 정렬
   display: inline-flex;
-  justify-content: center;
+  justify-content: center; 
   align-items: center;
   gap: 0.5rem;                  
 
@@ -59,4 +55,10 @@ export const BlackButton = styled.button`
   font-family: "Pretendard Variable";
   font-weight: 600;             
   word-wrap: break-word;
+
+  /* 💡 variant가 secondary(회원가입용)일 때와 아닐 때(기존 검은색 스타일) 분기 처리 */
+  background: ${props => props.$variant === 'secondary' ? 'var(--White)' : 'var(--Black)'};
+  color: ${props => props.$variant === 'secondary' ? 'var(--Gray_6)' : 'var(--White)'};
+  border: ${props => props.$variant === 'secondary' ? '1px solid var(--Gray_2)' : 'none'};
+
 `; 

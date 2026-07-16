@@ -21,7 +21,7 @@ const BottomNav = () => {
 
   // 데이터 배열에 각각 매칭될 이동 경로(path)를 추가합니다.
   const navItems = [
-    { id: 'home', label: '홈', path: '/', icon: HomeIcon, filledIcon: HomeFilledIcon },
+    { id: 'home', label: '홈', path: '/home', icon: HomeIcon, filledIcon: HomeFilledIcon },
     { id: 'quest', label: '일일퀘스트', path: '/quest', icon: QuestIcon, filledIcon: QuestFilledIcon },
     { id: 'character', label: '캐릭터 관리', path: '/character', icon: CharacterIcon, filledIcon: CharacterFilledIcon },
     { id: 'party', label: '파티', path: '/party', icon: PartyIcon, filledIcon: PartyFilledIcon },
