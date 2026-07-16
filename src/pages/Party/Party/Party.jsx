@@ -73,7 +73,8 @@ function Party() {
           </S.CategoryTag>
         ))}
       </S.CategoryRow>
-      <S.PartySetLink>파티개설 +</S.PartySetLink>
+      <S.PartySetButton>파티개설 +</S.PartySetButton>
+      <S.Divider />
       <S.PostList>
         {POSTS.map((post) => (
           <S.PostCard key={post.id}>
