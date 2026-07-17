@@ -2,6 +2,7 @@
 import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav/BottomNav.jsx";
 import Login from "./pages/Login/login.jsx";
+import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
 import Home from "./pages/Home/Home.jsx";
 import Quest from "./pages/Quest/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
@@ -14,7 +15,9 @@ const Layout = () => {
   const location = useLocation(); // 현재 브라우저의 주소 경로를 가져옴
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
-  const showBottomNav = location.pathname !== "/";
+  const showBottomNav =
+  location.pathname !== "/" &&
+  location.pathname !== "/onboarding";
 
   return (
     <div style={{ 
@@ -37,7 +40,8 @@ const router = createBrowserRouter([
     path: "/",
     element: <Layout />,
     children: [
-      { path: "", element: <Login /> }, // '/' 주소일 때
+      { path: "", element: <Login /> },
+      { path: "onboarding", element: <OnBoarding /> }, // '/onboarding' 주소일 때
       { path: "home", element: <Home /> }, // '/home' 주소일 때
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때

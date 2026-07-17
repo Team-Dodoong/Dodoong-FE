@@ -46,8 +46,7 @@ export const BlackButton = styled.button`
   // 내부 텍스트 정렬
   display: inline-flex;
   justify-content: center; 
-  align-items: center;
-  gap: 0.5rem;                  
+  align-items: center;                  
 
   // 3️⃣ 텍스트 스타일 
   color: var(--White);
@@ -60,5 +59,14 @@ export const BlackButton = styled.button`
   background: ${props => props.$variant === 'secondary' ? 'var(--White)' : 'var(--Black)'};
   color: ${props => props.$variant === 'secondary' ? 'var(--Gray_6)' : 'var(--White)'};
   border: ${props => props.$variant === 'secondary' ? '1px solid var(--Gray_2)' : 'none'};
+
+  &:disabled {
+    background: var(--Gray_2);
+    color: var(--Gray_4);
+    border: none;
+    cursor: not-allowed;
+    opacity: 1;
+  }
+
 
 `; 

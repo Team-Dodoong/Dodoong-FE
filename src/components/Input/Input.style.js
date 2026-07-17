@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 import Eye from '../../assets/ic_eye_24.svg?react';
 import EyeOff from '../../assets/ic_eye-off_24.svg?react';
+import { Regular_14 } from '../../styles/Fonts';
+
 
 export const EyeIcon = styled(Eye)`
-  width: 1.25rem;   /* 24px */
+  width: 1.25rem;  
   height: 1.25rem;
   color: var(--Gray_5); 
 `;
@@ -23,7 +25,7 @@ export const InputContainer = styled.div`
   padding: 1rem 1rem; 
   background: white;
   border-radius: 4px;
-  border: 1px solid #E8E8E8;
+  border: 1px solid var(--Gray_2);
   display: inline-flex;
   align-items: ${(props) => props.$height ? 'flex-start' : 'center'}; /* 💡 높이가 클 때는 정렬을 위로 맞춥니다 */
   justify-content: flex-start;
@@ -43,14 +45,7 @@ export const StyledInput = styled.input`
   padding: 0;
   height: 100%;
   resize: none;
-  
-  /* 피그마 폰트 스타일 반영 */
-  color: #A1A1A1; 
-  font-size: 0.875rem; /* 14px */
-  font-family: 'Pretendard';
-  font-weight: 400;
-  line-height: 19.60px;
-  word-wrap: break-word; //강제 줄바꿈
+  ${Regular_14};
 
   &::placeholder {
     color: #A1A1A1; 
@@ -60,8 +55,8 @@ export const StyledInput = styled.input`
 
 // 피그마의 StyledFrame(20x20)을 클릭 가능한 버튼 스타일로 변경
 export const ToggleButton = styled.button`
-  width: 18.75px; /* 20px */
-  height: 18.75px;  /* 20px */
+  width: 1.25rem; 
+  height: 1.25rem;  
   background: none;
   border: none;
   padding: 0;
