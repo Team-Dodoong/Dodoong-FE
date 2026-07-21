@@ -2,7 +2,7 @@ import React from 'react';
 import * as S from './BottomNav.style';
 import { useNavigate, useLocation } from 'react-router-dom';
 
-// 1. 피그마에서 에셋 가져오기
+// 피그마에서 에셋 가져오기
 import HomeIcon from '../../assets/icon-home.svg';
 import QuestIcon from '../../assets/icon-quest.svg';
 import CharacterIcon from '../../assets/icon-character.svg';
