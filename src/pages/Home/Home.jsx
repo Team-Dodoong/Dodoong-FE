@@ -1,7 +1,7 @@
 import React from "react";
 import * as S from "../Home/Home.style";
-
-
+import CtaButton from '../../components/Button/CtaButton';
+import PasswordInput from '../../components/Input/Input';
 
 
 
@@ -30,6 +30,7 @@ export default function Home() {
         <br />
         -사용 시 var(--Gray_1), var(--Main) 처럼 사용
       </div>
+      
     </S.Container>
   );
 }

@@ -1,5 +1,5 @@
-import styled from 'styled-components';
-import { Medium_12 } from '../../styles/Fonts';
+import styled from "styled-components";
+import { Medium_12 } from "../../styles/Fonts";
 
 // 1. 전체 바 컨테이너 (하단 고정)
 export const NavContainer = styled.nav`
@@ -9,13 +9,12 @@ export const NavContainer = styled.nav`
   width: 100%;
   padding-top: 6px;
   padding-bottom: 34px;
-  border-top: 1px solid #F7F7F7;
+  border-top: 1px solid #f7f7f7;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   z-index: 1000;
   background-color: var(--White);
 `;
-
 
 // 2. 내부 리스트 (균등 정렬)
 export const NavList = styled.ul`
@@ -41,7 +40,7 @@ export const NavItem = styled.li`
   gap: 6px; /* 아이콘과 글자 사이 간격 */
 `;
 
-// 4. 아이콘 이미지 스타일 
+// 4. 아이콘 이미지 스타일
 export const Icon = styled.img`
   width: 24px;
   height: 24px;
@@ -52,8 +51,10 @@ export const Icon = styled.img`
 export const Label = styled.span`
   ${Medium_12};
   line-height: 16.8px;
-  
-  font-weight: ${(props) => (props.$isActive ? '700' : '500')};
-  color: ${(props) => (props.$isActive ? 'var(--Main)' : 'var(--Gray_5)')};
-  transition: color 0.2s ease, font-weight 0.2s ease;
+
+  font-weight: ${(props) => (props.$isActive ? "700" : "500")};
+  color: ${(props) => (props.$isActive ? "var(--Main)" : "var(--Gray_5)")};
+  transition:
+    color 0.2s ease,
+    font-weight 0.2s ease;
 `;
