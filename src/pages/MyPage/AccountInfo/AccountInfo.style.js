@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import Back from '../../../assets/ic_back_24.svg?react';
 
 export const Container = styled.div`
   position: relative;
@@ -16,9 +17,10 @@ export const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px #F1F1F1 solid;
 `;
 
-export const BackButton = styled.button`
+/* export const BackButton = styled.button`
   position: absolute;
   left: 20px;
   background: none;
@@ -26,7 +28,7 @@ export const BackButton = styled.button`
   font-size: 20px;
   color: #333333;
   cursor: pointer;
-`;
+`; */
 
 export const HeaderTitle = styled.h1`
   font-size: 18px;
@@ -93,7 +95,6 @@ export const ActionItem = styled.div`
   align-items: center;
   justify-content: space-between;
   padding: 20px;
-  border-bottom: 1px solid #f9f9f9;
   font-size: 16px;
   font-weight: 500;
   color: #333333;
@@ -115,11 +116,11 @@ export const ModalOverlay = styled.div`
 
 export const ModalBox = styled.div`
   width: 100%;
-  max-width: 430px;
+  max-width: 480px;
   padding: 40px 20px 24px 20px;
   background: #ffffff;
-  border-top-left-radius: 24px;
-  border-top-right-radius: 24px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   box-sizing: border-box;
   text-align: center;
 `;
@@ -146,4 +147,13 @@ export const ModalButton = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
+`;
+
+export const BackButton = styled(Back)`
+  color: var(--Gray_5);
+  width: 1.5rem;
+  height: 1.5rem;
+  position: absolute;
+  left: 20px;
+  background: none;
 `;

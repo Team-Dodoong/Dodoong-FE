@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import * as S from './ServiceWithdraw.style';
+import CtaButton from "../../../components/Button/CtaButton";
+import Check from '../../../assets/ic_regular_check_24.svg?react';
+
 
 const ServiceWithdraw = () => {
   const navigate = useNavigate();
   const [checked1, setChecked1] = useState(false);
-  const [checked2, setChecked2] = useState(true);
+  const [checked2, setChecked2] = useState(false);
 
   const handleBack = () => {
     navigate(-1); // 이전 페이지(마이페이지)로 이동
@@ -33,17 +36,17 @@ const ServiceWithdraw = () => {
 
       <S.CheckboxSection>
         <S.CheckboxRow onClick={() => setChecked1(!checked1)}>
-          <S.CheckCircle active={checked1}>{checked1 && '✓'}</S.CheckCircle>
+          <S.CheckCircle active={checked1}>{checked1 && <S.CheckIcon />}</S.CheckCircle>
           <S.CheckboxLabel>탈퇴 시 회원님이 보유한 포인트는 모두 소멸되고, 복원 및 환불 불가한 것을 확인했습니다.</S.CheckboxLabel>
         </S.CheckboxRow>
 
         <S.CheckboxRow onClick={() => setChecked2(!checked2)}>
-          <S.CheckCircle active={checked2} color="#ff7a00">{checked2 && '✓'}</S.CheckCircle>
+          <S.CheckCircle active={checked2}>{checked2 && <S.CheckIcon /> }</S.CheckCircle>
           <S.CheckboxLabel>안내 사항을 모두 확인했으며, 탈퇴 시 회원 정보는 모두 삭제되고 데이터 복구가 불가함에 동의합니다.</S.CheckboxLabel>
         </S.CheckboxRow>
       </S.CheckboxSection>
 
-      <S.SubmitButton disabled={!(checked1 && checked2)}>탈퇴하기</S.SubmitButton>
+      <CtaButton $variant="bottom" disabled={!(checked1 && checked2)} onClick={() => navigate('/')}>탈퇴하기</CtaButton>
     </S.Container>
   );
 };

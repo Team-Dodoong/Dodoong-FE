@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './MyPage.style';
+import MyPageProfileImage from '../../assets/mypage-profile-image.png' ;
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -11,15 +12,15 @@ const MyPage = () => {
         <S.HeaderTitle>마이페이지</S.HeaderTitle>
       </S.Header>
 
-      <S.ProfileSection>
-        <S.Avatar src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" alt="프로필" />
+      <S.ProfileSection onClick={() => navigate('/accountinfo')} >
+        <S.Avatar src={MyPageProfileImage} alt="프로필" />
         <S.ProfileInfo>
           <S.Nickname>김이화</S.Nickname>
           <S.UserIdRow>
             <S.UserId>Px46BwfhL01Q</S.UserId>
           </S.UserIdRow>
         </S.ProfileInfo>
-        <S.ArrowIcon onClick={() => navigate('/accountinfo')} />
+        <S.ArrowIcon />
       </S.ProfileSection>
 
       <S.PointBanner>

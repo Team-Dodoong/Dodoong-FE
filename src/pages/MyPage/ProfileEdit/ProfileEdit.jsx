@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './ProfileEdit.style';
+import BackIcon from '../../../assets/ic_back_24.svg?react';
+import MyPageProfileImage from '../../../assets/mypage-profile-image.png' ;
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ const ProfileEdit = () => {
       </S.Header>
 
       <S.AvatarContainer>
-        <S.Avatar src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" />
+        <S.Avatar src={MyPageProfileImage} />
         <S.AddBadge>+</S.AddBadge>
       </S.AvatarContainer>
 
@@ -44,7 +46,6 @@ const ProfileEdit = () => {
             value={intro} 
             onChange={(e) => setIntro(e.target.value)} 
           />
-          <S.HideIcon>👁️‍🗨️</S.HideIcon>
         </S.TextAreaWrapper>
       </S.FormGroup>
 

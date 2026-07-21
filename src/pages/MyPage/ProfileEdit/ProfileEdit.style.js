@@ -1,4 +1,6 @@
 import styled from 'styled-components';
+import { Regular_14 } from "../../../styles/Fonts";
+
 
 export const Container = styled.div`
   position: relative;
@@ -137,22 +139,14 @@ export const TextArea = styled.textarea`
   border: 1px solid #e0e0e0;
   border-radius: 6px;
   box-sizing: border-box;
-  font-size: 15px;
-  color: #333333;
+  ${Regular_14}
+  color: var(--Gray_4);
   resize: none;
 
   &:focus {
     border-color: #111111;
     outline: none;
   }
-`;
-
-export const HideIcon = styled.span`
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  color: #cccccc;
-  cursor: pointer;
 `;
 
 export const SubmitButton = styled.button`

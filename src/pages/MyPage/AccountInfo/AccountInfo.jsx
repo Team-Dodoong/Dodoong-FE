@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import * as S from './AccountInfo.style';
+import MyPageProfileImage from '../../../assets/mypage-profile-image.png' ;
+
 
 const AccountInfo = () => {
   const navigate = useNavigate();
@@ -9,19 +11,19 @@ const AccountInfo = () => {
   return (
     <S.Container>
       <S.Header>
-        <S.BackButton onClick={() => navigate(-1)}>←</S.BackButton>
+        <S.BackButton onClick={() => navigate(-1)}/>
         <S.HeaderTitle>계정 정보</S.HeaderTitle>
       </S.Header>
 
       <S.AvatarSection>
-        <S.Avatar src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150" />
+        <S.Avatar src={MyPageProfileImage} />
       </S.AvatarSection>
 
-      <S.InfoGroup >
+      <S.InfoGroup onClick={() => navigate('/profile/edit')} >
         <S.Label>닉네임</S.Label>
         <S.ValueRow>
           <S.ValueText>김이화</S.ValueText>
-          <S.Arrow onClick={() => navigate('/profile/edit')} />
+          <S.Arrow />
         </S.ValueRow>
       </S.InfoGroup>
 
@@ -45,9 +47,9 @@ const AccountInfo = () => {
         <S.Arrow />
       </S.ActionItem>
 
-      <S.ActionItem >
+      <S.ActionItem onClick={() => navigate('/profile/servicewithdraw')} >
         <span >서비스 탈퇴</span>
-        <S.Arrow onClick={() => navigate('/profile/servicewithdraw')} />
+        <S.Arrow />
       </S.ActionItem>
 
       {showLogoutModal && (

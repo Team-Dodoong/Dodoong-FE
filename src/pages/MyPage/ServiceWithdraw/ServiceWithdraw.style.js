@@ -1,14 +1,20 @@
 import styled from 'styled-components';
+import Back from '../../../assets/ic_back_24.svg?react';
+import Check from '../../../assets/ic_regular_check_24.svg?react';
+
+
 
 export const Container = styled.div`
   position: relative;
   width: 100%;
-  max-width: 430px;
+  max-width: 480px;
   min-height: 100vh;
   margin: 0 auto;
-  padding-bottom: 100px;
+  // padding-bottom: 100px;
   background: #ffffff;
-  font-family: -apple-system, sans-serif;
+  font-family: "pretendard";
+  display: flex;
+  flex-direction: column;
 `;
 
 export const Header = styled.div`
@@ -17,16 +23,16 @@ export const Header = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  border-bottom: 1px #F1F1F1 solid;
 `;
 
-export const BackButton = styled.button`
+export const BackButton = styled(Back)`
+  color: var(--Gray_5);
+  width: 1.5rem;
+  height: 1.5rem;
   position: absolute;
   left: 20px;
   background: none;
-  border: none;
-  font-size: 20px;
-  color: #333333;
-  cursor: pointer;
 `;
 
 export const HeaderTitle = styled.h1`
@@ -77,11 +83,13 @@ export const PointLink = styled.div`
 `;
 
 export const CheckboxSection = styled.div`
+  flex: 1; 
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 24px 20px;
-  background-color: #f8f9fa;
+  background-color: #F5F5F5; /* 왼쪽과 동일한 연한 회색으로 미세 조정 */
+
 `;
 
 export const CheckboxRow = styled.div`
@@ -97,11 +105,21 @@ export const CheckCircle = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  background-color: ${(props) => (props.active ? props.color || '#111111' : '#ffffff')};
-  border: 1px solid ${(props) => (props.active ? props.color || '#111111' : '#cccccc')};
+  /* 활성화되면 지정 색상/오렌지색, 비활성화면 투명/흰색 배경 */
+  background-color: ${(props) => (props.active ? props.color || '#E87C38' : 'transparent')};
+  border: 1px solid ${(props) => (props.active ? props.color || '#E87C38' : '#CCCCCC')};
   border-radius: 50%;
   color: #ffffff;
   font-size: 11px;
+`;
+
+export const CheckIcon = styled(Check)`
+  color: var(--White);
+  width: .625rem;
+  height: .625rem;
+  // position: absolute;
+  // left: 20px;
+  background: none;
 `;
 
 export const CheckboxLabel = styled.p`
@@ -111,7 +129,8 @@ export const CheckboxLabel = styled.p`
   color: #444444;
 `;
 
-export const SubmitButton = styled.button`
+
+/* export const SubmitButton = styled.button`
   position: absolute;
   bottom: 24px;
   left: 20px;
@@ -124,4 +143,4 @@ export const SubmitButton = styled.button`
   font-size: 16px;
   font-weight: 600;
   cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
-`;
+`; */
