@@ -43,3 +43,10 @@ ul,
 ol {
   list-style: none;
 }
+
+@font-face {
+  font-family: "Jalnan2";
+  font-weight: normal;
+  src: url("./styles/Jalnan2.otf") format("opentype");
+}
+

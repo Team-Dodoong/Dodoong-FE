@@ -6,7 +6,7 @@ export const Container = styled.div`
   flex-direction: column;
   color: var(--main); //index.css의 :root 내부에 자주 쓰는 컬러 추가 후 사용
   position: relative;
-  min-height: 100%;
+  min-height: 100vh;
 `;
 
 
