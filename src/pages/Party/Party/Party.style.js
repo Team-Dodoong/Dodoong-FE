@@ -1,6 +1,7 @@
 import styled from "styled-components";
-import More from "../../../assets/ic_regular_more_24.svg";
+import More from "../../../assets/ic_regular_more_24.svg?react";
 import Lock from "../../../assets/ic_filled_lock_24.svg?react";
+import Social from "../../../assets/ic_social_24.svg?react";
 import {
   SemiBold_16,
   Medium_14,
@@ -9,6 +10,7 @@ import {
   Medium_12,
   Bold_18,
   Regular_14,
+  Regular_12,
 } from "../../../styles/Fonts";
 
 export const Container = styled.div`
@@ -72,6 +74,12 @@ export const Divider = styled.div`
   background: var(--Gray_1);
 `;
 
+export const ScrollArea = styled.div`
+  height: calc(100vh - 20rem);
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
 export const PostList = styled.div`
   display: flex;
   flex-direction: column;
@@ -80,17 +88,21 @@ export const PostList = styled.div`
 export const PostCard = styled.div`
   border-bottom: 0.0625rem solid var(--Gray_1);
   padding: 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 `;
 
 export const TagRow = styled.div`
   display: flex;
   gap: 0.25rem;
+  align-items: center;
 `;
 
 export const StatusTag = styled.span`
   ${SemiBold_12};
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: ${({ $active }) => ($active ? " var(--Main)" : " var(--Gray_2)")};
   color: ${({ $active }) => ($active ? " var(--White)" : " var(--Gray_5)")};
   margin-right: 0.25rem;
@@ -99,15 +111,15 @@ export const StatusTag = styled.span`
 export const Tag = styled.span`
   ${Medium_12};
   padding: 0.25rem 0.5rem;
-  border-radius: 4px;
+  border-radius: 0.25rem;
   background: var(--Sub);
   color: var(--Main);
 `;
 
 export const MoreIcon = styled(More)`
   color: var(--Gray_6);
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
 `;
 
 export const TagWrapper = styled.div`
@@ -131,6 +143,8 @@ export const LockIcon = styled(Lock)`
 export const PostTitle = styled.h3`
   ${Bold_18};
   color: var(--Black);
+  display: flex;
+  gap: 0.5rem;
 `;
 
 export const PostContent = styled.p`
@@ -138,9 +152,35 @@ export const PostContent = styled.p`
   color: var(--Black);
 `;
 
+export const SocialIcon = styled(Social)`
+  width: 1.0625rem;
+  height: 1.0625rem;
+  color: var(--Gray_5);
+`;
+
+export const MemberCount = styled.p`
+  ${Regular_12};
+  color: var(--Gray_5);
+  padding-left: 0.25rem;
+`;
+
+export const MemberWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+export const LastConversation = styled.p`
+  ${Regular_12};
+  color: var(--Gray_3);
+  display: flex;
+  flex-direction: row;
+`;
+
+export const TimeHighlight = styled.p`
+  color: var(--Main);
+`;
+
 export const PostMeta = styled.div`
   display: flex;
   gap: 0.75rem;
-  font-size: 0.75rem;
-  color: #aaa;
 `;
