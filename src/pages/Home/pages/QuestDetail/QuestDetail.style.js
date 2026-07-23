@@ -13,6 +13,7 @@ export const TopBar = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 14px 16px;
+  border-bottom: 1px #F1F1F1 solid;
 `;
 
 export const BackButton = styled.button`
@@ -34,7 +35,7 @@ export const SaveButton = styled.button`
 `;
 
 export const Section = styled.section`
-  padding: 8px 20px 24px;
+  padding: 20px 20px 24px;
 `;
 
 export const SectionLabel = styled.h2`
@@ -48,7 +49,7 @@ export const TextareaWrapper = styled.div`
   position: relative;
 `;
 
-export const Textarea = styled.textarea`
+/* export const Textarea = styled.textarea`
   width: 100%;
   min-height: 52px;
   padding: 14px 40px 14px 14px;
@@ -62,10 +63,10 @@ export const Textarea = styled.textarea`
   &::placeholder {
     color: #C7C7CC;
   }
-`;
+`; */ 
 
-export const VisibilityToggle = styled.button`
+/* export const VisibilityToggle = styled.button`
   position: absolute;
   right: 12px;
   top: 14px;
-`;
+`; */
