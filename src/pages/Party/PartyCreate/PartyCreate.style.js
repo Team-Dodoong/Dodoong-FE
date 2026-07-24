@@ -41,7 +41,7 @@ export const CompleteButton = styled.button`
 `;
 
 export const ScrollArea = styled.div`
-  height: calc(100vh - 8.4375rem);
+  height: calc(100vh - 3rem);
   overflow-y: auto;
   overflow-x: hidden;
 `;
