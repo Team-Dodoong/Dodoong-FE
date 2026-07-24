@@ -5,7 +5,7 @@ import Login from "./pages/Login/login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
 import Home from "./pages/Home/pages/Home/Home.jsx";
 import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
-import Quest from "./pages/Quest/Quest/Quest.jsx";
+import Quest from "./pages/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
