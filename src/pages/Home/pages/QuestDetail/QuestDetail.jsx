@@ -4,9 +4,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import BackIcon from '../../../../assets/ic_back_24.svg?react';
 import EyeOffIcon from '../../../../assets/ic_eye-off_24.svg?react';
 
-import BottomCta from '../../../../components/Button/CtaButton';
 
 import CategorySelector from './components/CategorySelector';
+import CtaButton from "../../../../components/Button/CtaButton";
+import Input from "../../../../components/Input/Input"
 import * as S from './QuestDetail.style';
 
 // 퀘스트 상세보기 / 수정 페이지
@@ -16,7 +17,7 @@ function QuestDetail() {
   const isNew = !id || id === 'new';
 
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('postponable');
+  const [category, setCategory] = useState('urgent');
   const [isVisible, setIsVisible] = useState(true);
 
   const handleSave = () => {
@@ -44,18 +45,11 @@ function QuestDetail() {
       <S.Section>
         <S.SectionLabel>내용</S.SectionLabel>
         <S.TextareaWrapper>
-          <S.Textarea
+          <Input
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="퀘스트 내용을 입력해주세요."
-          />
-          <S.VisibilityToggle
-            type="button"
-            onClick={() => setIsVisible((prev) => !prev)}
-            aria-label="공개 여부 전환"
-          >
-            <EyeOffIcon color={isVisible ? '#C7C7CC' : '#FF9142'} />
-          </S.VisibilityToggle>
+        />
         </S.TextareaWrapper>
       </S.Section>
 
@@ -64,12 +58,7 @@ function QuestDetail() {
         <CategorySelector value={category} onChange={setCategory} />
       </S.Section>
 
-      <BottomCta
-        variant="bottom"
-        label={isNew ? '등록완료' : '수정완료'}
-        onClick={handleSave}
-        disabled={!content.trim()}
-      />
+      <CtaButton $variant="bottom" onClick={() => navigate(-1)}>수정완료</CtaButton>
     </S.Wrapper>
   );
 }

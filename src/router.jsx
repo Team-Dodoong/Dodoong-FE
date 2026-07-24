@@ -19,7 +19,11 @@ const Layout = () => {
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
   const showBottomNav =
-    location.pathname !== "/" && location.pathname !== "/onboarding" && location.pathname !== "/accountinfo" && location.pathname !== "/profile/servicewithdraw";
+    location.pathname !== "/" 
+    && location.pathname !== "/onboarding" 
+    && location.pathname !== "/accountinfo" 
+    && location.pathname !== "/profile/servicewithdraw" 
+    && location.pathname !== "/questdetail";
 
   return (
     <div

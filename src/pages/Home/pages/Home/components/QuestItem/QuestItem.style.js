@@ -38,7 +38,7 @@ export const Label = styled.p`
 `;
 
 export const Tag = styled.span`
-  color: #FF9142;
+  color: var(--Black);
   font-weight: 700;
 `;
 

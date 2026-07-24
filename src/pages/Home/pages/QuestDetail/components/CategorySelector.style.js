@@ -1,21 +1,30 @@
 import styled from 'styled-components';
 
-export const Grid = styled.div`
+export const Container = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  margin-top: 12px;
+  width: 100%;
 `;
 
-export const Chip = styled.button`
-  padding: 14px 0;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 400;
+export const CategoryButton = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 10px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
-  color: ${({ $active }) => ($active ? '#FF9142' : '#C7C7CC')};
-  background-color: ${({ $active }) =>
-    $active ? '#FFF1E4' :  '#F2F2F4'};
-  border: 1.4px solid
-    ${({ $active }) => ($active ? '#FF9142' : 'transparent')};
+  /* 선택(selected) 상태별 스타일 정의 */
+  background-color: ${props => (props.$selected ? '#FFF7ED' : '#F8F9FA')};
+  border: ${props => (props.$selected ? '1.5px solid #FF9142' : '1.5px solid transparent')};
+  color: ${props => (props.$selected ? '#FF9142' : '#C7C7CC')};
+
+  svg {
+    flex-shrink: 0;
+  }
 `;

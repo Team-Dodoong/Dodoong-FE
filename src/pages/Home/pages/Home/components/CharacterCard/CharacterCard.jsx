@@ -1,7 +1,9 @@
 import * as S from './CharacterCard.style';
 import character_doobi from "../../../../../../assets/character_두비.png";
+import bgGradient from "../../../../../../assets/Rectangle 3410.png";
+import CharacterIcon_Img from '../../../../../../assets/character-icon.png'; // ✨ 이미지 경로
 
-// 인사말 + 캐릭터(두비) + 경험치 프로그레스바
+
 function CharacterCard({
   userName,
   characterName,
@@ -16,9 +18,8 @@ function CharacterCard({
         안녕하세요 <strong>{userName}</strong>님 오늘도 힘내볼까요?!
       </S.GreetingBubble>
 
-      <S.CharacterArea>
-        <S.Decoration $position="left: 14%; top: 32%;">✨</S.Decoration>
-        <S.Decoration $position="right: 12%; bottom: 26%;">🧡</S.Decoration>
+      <S.CharacterArea $bgImage={bgGradient}>
+        <S.Decoration  src={CharacterIcon_Img} alt="character-icon" />
         <S.CharacterImage src={character_doobi} alt={characterName} />
       </S.CharacterArea>
 
@@ -29,7 +30,7 @@ function CharacterCard({
           <S.ProgressFill $percent={percent} />
         </S.ProgressTrack>
         <S.ProgressLabel>
-          {exp.toLocaleString()}/{maxExp.toLocaleString()}
+          <span>{exp.toLocaleString()}</span>/{maxExp.toLocaleString()}
         </S.ProgressLabel>
       </S.ProgressWrapper>
     </S.Wrapper>

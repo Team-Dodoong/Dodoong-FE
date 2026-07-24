@@ -1,18 +1,20 @@
+// import { motion, useAnimation } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../../../../components/Header/Header'
 import BottomNav from '../../../../components/BottomNav/BottomNav';
 import PointBadge from '../../../../components/PointBadge/PointBadge';
-
+import BottomSheet from '../Home/components/BottomSheet/BottomSheet';
 import CharacterCard from './components/CharacterCard/CharacterCard';
 import StreakTracker from './components/StreakTracker/StreakTracker';
-import QuestTabs from './components/QuestTabs/QuestTabs';
-import QuestList from './components/QuestList/QuestList';
 import LevelUpModal from './components/LevelUpModal/LevelUpModal';
 import FloatingAddButton from './components/FloatingAddButton/FloatingAddButton';
 
+
 import * as S from './Home.style';
+
+import bgGradient from '../../../../assets/Rectangle 3410.png';
 
 // 실제로는 API에서 받아올 목데이터입니다.
 const INITIAL_DAILY_QUESTS = Array.from({ length: 8 }, (_, i) => ({
@@ -81,7 +83,7 @@ function Home() {
     <S.Wrapper>
       <Header />
 
-      <S.Content>
+      <S.Content $bgImage={bgGradient} >
         <PointBadge point={1270} />
 
         <CharacterCard
@@ -98,20 +100,19 @@ function Home() {
         />
       </S.Content>
 
-      <QuestTabs activeTab={activeTab} onChange={setActiveTab} />
 
-      <S.Content>
-        <QuestList
-          quests={quests}
-          type={activeTab}
-          onToggle={handleToggle}
-          onEdit={handleEdit}
-          onPostpone={handlePostpone}
-          onDeleteToday={handleDeleteToday}
-          onDeleteForever={handleDeleteForever}
-          onLeaveParty={handleLeaveParty}
-        />
-      </S.Content>
+      <BottomSheet
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        quests={quests}
+        onToggle={handleToggle}
+        onEdit={handleEdit}
+        onPostpone={handlePostpone}
+        onDeleteToday={handleDeleteToday}
+        onDeleteForever={handleDeleteForever}
+        onLeaveParty={handleLeaveParty}
+      />
+
 
       <FloatingAddButton onClick={handleAddQuest} />
       <BottomNav active="home" onNavigate={(key) => navigate(`/${key}`)} />

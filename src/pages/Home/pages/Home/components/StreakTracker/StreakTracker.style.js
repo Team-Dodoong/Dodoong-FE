@@ -2,6 +2,7 @@ import styled from 'styled-components';
 
 
 export const Wrapper = styled.section`
+  width: 100%;
   margin-top: 16px;
   padding: 16px;
   border-radius: 20px;

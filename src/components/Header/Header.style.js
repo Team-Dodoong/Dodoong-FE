@@ -6,6 +6,7 @@ export const Wrapper = styled.header`
   justify-content: space-between;
   padding: 14px 20px 8px;
   background-color: var(--White);
+  border-bottom: 1px #F1F1F1 solid;
 `;
 
 export const Logo = styled.h1`
@@ -15,8 +16,9 @@ export const Logo = styled.h1`
   line-height : 28px;
   color: #FF974D;
   word-wrap: break-word;
-  margin: 0;
+  margin: 0 auto;
   letter-spacing: -0.3px;
+  text-align: center;
 `;
 
 export const ChatButton = styled.button`

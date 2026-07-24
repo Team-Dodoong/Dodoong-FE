@@ -2,10 +2,18 @@ import styled from 'styled-components';
 
 
 export const Wrapper = styled.section`
-  margin-top: 18px;
-  border-radius: 24px 24px 0 0;
-  background-color: var(--White);
-  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.04);
+  width: 100%;
+  // padding-top: 12px;
+  // border-radius: 24px 24px 0 0;
+  // background-color: var(--White);
+  // box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.04);
+`;
+
+// 🔽 터치나 클릭이 잘 먹히도록 넓힌 드래그 바 클릭 영역
+export const HandleArea = styled.div`
+  width: 100%;
+  padding: 12px 0 0px;
+  touch-action: none;
 `;
 
 export const DragHandle = styled.span`
@@ -19,7 +27,7 @@ export const DragHandle = styled.span`
 
 export const TabRow = styled.div`
   display: flex;
-  margin-top: 12px;
+  margin-top: 4px;
   border-bottom: 1px solid #E5E5EA;
 `;
 
