@@ -3,12 +3,16 @@ import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav/BottomNav.jsx";
 import Login from "./pages/Login/login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
-import Home from "./pages/Home/Home.jsx";
+import Home from "./pages/Home/pages/Home/Home.jsx";
+import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
 import Quest from "./pages/Quest/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import PartyCreate from "./pages/Party/PartyCreate/PartyCreate.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
+import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
+import ProfileEdit from "./pages/MyPage/ProfileEdit/ProfileEdit.jsx";
+import ServiceWithdraw from "./pages/MyPage/ServiceWithdraw/ServiceWithdraw.jsx";
 
 // 공통 레이아웃 컴포넌트
 const Layout = () => {
@@ -16,9 +20,12 @@ const Layout = () => {
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
   const showBottomNav =
-    location.pathname !== "/" &&
-    location.pathname !== "/onboarding" &&
-    location.pathname !== "/party/create";
+    location.pathname !== "/" 
+    && location.pathname !== "/onboarding" 
+    && location.pathname !== "/accountinfo" 
+    && location.pathname !== "/profile/servicewithdraw" 
+    && location.pathname !== "/questdetail";
+    && location.pathname !== "/party/create";
 
   return (
     <div
@@ -46,11 +53,15 @@ const router = createBrowserRouter([
       { path: "", element: <Login /> },
       { path: "onboarding", element: <OnBoarding /> }, // '/onboarding' 주소일 때
       { path: "home", element: <Home /> }, // '/home' 주소일 때
+      { path: "questdetail", element: <QuestDetail /> }, // '/queestdetail' 주소일 때
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
+      { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
+      { path: "accountinfo", element: <AccountInfo /> },
+      { path: "profile/servicewithdraw", element: <ServiceWithdraw /> }
     ],
   },
 ]);
