@@ -2,23 +2,29 @@ import styled from 'styled-components';
 
 export const Container = styled.div`
   padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
 `;
 
 export const CalendarGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 8px;
+  row-gap: 10px;
+  justify-items: center;
+  align-items: center;
   text-align: center;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 `;
 
 export const DayHeader = styled.div`
   font-size: 12px;
   font-weight: 600;
+  padding-bottom: 6px;
   color: ${({ $isSun, $isSat }) => ($isSun ? '#FF5A5A' : $isSat ? '#4A90E2' : '#888888')};
 `;
 
 export const DateCell = styled.div`
+  height: 36px;
   height: 36px;
   display: flex;
   flex-direction: column;
@@ -26,11 +32,12 @@ export const DateCell = styled.div`
   justify-content: center;
   font-size: 13px;
   background: ${({ $isSelected }) => ($isSelected ? '#FFF8F0' : 'transparent')};
-  border-radius: ${({ $isSelected }) => ($isSelected ? '50%' : '0')};
+  // border-radius: ${({ $isSelected }) => ($isSelected ? '50%' : '0')};
   position: relative;
 
   span {
     font-weight: ${({ $isSelected }) => ($isSelected ? '700' : '400')};
+    color: ${({ $isSelected }) => ($isSelected ? '#FF8A3D' : '#333333')};
   }
 `;
 
@@ -38,9 +45,9 @@ export const Dot = styled.div`
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  background-color: ${({ $color }) => $color};
+  background-color: ${({ $color }) => $color || '#FF8A3D'};
   position: absolute;
-  bottom: 2px;
+  bottom: 3px;
 `;
 
 export const StreakBanner = styled.div`
@@ -70,7 +77,7 @@ export const StreakItem = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 
   span {
     font-size: 11px;
@@ -90,7 +97,7 @@ export const CheckCircle = styled.div`
   font-size: 12px;
 `;
 
-export const TabContainer = styled.div`
+{/* export const TabContainer = styled.div`
   display: flex;
   border-bottom: 2px solid #f0f0f0;
   margin-bottom: 12px;
@@ -141,4 +148,4 @@ export const MoreBtn = styled.button`
   color: #888888;
   font-size: 16px;
   cursor: pointer;
-`;
+`; */}

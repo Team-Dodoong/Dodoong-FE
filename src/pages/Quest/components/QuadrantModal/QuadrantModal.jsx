@@ -1,7 +1,8 @@
 import React from 'react';
 import * as S from './QuadrantModal.style';
 
-function QuadrantModal({ category, items, onClose }) {
+
+function QuadrantModal({ category, items, onClose, onToggle }) {
   if (!category) return null;
 
   return (
@@ -14,7 +15,11 @@ function QuadrantModal({ category, items, onClose }) {
         <S.List>
           {items.map((item) => (
             <S.ListItem key={item.id}>
-              <S.Checkbox type="checkbox" defaultChecked={item.completed} />
+              <S.Checkbox
+                type="checkbox"
+                checked={item.completed}
+                onChange={() => onToggle(category.id, item.id)}
+              />
               <S.ItemText>{item.title}</S.ItemText>
             </S.ListItem>
           ))}
