@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./PartyDetail.style";
-import CtaButton from "../../../components/Button/CtaButton";
+import NotJoinedView from "./NotJoinedView";
+import JoinedView from "./JoinedView";
 
 const MOCK_DETAIL = {
   id: 1,
@@ -24,9 +26,14 @@ const MOCK_DETAIL = {
 };
 
 function PartyDetail() {
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
+  const [showApplyMenu, setShowApplyMenu] = useState(false);
+  const [showPasswordMenu, setShowPasswordMenu] = useState(false);
+  const [value, setValue] = useState("");
   const navigate = useNavigate();
   const { partyId } = useParams();
   const detail = MOCK_DETAIL.id === Number(partyId) ? MOCK_DETAIL : null;
+  const isJoined = true;
 
   return (
     <S.Container>
@@ -39,7 +46,7 @@ function PartyDetail() {
             <S.HeaderRight>
               <S.ChatIcon />
               <S.ShareIcon />
-              <S.MoreIcon />
+              <S.MoreIcon onClick={() => setShowMoreMenu(true)} />
             </S.HeaderRight>
           </S.HeaderIcons>
           <S.ImageContent>
@@ -64,25 +71,33 @@ function PartyDetail() {
           </S.ImageContent>
         </S.ImageSection>
 
-        <S.Body>
-          <S.Section>
-            <S.SectionTitle>파티 소개</S.SectionTitle>
-            <S.SectionContent>{detail.introduction}</S.SectionContent>
-          </S.Section>
-
-          <S.SectionDivider />
-
-          <S.Section>
-            <S.SectionTitle>파티 지정퀘스트</S.SectionTitle>
-            <S.QuestItem>
-              <S.QuestIcon />
-              <S.QuestText>{detail.quest}</S.QuestText>
-            </S.QuestItem>
-          </S.Section>
-        </S.Body>
+        {isJoined ? (
+          <JoinedView detail={detail} />
+        ) : (
+          <NotJoinedView detail={detail} />
+        )}
       </S.ScrollArea>
 
-      <CtaButton $variant="bottom" text="파티 신청하기" />
+      {isJoined && (
+        <S.RankingButton>
+          <S.RankIcon />
+        </S.RankingButton>
+      )}
+
+      {showMoreMenu && (
+        <>
+          <S.Overlay $menu onClick={() => setShowMoreMenu(false)} />
+          <S.MenuContainer>
+            <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+              파티 숨기기
+            </S.MenuItem>
+            <S.MenuDivider />
+            <S.MenuItem $report onClick={() => setShowMoreMenu(false)}>
+              신고하기
+            </S.MenuItem>
+          </S.MenuContainer>
+        </>
+      )}
     </S.Container>
   );
 }
