@@ -9,6 +9,7 @@ import Quest from "./pages/Quest/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import ChatList from "./pages/PartyChat/ChatList/ChatList.jsx";
+import ChatRoom from "./pages/PartyChat/ChatRoom/ChatRoom.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
 import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
 import ProfileEdit from "./pages/MyPage/ProfileEdit/ProfileEdit.jsx";
@@ -24,7 +25,8 @@ const Layout = () => {
     location.pathname !== "/onboarding" &&
     location.pathname !== "/accountinfo" &&
     location.pathname !== "/profile/servicewithdraw" &&
-    location.pathname !== "/questdetail";
+    location.pathname !== "/questdetail" &&
+    !location.pathname.startsWith("/party/chat/");
 
   return (
     <div
@@ -56,6 +58,7 @@ const router = createBrowserRouter([
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/chat", element: <ChatList /> },
+      { path: "party/chat/:roomId", element: <ChatRoom /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
