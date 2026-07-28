@@ -8,6 +8,7 @@ import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
 import Quest from "./pages/Quest/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
+import PartyDetail from "./pages/PartyDetail/PartyDetail/PartyDetail.jsx";
 import PartyCreate from "./pages/Party/PartyCreate/PartyCreate.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
 import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
@@ -20,12 +21,12 @@ const Layout = () => {
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
   const showBottomNav =
-    location.pathname !== "/" 
-    && location.pathname !== "/onboarding" 
-    && location.pathname !== "/accountinfo" 
-    && location.pathname !== "/profile/servicewithdraw" 
-    && location.pathname !== "/questdetail";
-    && location.pathname !== "/party/create";
+    location.pathname !== "/" &&
+    location.pathname !== "/onboarding" &&
+    location.pathname !== "/accountinfo" &&
+    location.pathname !== "/profile/servicewithdraw" &&
+    location.pathname !== "/questdetail" &&
+    !location.pathname.startsWith("/party/");
 
   return (
     <div
@@ -56,12 +57,13 @@ const router = createBrowserRouter([
       { path: "questdetail", element: <QuestDetail /> }, // '/queestdetail' 주소일 때
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때
+      { path: "party/:partyId", element: <PartyDetail /> },
       { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
       { path: "accountinfo", element: <AccountInfo /> },
-      { path: "profile/servicewithdraw", element: <ServiceWithdraw /> }
+      { path: "profile/servicewithdraw", element: <ServiceWithdraw /> },
     ],
   },
 ]);
