@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
 import PointBadge from "../../../components/PointBadge/PointBadge";
 import character1 from "../images/character_1.png";
@@ -49,6 +50,7 @@ const MOCK_USER = {
 };
 
 function Character() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("전체캐릭터");
   const [search, setSearch] = useState("");
   const [equipped, setEquipped] = useState(1);
@@ -67,7 +69,7 @@ function Character() {
     <S.Container>
       <S.Header>
         <S.HeaderTitle>캐릭터 관리</S.HeaderTitle>
-        <S.ChatIcon />
+        <S.ChatIcon onClick={() => navigate('/party/chat')} />
       </S.Header>
 
       <S.PointRow>

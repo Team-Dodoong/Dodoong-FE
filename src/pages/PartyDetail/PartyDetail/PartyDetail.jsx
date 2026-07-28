@@ -44,7 +44,7 @@ function PartyDetail() {
           <S.HeaderIcons>
             <S.BackIcon onClick={() => navigate(-1)} />
             <S.HeaderRight>
-              <S.ChatIcon />
+              <S.ChatIcon onClick={() => navigate(`/party/chat/${partyId}`)} />
               <S.ShareIcon />
               <S.MoreIcon onClick={() => setShowMoreMenu(true)} />
             </S.HeaderRight>
@@ -79,7 +79,7 @@ function PartyDetail() {
       </S.ScrollArea>
 
       {isJoined && (
-        <S.RankingButton>
+        <S.RankingButton onClick={() => navigate(`/party/${partyId}/ranking`)}>
           <S.RankIcon />
         </S.RankingButton>
       )}
