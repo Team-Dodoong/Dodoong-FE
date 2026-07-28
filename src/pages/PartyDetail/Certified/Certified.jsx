@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./Certified.style";
 
 const FILTER_OPTIONS = ["전체 멤버", "인증 멤버", "미인증 멤버"];
+
+const MOCK_PARTY_ID = 1;
 
 const MOCK_RECORDS = [
   {
@@ -51,10 +53,13 @@ const MOCK_RECORDS = [
 
 function Certified() {
   const navigate = useNavigate();
+  const { partyId } = useParams();
   const [selectedFilter, setSelectedFilter] = useState("전체 멤버");
   const [showFilterMenu, setShowFilterMenu] = useState(false);
 
-  const filteredRecords = MOCK_RECORDS.filter((record) => {
+  const records = Number(partyId) === MOCK_PARTY_ID ? MOCK_RECORDS : [];
+
+  const filteredRecords = records.filter((record) => {
     if (selectedFilter === "인증 멤버") return record.certified;
     if (selectedFilter === "미인증 멤버") return !record.certified;
     return true;

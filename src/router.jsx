@@ -66,9 +66,9 @@ const router = createBrowserRouter([
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/chat", element: <ChatList /> },
       { path: "party/chat/:roomId", element: <ChatRoom /> },
-      { path: "ranking", element: <Ranking /> },
-      { path: "certified", element: <Certified /> },
       { path: "party/:partyId", element: <PartyDetail /> },
+      { path: "party/:partyId/ranking", element: <Ranking /> },
+      { path: "party/:partyId/certified", element: <Certified /> },
       { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },

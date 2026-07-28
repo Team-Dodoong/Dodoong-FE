@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./Ranking.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import character1 from "./images/character_1.png";
@@ -8,6 +8,8 @@ import character3 from "./images/character_3.png";
 import podium1 from "./images/podium_1.png";
 import podium2 from "./images/podium_2.png";
 import podium3 from "./images/podium_3.png";
+
+const MOCK_PARTY_ID = 1;
 
 const MOCK_RANKING = [
   { rank: 1, name: "김일등", score: 520 },
@@ -21,10 +23,13 @@ const MOCK_RANKING = [
 
 function Ranking() {
   const navigate = useNavigate();
+  const { partyId } = useParams();
   const [search, setSearch] = useState("");
 
-  const top3 = MOCK_RANKING.slice(0, 3);
-  const rest = MOCK_RANKING.slice(3);
+  const ranking = Number(partyId) === MOCK_PARTY_ID ? MOCK_RANKING : [];
+
+  const top3 = ranking.slice(0, 3);
+  const rest = ranking.slice(3);
 
   const filtered = rest.filter((m) => m.name.includes(search));
 

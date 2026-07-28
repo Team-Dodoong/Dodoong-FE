@@ -46,7 +46,7 @@ function ChatList() {
   return (
     <S.Container onClick={() => setPressedId(null)}>
       <S.Header>
-        <S.BackIcon />
+        <S.BackIcon onClick={() => navigate(-1)} />
         <S.HeaderTitle>채팅</S.HeaderTitle>
         <S.Placeholder />
       </S.Header>
