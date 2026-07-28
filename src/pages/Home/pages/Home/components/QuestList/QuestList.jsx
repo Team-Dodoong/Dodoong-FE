@@ -32,13 +32,13 @@ function QuestList({
     setDeleteExpandedId(null);
   };
 
-  if (quests.length === 0) {
+  if (quests?.length === 0) {
     return <S.Empty>등록된 퀘스트가 없어요. + 버튼으로 추가해보세요!</S.Empty>;
   }
 
   return (
     <S.List>
-      {quests.map((quest) => (
+      {quests?.map((quest) => (
         <QuestItem
           key={quest.id}
           quest={quest}
