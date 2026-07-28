@@ -9,6 +9,12 @@ import FloatingAddButtonPage from "./pages/Quest/QuestDetail/QuestDetail.jsx"
 import Quest from "./pages/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
+import ChatList from "./pages/PartyChat/ChatList/ChatList.jsx";
+import ChatRoom from "./pages/PartyChat/ChatRoom/ChatRoom.jsx";
+import Ranking from "./pages/PartyDetail/Ranking/Ranking.jsx";
+import Certified from "./pages/PartyDetail/Certified/Certified.jsx";
+import PartyDetail from "./pages/PartyDetail/PartyDetail/PartyDetail.jsx";
+import PartyCreate from "./pages/Party/PartyCreate/PartyCreate.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
 import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
 import ProfileEdit from "./pages/MyPage/ProfileEdit/ProfileEdit.jsx";
@@ -16,16 +22,17 @@ import ServiceWithdraw from "./pages/MyPage/ServiceWithdraw/ServiceWithdraw.jsx"
 
 // 공통 레이아웃 컴포넌트
 const Layout = () => {
-  const location = useLocation(); // 현재 브라우저의 주소 경로를 가져옴 
+  const location = useLocation(); // 현재 브라우저의 주소 경로를 가져옴
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
   const showBottomNav =
-    location.pathname !== "/" 
-    && location.pathname !== "/onboarding" 
-    && location.pathname !== "/accountinfo" 
-    && location.pathname !== "/profile/servicewithdraw" 
-    && location.pathname !== "/questdetail"
-    && location.pathname !== "/floatingadd_questdetail";
+    location.pathname !== "/" &&
+    location.pathname !== "/onboarding" &&
+    location.pathname !== "/accountinfo" &&
+    location.pathname !== "/profile/servicewithdraw" &&
+    location.pathname !== "/questdetail" &&
+    location.pathname !== "/floatingadd_questdetail" &&
+    !location.pathname.startsWith("/party/");
 
   return (
     <div
@@ -57,11 +64,17 @@ const router = createBrowserRouter([
       { path: "floatingadd_questdetail", element: <FloatingAddButtonPage /> }, // '/queestdetail' 주소일 때
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때
+      { path: "party/chat", element: <ChatList /> },
+      { path: "party/chat/:roomId", element: <ChatRoom /> },
+      { path: "ranking", element: <Ranking /> },
+      { path: "certified", element: <Certified /> },
+      { path: "party/:partyId", element: <PartyDetail /> },
+      { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
       { path: "accountinfo", element: <AccountInfo /> },
-      { path: "profile/servicewithdraw", element: <ServiceWithdraw /> }
+      { path: "profile/servicewithdraw", element: <ServiceWithdraw /> },
     ],
   },
 ]);
