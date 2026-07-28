@@ -9,6 +9,7 @@ import Quest from "./pages/Quest/Quest/Quest.jsx";
 import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import PartyDetail from "./pages/PartyDetail/PartyDetail/PartyDetail.jsx";
+import PartyCreate from "./pages/Party/PartyCreate/PartyCreate.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
 import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
 import ProfileEdit from "./pages/MyPage/ProfileEdit/ProfileEdit.jsx";
@@ -57,6 +58,7 @@ const router = createBrowserRouter([
       { path: "quest", element: <Quest /> }, // '/quest' 주소일 때
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/:partyId", element: <PartyDetail /> },
+      { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
