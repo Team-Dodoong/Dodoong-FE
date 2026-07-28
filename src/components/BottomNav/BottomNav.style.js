@@ -12,7 +12,7 @@ export const NavContainer = styled.nav`
   border-top: 1px solid #f7f7f7;
   box-shadow: 0px -4px 10px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
-  z-index: 1000;
+  z-index: 199;
   background-color: var(--White);
 `;
 

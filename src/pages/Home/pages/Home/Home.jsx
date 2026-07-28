@@ -76,7 +76,7 @@ function Home() {
   };
 
   const handleAddQuest = () => {
-    navigate('/questdetail', { state: { type: activeTab } });
+    navigate('/floatingadd_questdetail', { state: { type: activeTab } });
   };
 
   return (

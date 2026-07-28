@@ -49,24 +49,4 @@ export const TextareaWrapper = styled.div`
   position: relative;
 `;
 
-/* export const Textarea = styled.textarea`
-  width: 100%;
-  min-height: 52px;
-  padding: 14px 40px 14px 14px;
-  border-radius: 14px;
-  border: 1px solid #E5E5EA;
-  font-size: 14px;
-  font-weight: 400;
-  color: #1A1A1A;
-  resize: none;
 
-  &::placeholder {
-    color: #C7C7CC;
-  }
-`; */ 
-
-/* export const VisibilityToggle = styled.button`
-  position: absolute;
-  right: 12px;
-  top: 14px;
-`; */
