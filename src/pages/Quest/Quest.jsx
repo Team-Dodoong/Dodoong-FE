@@ -69,7 +69,7 @@ function QuestPage() {
 
   // ⭐️ [페이지 이동 방식] 플로팅 버튼(+) 클릭 시 퀘스트 작성 페이지로 이동
   const handleAddQuest = () => {
-    navigate('/questdetail', { state: { type: activeTab } });
+    navigate('/floatingadd_questdetail', { state: { type: activeTab } });
   };
 
   const handlePostpone = (id) => {
