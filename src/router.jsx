@@ -1,7 +1,7 @@
 // src/router.jsx
 import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav/BottomNav.jsx";
-import Login from "./pages/Login/login.jsx";
+import Login from "./pages/Login/Login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
 import Home from "./pages/Home/pages/Home/Home.jsx";
 import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
