@@ -81,7 +81,7 @@ function Home() {
 
   return (
     <S.Wrapper>
-      <Header onChatClick={() => navigate('/party/chat')} />
+      <Header />
 
       <S.Content $bgImage={bgGradient} >
         <PointBadge point={1270} />
