@@ -1,4 +1,5 @@
 import { React, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as S from "./Party.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import DividerIcon from "../../../assets/ic_party_divider_13.svg?react";
@@ -53,6 +54,7 @@ const POSTS = [
 ];
 
 function Party() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("전체 파티");
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -93,7 +95,10 @@ function Party() {
       <S.ScrollArea>
         <S.PostList>
           {POSTS.map((post) => (
-            <S.PostCard key={post.id}>
+            <S.PostCard
+              key={post.id}
+              onClick={() => navigate(`/party/${post.id}`)}
+            >
               <S.TagWrapper>
                 <S.TagRow>
                   <S.StatusTag $active={true}>{post.status}</S.StatusTag>

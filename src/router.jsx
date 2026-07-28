@@ -10,6 +10,10 @@ import Character from "./pages/Character/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import ChatList from "./pages/PartyChat/ChatList/ChatList.jsx";
 import ChatRoom from "./pages/PartyChat/ChatRoom/ChatRoom.jsx";
+import Ranking from "./pages/PartyDetail/Ranking/Ranking.jsx";
+import Certified from "./pages/PartyDetail/Certified/Certified.jsx";
+import PartyDetail from "./pages/PartyDetail/PartyDetail/PartyDetail.jsx";
+import PartyCreate from "./pages/Party/PartyCreate/PartyCreate.jsx";
 import MyPage from "./pages/MyPage/MyPage.jsx";
 import AccountInfo from "./pages/MyPage/AccountInfo/AccountInfo.jsx";
 import ProfileEdit from "./pages/MyPage/ProfileEdit/ProfileEdit.jsx";
@@ -26,7 +30,7 @@ const Layout = () => {
     location.pathname !== "/accountinfo" &&
     location.pathname !== "/profile/servicewithdraw" &&
     location.pathname !== "/questdetail" &&
-    !location.pathname.startsWith("/party/chat/");
+    !location.pathname.startsWith("/party/");
 
   return (
     <div
@@ -59,6 +63,10 @@ const router = createBrowserRouter([
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/chat", element: <ChatList /> },
       { path: "party/chat/:roomId", element: <ChatRoom /> },
+      { path: "ranking", element: <Ranking /> },
+      { path: "certified", element: <Certified /> },
+      { path: "party/:partyId", element: <PartyDetail /> },
+      { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },
