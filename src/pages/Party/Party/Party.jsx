@@ -90,7 +90,9 @@ function Party() {
           </S.CategoryTag>
         ))}
       </S.CategoryRow>
-      <S.PartySetButton>파티개설 +</S.PartySetButton>
+      <S.PartySetButton onClick={() => navigate("/party/create")}>
+        파티개설 +
+      </S.PartySetButton>
       <S.Divider />
       <S.ScrollArea>
         <S.PostList>
