@@ -5,7 +5,12 @@ import PointBadge from "../../../components/PointBadge/PointBadge";
 import character1 from "../../../assets/characters/character_hello_1.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
-import { getCharacters, getOwnedCharacters } from "../../../api/characterApi";
+import {
+  getCharacters,
+  getOwnedCharacters,
+  getEquippedCharacter,
+  equipCharacter,
+} from "../../../api/characterApi";
 
 const basicImageModules = import.meta.glob(
   "../../../assets/characters/character_basic_*.png",
@@ -39,6 +44,8 @@ function Character() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [equipped, setEquipped] = useState(null);
+  const [equippedCharacter, setEquippedCharacter] = useState(null);
+  const [equipping, setEquipping] = useState(false);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
@@ -89,6 +96,64 @@ function Character() {
     loadTab(activeTab);
   }, [activeTab, loadTab]);
 
+  useEffect(() => {
+    let ignore = false;
+
+    const loadEquippedCharacter = async () => {
+      try {
+        const response = await getEquippedCharacter();
+        if (ignore) return;
+        const { characterId, name } = response.data.data;
+        setEquippedCharacter({
+          id: characterId,
+          name,
+          image: getCharacterImage(characterId),
+        });
+      } catch (err) {
+        if (ignore) return;
+        if (err.response?.status !== 404) {
+          console.error("장착 캐릭터 조회 실패", err);
+        }
+        setEquippedCharacter(null);
+      }
+    };
+
+    loadEquippedCharacter();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  const handleEquip = async (character) => {
+    if (equipped === character.id || equipping) return;
+    setEquipping(true);
+    try {
+      const response = await equipCharacter(character.id);
+      const { characterId, name, isEquipped } = response.data.data;
+
+      setEquipped(characterId);
+      setEquippedCharacter({
+        id: characterId,
+        name,
+        image: getCharacterImage(characterId),
+      });
+
+      const applyEquip = (list) =>
+        list.map((c) => ({
+          ...c,
+          equipped: c.id === characterId ? isEquipped : false,
+        }));
+      setCharacters(applyEquip);
+      Object.keys(cacheRef.current).forEach((tab) => {
+        cacheRef.current[tab] = applyEquip(cacheRef.current[tab]);
+      });
+    } catch (err) {
+      alert(err.response?.data?.message ?? "캐릭터 장착에 실패했습니다.");
+    } finally {
+      setEquipping(false);
+    }
+  };
+
   const filtered = characters.filter((c) => c.name.includes(search));
 
   return (
@@ -103,9 +168,16 @@ function Character() {
       </S.PointRow>
 
       <S.CharacterSection>
-        <S.CharacterMessage>{MOCK_USER.message}</S.CharacterMessage>
-        <S.MainCharacterImage src={MOCK_USER.image} alt={MOCK_USER.name} />
-        <S.CharacterName>{MOCK_USER.name}</S.CharacterName>
+        <S.CharacterMessage>
+          {equippedCharacter
+            ? `안녕! 나는 ${equippedCharacter.name}야 만나서 반가워!`
+            : "아직 장착한 캐릭터가 없어요."}
+        </S.CharacterMessage>
+        <S.MainCharacterImage
+          src={equippedCharacter?.image ?? character1}
+          alt={equippedCharacter?.name ?? "캐릭터"}
+        />
+        <S.CharacterName>{equippedCharacter?.name ?? "-"}</S.CharacterName>
         <S.ExpBarWrapper>
           <S.ExpBar>
             <S.ExpFill $percent={(MOCK_USER.exp / MOCK_USER.maxExp) * 100} />
@@ -152,7 +224,8 @@ function Character() {
               {character.owned ? (
                 <S.ActionButton
                   $equipped={equipped === character.id}
-                  onClick={() => setEquipped(character.id)}
+                  disabled={equipping}
+                  onClick={() => handleEquip(character)}
                 >
                   {equipped === character.id ? "장착중" : "장착하기"}
                 </S.ActionButton>
