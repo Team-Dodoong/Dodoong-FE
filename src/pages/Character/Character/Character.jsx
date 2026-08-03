@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
 import PointBadge from "../../../components/PointBadge/PointBadge";
-import character1 from "../images/character_1.png";
-import character2 from "../images/character_2.png";
-import character3 from "../images/character_3.png";
+import character1 from "../../../assets/characters/character_hello_1.png";
+import character2 from "../../../assets/characters/character_basic_3.png";
+import character3 from "../../../assets/characters/character_basic_6.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
 const MOCK_CHARACTERS = [
