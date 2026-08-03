@@ -20,7 +20,7 @@ function PartyCreate() {
   const [description, setDescription] = useState("");
   const [questContent, setQuestContent] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [maxMembers, setMaxMembers] = useState(1);
+  const [maxMembers, setMaxMembers] = useState(2);
   const [isPublic, setIsPublic] = useState(true);
   const [password, setPassword] = useState("");
   const [image, setImage] = useState(null);
@@ -46,6 +46,31 @@ function PartyCreate() {
   };
 
   const handleComplete = async () => {
+    if (!partyName.trim()) {
+      alert("파티명을 입력해주세요.");
+      return;
+    }
+    if (selectedCategories.length === 0) {
+      alert("카테고리를 1개 이상 선택해주세요.");
+      return;
+    }
+    if (!questContent.trim()) {
+      alert("파티퀘스트를 입력해주세요.");
+      return;
+    }
+    if (!description.trim()) {
+      alert("파티소개를 입력해주세요.");
+      return;
+    }
+    if (Number(maxMembers) < 2) {
+      alert("최대 인원은 2명 이상이어야 합니다.");
+      return;
+    }
+    if (!isPublic && password.length !== 4) {
+      alert("비밀번호는 4자리 숫자로 입력해주세요.");
+      return;
+    }
+
     try {
       const requestBody = {
         name: partyName,
@@ -63,6 +88,7 @@ function PartyCreate() {
       navigate("/party");
     } catch (error) {
       console.error("파티 생성 실패", error);
+      alert("파티 생성에 실패했습니다. 입력값을 확인해주세요.");
     }
   };
 
@@ -131,7 +157,7 @@ function PartyCreate() {
                   type="number"
                   value={maxMembers}
                   onChange={(e) => setMaxMembers(e.target.value)}
-                  min={1}
+                  min={2}
                 />
               </S.SettingWrapper>
             </S.SettingRow>
