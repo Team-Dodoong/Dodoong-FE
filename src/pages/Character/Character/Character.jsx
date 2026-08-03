@@ -1,44 +1,26 @@
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
 import PointBadge from "../../../components/PointBadge/PointBadge";
 import character1 from "../../../assets/characters/character_hello_1.png";
-import character2 from "../../../assets/characters/character_basic_3.png";
-import character3 from "../../../assets/characters/character_basic_6.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
-const MOCK_CHARACTERS = [
-  {
-    id: 1,
-    name: "두비",
-    image: character1,
-    owned: true,
-    equipped: true,
-    price: null,
-    subtitle: "꾸준함을 좋아하는 응원냥이",
-    description: `나비는 꾸준함의 숲에서 작은 응원냥이에요.\n처음엔 무엇이든 금방 포기하곤 했지만,...`,
-  },
-  {
-    id: 2,
-    name: "토토",
-    image: character2,
-    owned: false,
-    equipped: false,
-    price: 500,
-    subtitle: "꾸준함을 좋아하는 응원냥이",
-    description: `나비는 꾸준함의 숲에서 작은 응원냥이에요.\n처음엔 무엇이든 금방 포기하곤 했지만,...`,
-  },
-  {
-    id: 3,
-    name: "나비",
-    image: character3,
-    owned: true,
-    equipped: false,
-    price: null,
-    subtitle: "꾸준함을 좋아하는 응원냥이",
-    description: `나비는 꾸준함의 숲에서 작은 응원냥이에요.\n처음엔 무엇이든 금방 포기하곤 했지만,...`,
-  },
-];
+import { getCharacters, getOwnedCharacters } from "../../../api/characterApi";
+
+const basicImageModules = import.meta.glob(
+  "../../../assets/characters/character_basic_*.png",
+  { eager: true, import: "default" }
+);
+
+const CHARACTER_IMAGES = Object.fromEntries(
+  Object.entries(basicImageModules).map(([path, src]) => {
+    const id = Number(path.match(/character_basic_(\d+)\.png$/)[1]);
+    return [id, src];
+  })
+);
+
+const getCharacterImage = (characterId) =>
+  CHARACTER_IMAGES[characterId] ?? character1;
 
 const MOCK_USER = {
   name: "두비",
@@ -53,17 +35,61 @@ function Character() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("전체캐릭터");
   const [search, setSearch] = useState("");
-  const [equipped, setEquipped] = useState(1);
+  const [characters, setCharacters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [equipped, setEquipped] = useState(null);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailCharacter, setDetailCharacter] = useState(null);
 
-  const filtered = MOCK_CHARACTERS.filter((c) => {
-    const matchSearch = c.name.includes(search);
-    const matchTab = activeTab === "전체캐릭터" ? true : c.owned;
-    return matchSearch && matchTab;
-  });
+  const cacheRef = useRef({});
+  const requestIdRef = useRef(0);
+
+  const loadTab = useCallback(async (tab, { force = false } = {}) => {
+    if (!force && cacheRef.current[tab]) {
+      const cached = cacheRef.current[tab];
+      setCharacters(cached);
+      setEquipped(cached.find((c) => c.equipped)?.id ?? null);
+      return;
+    }
+
+    const requestId = ++requestIdRef.current;
+    setLoading(true);
+    setError(null);
+    try {
+      const isOwnedTab = tab === "보유캐릭터";
+      const response = isOwnedTab
+        ? await getOwnedCharacters()
+        : await getCharacters();
+      if (requestIdRef.current !== requestId) return;
+      const list = response.data.data.characters.map((c) => ({
+        id: c.characterId,
+        name: c.name,
+        price: c.price ?? null,
+        owned: isOwnedTab ? true : c.owned,
+        equipped: c.isEquipped,
+        image: getCharacterImage(c.characterId),
+      }));
+      cacheRef.current[tab] = list;
+      setCharacters(list);
+      setEquipped(list.find((c) => c.equipped)?.id ?? null);
+    } catch (err) {
+      if (requestIdRef.current === requestId) {
+        console.error("캐릭터 목록 조회 실패", err);
+        setError("캐릭터 목록을 불러오지 못했습니다.");
+      }
+    } finally {
+      if (requestIdRef.current === requestId) setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadTab(activeTab);
+  }, [activeTab, loadTab]);
+
+  const filtered = characters.filter((c) => c.name.includes(search));
 
   return (
     <S.Container>
@@ -113,6 +139,11 @@ function Character() {
       </S.TabRow>
 
       <S.ScrollArea>
+        {loading && <S.CardName>불러오는 중...</S.CardName>}
+        {error && <S.CardName>{error}</S.CardName>}
+        {!loading && !error && filtered.length === 0 && (
+          <S.CardName>표시할 캐릭터가 없습니다.</S.CardName>
+        )}
         <S.Grid>
           {filtered.map((character) => (
             <S.CharacterCard key={character.id}>
