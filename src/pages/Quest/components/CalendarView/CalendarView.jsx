@@ -1,9 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as S from './CalendarView.style';
 
-function CalendarView({ currentYear = 2026, currentMonth = 2, activeTab, setActiveTab, questList }) {
+// 🟢 1. 캘린더 API 불러오기 (프로젝트 경로에 맞게 확인해주세요)
+import { getCalendarQuests } from '../../../../api/dailyQuestApi';
+import { getStreaks } from '../../../../api/streakApi'; // 🟢 스트릭 API 추가
+
+// 🟢 1. 현재 날짜를 동적으로 가져옵니다.
+const today = new Date();
+const defaultYear = today.getFullYear();
+const defaultMonth = today.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+const defaultDateNum = today.getDate();
+
+function CalendarView({
+  currentYear = defaultYear,
+  currentMonth = defaultMonth,
+  onSelectDate,
+}) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const [selectedDate, setSelectedDate] = useState(10); // 클릭한 날짜 관리
+  
+  // 🟢 3. 선택된 날짜 숫자도 오늘 날짜로 기본 세팅
+  const [selectedDateNum, setSelectedDateNum] = useState(defaultDateNum);
+  const [calendarData, setCalendarData] = useState({});
+  const [streakDays, setStreakDays] = useState(0);
+
+  // 🟢 2. 연/월 변경 시 백엔드 캘린더 데이터 조회
+  useEffect(() => {
+    const fetchCalendar = async () => {
+      try {
+        const response = await getCalendarQuests(currentYear, currentMonth);
+        const daysList = response.data?.days || [];
+        
+        // 날짜별 조회 속도를 위해 객체(Map) 형태로 정제
+        const dateMap = {};
+        daysList.forEach((item) => {
+          // item 예시: { date: '2026-08-01', totalCount: 3, checkedCount: 3 }
+          dateMap[item.date] = item;
+        });
+
+        setCalendarData(dateMap);
+      } catch (error) {
+        console.error('캘린더 데이터 로딩 실패:', error);
+      }
+    };
+
+    fetchCalendar();
+  }, [currentYear, currentMonth]);
+
+  // 2. 스트릭 정보 조회 API
+  useEffect(() => {
+    const fetchStreakInfo = async () => {
+      try {
+        const res = await getStreaks();
+        if (res.data) {
+          setStreakDays(res.data.consecutiveDays || 0);
+        }
+      } catch (error) {
+        console.error('스트릭 조회 중 오류 발생:', error);
+      }
+    };
+
+    fetchStreakInfo();
+  }, []);
 
 // 1. 해당 월의 1일 시작 요일 (0: 일요일 ~ 6: 토요일)
   const firstDayOfWeek = new Date(currentYear, currentMonth - 1, 1).getDay();
@@ -18,6 +75,19 @@ function CalendarView({ currentYear = 2026, currentMonth = 2, activeTab, setActi
   for (let d = 1; d <= totalDays; d++) {
     calendarDays.push(d); // 실제 날짜
   }
+
+  // 🟢 4. 날짜 클릭 핸들러 (부모 QuestPage로 YYYY-MM-DD 전달)
+  const handleDateClick = (dateNum) => {
+    setSelectedDateNum(dateNum);
+
+    if (onSelectDate) {
+      const formattedMonth = String(currentMonth).padStart(2, '0');
+      const formattedDay = String(dateNum).padStart(2, '0');
+      const fullDateStr = `${currentYear}-${formattedMonth}-${formattedDay}`;
+      
+      onSelectDate(fullDateStr);
+    }
+  };
 
   return (
     <S.Container>
@@ -35,7 +105,14 @@ function CalendarView({ currentYear = 2026, currentMonth = 2, activeTab, setActi
             return <div key={`empty-${index}`} />;
           }
 
-          const isSelected = date === selectedDate;
+          const isSelected = date === selectedDateNum;
+
+          // YYYY-MM-DD 키 생성하여 해당 날짜의 API 데이터 조회
+          const formattedMonth = String(currentMonth).padStart(2, '0');
+          const formattedDay = String(date).padStart(2, '0');
+          const dateKey = `${currentYear}-${formattedMonth}-${formattedDay}`;
+          
+          const dayInfo = calendarData[dateKey];
 
           return (
             <S.DateCell
@@ -44,10 +121,17 @@ function CalendarView({ currentYear = 2026, currentMonth = 2, activeTab, setActi
               onClick={() => setSelectedDate(date)}
             >
               <span>{date}</span>
-              {/* 목데이터 점 표시 예시 */}
-              {date === 1 && <S.Dot $color="#FF8A3D" />}
-              {date === 2 && <S.Dot $color="#CCCCCC" />}
-              {date === 3 && <S.Dot $color="#FF8A3D" />}
+
+              {/* 🟢 퀘스트 달성 상태 Dot 표시 */}
+              {dayInfo && dayInfo.totalCount > 0 && (
+                <S.Dot
+                  $color={
+                    dayInfo.checkedCount === dayInfo.totalCount
+                      ? '#FF8A3D' // 모두 달성 시 주황색
+                      : '#CCCCCC' // 일부/미달성 시 회색
+                  }
+                />
+              )}
             </S.DateCell>
           );
         })}
@@ -55,12 +139,16 @@ function CalendarView({ currentYear = 2026, currentMonth = 2, activeTab, setActi
 
       {/* 연속 달성 스트릭 배너 */}
       <S.StreakBanner>
-        <S.StreakTitle>🔥 연속 <span>3일째</span>에요!</S.StreakTitle>
+        <S.StreakTitle>
+          🔥 연속 <span>{streakDays}일째</span>에요!
+        </S.StreakTitle>
         <S.StreakDays>
           {days.map((day, i) => (
-            <S.StreakItem key={day} $isActive={i <= 2}>
+            <S.StreakItem key={day} $isActive={i < streakDays}>
               <span>{day}</span>
-              <S.CheckCircle $isActive={i <= 2}>{i <= 2 ? '✓' : ''}</S.CheckCircle>
+              <S.CheckCircle $isActive={i < streakDays}>
+                {i < streakDays ? '✓' : ''}
+              </S.CheckCircle>
             </S.StreakItem>
           ))}
         </S.StreakDays>

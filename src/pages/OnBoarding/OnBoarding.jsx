@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./OnBoarding.style";
 import Input from "../../components/Input/Input";
 import CtaButton from "../../components/Button/CtaButton";
 
+import { signup, login, updateProfile } from "../../api/memberApi";
+
 export default function OnBoarding() {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
+  const fileInputRef = useRef(null);
 
 // Form States
   const [agreements, setAgreements] = useState({
@@ -20,16 +23,18 @@ export default function OnBoarding() {
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
 
+  // Form States - Step 3 (프로필 정보)
+  const [nickname, setNickname] = useState("");
+  const [introduction, setIntroduction] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+
   // Validation States
   const [idError, setIdError] = useState(false);
   const [pwError, setPwError] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleRegisterComplete = () => {
-    console.log("회원가입 완료");
-    navigate("/");
-  };
-
-  // 약관 동의
+  // ================= Step 1: 약관 동의 관련 =================
 
   const isRequiredAgreed =
   agreements.term1 &&
@@ -59,6 +64,78 @@ export default function OnBoarding() {
     setAgreements(nextTerms);
   };
 
+  // ================= Step 2: 회원가입 요청 핸들러 =================
+  const handleSignupNext = async () => {
+    setIdError(false);
+    setPwError(false);
+
+    // 1. 비밀번호 일치 검사
+    if (password !== passwordCheck) {
+      setPwError(true);
+      return;
+    }
+
+    if (!id || !password) {
+      alert("아이디와 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // 2. 회원가입 API 호출
+      await signup({ loginId: id, password: password });
+
+      // 3. 프로필 설정을 위한 자동 로그인 (accessToken 쿠키 생성)
+      await login({ loginId: id, password: password });
+
+      // Step 3로 이동
+      setStep(3);
+    } catch (error) {
+      // 아이디 중복 등의 에러 응답 처리
+      if (error.response?.status === 400 || error.response?.status === 409) {
+        setIdError(true);
+      } else {
+        alert(error.response?.data?.message || "회원가입 처리 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ================= Step 3: 프로필 이미지 및 제출 핸들러 =================
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setPreviewUrl(URL.createObjectURL(file)); // 미리보기 URL 생성
+    }
+  };
+
+  const handleRegisterComplete = async () => {
+    if (!nickname) {
+      alert("닉네임을 입력해 주세요.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // 프로필 설정 API 호출 (multipart/form-data)
+      await updateProfile(
+        { nickname, introduction },
+        imageFile
+      );
+
+      alert("회원가입 및 프로필 설정이 완료되었습니다!");
+      navigate("/"); // 메인/로그인 페이지로 이동
+    } catch (error) {
+      alert(error.response?.data?.message || "프로필 저장 중 오류가 발생했습니다.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // 뒤로가기
   const handleBack = () => {
     if (step === 1) {
@@ -85,9 +162,9 @@ return (
             <S.StepZeroTitle>서비스 가입을 위해<br />아래 항목에 동의해주세요</S.StepZeroTitle>
             
             <S.TermsContainer>
-              <S.TermRow isHeader onClick={handleAgreeAll}>
+              <S.TermRow $isHeader onClick={handleAgreeAll}>
                 <S.CheckIcon checked={agreements.all} />
-                <S.TermText isHeader>아래 내용에 모두 동의합니다.</S.TermText>
+                <S.TermText $isHeader>아래 내용에 모두 동의합니다.</S.TermText>
               </S.TermRow>
               
               <S.Divider />
@@ -128,7 +205,10 @@ return (
               <Input 
                 placeholder="아이디를 입력해 주세요" 
                 value={id} 
-                onChange={(e) => setId(e.target.value)}
+                onChange={(e) => {
+                  setId(e.target.value);
+                  if (idError) setIdError(false);
+                }}
                 isError={idError}
               />
               {idError && <S.ErrorMessage>*중복된 아이디입니다</S.ErrorMessage>}
@@ -138,22 +218,33 @@ return (
                 type="password" 
                 placeholder="비밀번호를 입력해 주세요" 
                 value={password} 
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (pwError) setPwError(false);
+                }}
               />
 
               <Input 
                 type="password" 
                 placeholder="비밀번호 재확인" 
                 value={passwordCheck} 
-                onChange={(e) => setPasswordCheck(e.target.value)}
+                onChange={(e) => {
+                  setPasswordCheck(e.target.value);
+                  if (pwError) setPwError(false);
+                }}
                 isError={pwError}
                 $marginTop="12px"
               />
               {pwError && <S.ErrorMessage>*비밀번호가 일치하지 않습니다</S.ErrorMessage>}
             </S.InputFormSection>
 
-            {/* 테스트를 위해 클릭 시 에러 분기가 토글되도록 임시 처리 가능 */}
-            <CtaButton $variant="bottom" onClick={() => setStep(3)}>입력완료</CtaButton>
+            <CtaButton
+              $variant="bottom"
+              onClick={handleSignupNext}
+              disabled={loading}
+            >
+              {loading ? "처리 중..." : "입력완료"}
+            </CtaButton>
           </S.StepWrapper>
         )}
 
@@ -162,26 +253,56 @@ return (
           <S.StepWrapper>
             <S.Title>회원가입 완료!<br />프로필을 설정해볼까요?</S.Title>
             
-            <S.ProfileImageContainer>
-              <S.ProfileCircle />
+            {/* 프로필 이미지 선택 영역 */}
+            <S.ProfileImageContainer onClick={() => fileInputRef.current?.click()}>
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="프로필 미리보기"
+                  style={{ width: "100%", height: "100%", borderRadius: "50%", objectFit: "cover" }}
+                />
+              ) : (
+                <S.ProfileCircle />
+              )}
               <S.CameraBadge>
                 <S.CameraIcon />
               </S.CameraBadge>
             </S.ProfileImageContainer>
 
+            {/* 숨겨진 File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              accept="image/*"
+              onChange={handleImageChange}
+            />
+
             <S.InputFormSection>
               <S.InputLabel>닉네임</S.InputLabel>
-              <Input placeholder="아이디를 입력해 주세요" />
+              <Input
+                placeholder="닉네임을 입력해 주세요"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+              />
 
               <S.InputLabel style={{ marginTop: '24px' }}>나의 소개글</S.InputLabel>
               <Input 
                 as="textarea"
                 placeholder="소개글을 입력해 주세요" 
                 $height="153px" 
+                value={introduction}
+                onChange={(e) => setIntroduction(e.target.value)}
               />
             </S.InputFormSection>
 
-            <CtaButton $variant="bottom" onClick={handleRegisterComplete}>가입완료</CtaButton>
+            <CtaButton
+              $variant="bottom"
+              onClick={handleRegisterComplete}
+              disabled={loading}
+            >
+              {loading ? "처리 중..." : "가입완료"}
+            </CtaButton>
           </S.StepWrapper>
         )}
 
