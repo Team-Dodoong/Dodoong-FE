@@ -9,3 +9,6 @@ export const getEquippedCharacter = () =>
 
 export const equipCharacter = (characterId) =>
   instance.patch(`/api/characters/${characterId}/equip`);
+
+export const getCharacterDetail = (characterId) =>
+  instance.get(`/api/characters/${characterId}`);

@@ -10,6 +10,7 @@ import {
   getOwnedCharacters,
   getEquippedCharacter,
   equipCharacter,
+  getCharacterDetail,
 } from "../../../api/characterApi";
 
 const basicImageModules = import.meta.glob(
@@ -50,6 +51,7 @@ function Character() {
   const [selectedCharacter, setSelectedCharacter] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailCharacter, setDetailCharacter] = useState(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const cacheRef = useRef({});
   const requestIdRef = useRef(0);
@@ -154,6 +156,29 @@ function Character() {
     }
   };
 
+  const handleShowDetail = async (character) => {
+    setDetailLoading(true);
+    try {
+      const response = await getCharacterDetail(character.id);
+      const data = response.data.data;
+      setDetailCharacter({
+        id: data.characterId,
+        name: data.name,
+        subtitle: data.summary,
+        description: data.description,
+        price: data.price,
+        owned: data.owned,
+        equipped: data.isEquipped,
+        image: getCharacterImage(data.characterId),
+      });
+      setShowDetailModal(true);
+    } catch (err) {
+      alert(err.response?.data?.message ?? "캐릭터 정보를 불러오지 못했습니다.");
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
   const filtered = characters.filter((c) => c.name.includes(search));
 
   return (
@@ -243,10 +268,8 @@ function Character() {
                 </S.ActionButton>
               )}
               <S.DetailButton
-                onClick={() => {
-                  setDetailCharacter(character);
-                  setShowDetailModal(true);
-                }}
+                disabled={detailLoading}
+                onClick={() => handleShowDetail(character)}
               >
                 상세보기
               </S.DetailButton>
