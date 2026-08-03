@@ -2,6 +2,9 @@ import instance from "./instance";
 
 export const createParty = (data) => instance.post("/api/parties", data);
 
+export const getPartyDetail = (partyId) =>
+  instance.get(`/api/parties/${partyId}`);
+
 export const searchParties = ({
   keyword,
   categories,
