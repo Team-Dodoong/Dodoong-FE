@@ -11,6 +11,7 @@ import {
   getEquippedCharacter,
   equipCharacter,
   getCharacterDetail,
+  purchaseCharacter,
 } from "../../../api/characterApi";
 
 const basicImageModules = import.meta.glob(
@@ -52,6 +53,8 @@ function Character() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailCharacter, setDetailCharacter] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [point, setPoint] = useState(MOCK_USER.point);
+  const [purchasing, setPurchasing] = useState(false);
 
   const cacheRef = useRef({});
   const requestIdRef = useRef(0);
@@ -179,6 +182,32 @@ function Character() {
     }
   };
 
+  const handlePurchase = async () => {
+    if (!selectedCharacter || purchasing) return;
+    setPurchasing(true);
+    try {
+      const response = await purchaseCharacter(selectedCharacter.id);
+      const { characterId, remainingCoin } = response.data.data;
+
+      setPoint(remainingCoin);
+      setShowBuyModal(false);
+
+      setCharacters((prev) =>
+        prev.map((c) => (c.id === characterId ? { ...c, owned: true } : c))
+      );
+      if (cacheRef.current["전체캐릭터"]) {
+        cacheRef.current["전체캐릭터"] = cacheRef.current["전체캐릭터"].map(
+          (c) => (c.id === characterId ? { ...c, owned: true } : c)
+        );
+      }
+      delete cacheRef.current["보유캐릭터"];
+    } catch (err) {
+      alert(err.response?.data?.message ?? "캐릭터 구매에 실패했습니다.");
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
   const filtered = characters.filter((c) => c.name.includes(search));
 
   return (
@@ -189,7 +218,7 @@ function Character() {
       </S.Header>
 
       <S.PointRow>
-        <PointBadge point={MOCK_USER.point} />
+        <PointBadge point={point} />
       </S.PointRow>
 
       <S.CharacterSection>
@@ -280,9 +309,9 @@ function Character() {
       {showBuyModal && selectedCharacter && (
         <BuyModal
           character={selectedCharacter}
-          userPoint={MOCK_USER.point}
+          userPoint={point}
           onCancel={() => setShowBuyModal(false)}
-          onConfirm={() => setShowBuyModal(false)}
+          onConfirm={handlePurchase}
         />
       )}
 

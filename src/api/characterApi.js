@@ -12,3 +12,6 @@ export const equipCharacter = (characterId) =>
 
 export const getCharacterDetail = (characterId) =>
   instance.get(`/api/characters/${characterId}`);
+
+export const purchaseCharacter = (characterId) =>
+  instance.post(`/api/characters/${characterId}/purchase`);
