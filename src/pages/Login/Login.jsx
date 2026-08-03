@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import * as S from './login.style';
+import * as S from './Login.style';
 import Input from "../../components/Input/Input";
 import CtaButton from "../../components/Button/CtaButton";
 import { login } from '../../api/memberApi';

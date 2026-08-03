@@ -1,7 +1,7 @@
 // src/router.jsx
 import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
 import BottomNav from "./components/BottomNav/BottomNav.jsx";
-import Login from "./pages/Login/login.jsx";
+import Login from "./pages/Login/Login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
 import Home from "./pages/Home/pages/Home/Home.jsx";
 import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
@@ -66,9 +66,9 @@ const router = createBrowserRouter([
       { path: "party", element: <Party /> }, // '/party' 주소일 때
       { path: "party/chat", element: <ChatList /> },
       { path: "party/chat/:roomId", element: <ChatRoom /> },
-      { path: "ranking", element: <Ranking /> },
-      { path: "certified", element: <Certified /> },
       { path: "party/:partyId", element: <PartyDetail /> },
+      { path: "party/:partyId/ranking", element: <Ranking /> },
+      { path: "party/:partyId/certified", element: <Certified /> },
       { path: "party/create", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },

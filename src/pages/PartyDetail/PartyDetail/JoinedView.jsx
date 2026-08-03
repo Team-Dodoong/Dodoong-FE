@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import CtaButton from "../../../components/Button/CtaButton";
 
@@ -16,6 +17,8 @@ const MOCK_RECORDS = [
 ];
 
 function JoinedView({ detail }) {
+  const navigate = useNavigate();
+  const { partyId } = useParams();
   const [isVerified, setIsVerified] = useState(false);
   const [showVerifySheet, setShowVerifySheet] = useState(false);
   const [sheetChecked, setSheetChecked] = useState(false);
@@ -77,7 +80,11 @@ function JoinedView({ detail }) {
         <S.Section>
           <S.RecordHeader>
             <S.SectionTitle>인증기록</S.SectionTitle>
-            <S.RecordMore>전체보기 &gt;</S.RecordMore>
+            <S.RecordMore
+              onClick={() => navigate(`/party/${partyId}/certified`)}
+            >
+              전체보기 &gt;
+            </S.RecordMore>
           </S.RecordHeader>
           <S.RecordRow>
             {MOCK_RECORDS.map((src, i) => (

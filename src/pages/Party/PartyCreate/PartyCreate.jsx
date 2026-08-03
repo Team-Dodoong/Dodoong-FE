@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import * as S from "../PartyCreate/PartyCreate.style";
 import Input from "../../../components/Input/Input";
 
 const CATEGORIES = ["공부", "운동", "일상", "외국어", "취업"];
 
 function PartyCreate() {
+  const navigate = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [maxMembers, setMaxMembers] = useState(50);
   const [isPublic, setIsPublic] = useState(true);
@@ -34,9 +36,9 @@ function PartyCreate() {
   return (
     <div>
       <S.HeaderWrapper>
-        <S.BackIcon />
+        <S.BackIcon onClick={() => navigate(-1)} />
         <S.HeaderTitle>파티 개설</S.HeaderTitle>
-        <S.CompleteButton>완료</S.CompleteButton>
+        <S.CompleteButton onClick={() => navigate(-1)}>완료</S.CompleteButton>
       </S.HeaderWrapper>
       <S.ScrollArea>
         <S.BodyWrapper>
