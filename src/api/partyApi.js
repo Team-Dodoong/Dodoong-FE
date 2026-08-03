@@ -5,6 +5,11 @@ export const createParty = (data) => instance.post("/api/parties", data);
 export const getPartyDetail = (partyId) =>
   instance.get(`/api/parties/${partyId}`);
 
+export const joinParty = (partyId, partyPassword) =>
+  instance.post(`/api/parties/${partyId}`, {
+    partyPassword: partyPassword || null,
+  });
+
 export const searchParties = ({
   keyword,
   categories,

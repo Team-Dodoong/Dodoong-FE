@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import NotJoinedView from "./NotJoinedView";
@@ -22,6 +22,19 @@ function PartyDetail() {
   const [error, setError] = useState(null);
   const isJoined = true;
 
+  const applyDetail = (party) =>
+    setDetail({
+      id: party.id,
+      status: party.isRecruiting ? "모집중" : "마감",
+      tags: party.categories.map((cat) => CATEGORY_LABELS[cat] ?? cat),
+      title: party.name,
+      isLocked: !party.isPublic,
+      members: `${party.currentMembers}/${party.maxMembers}`,
+      image: party.imageUrl,
+      introduction: party.description,
+      quest: party.questContent,
+    });
+
   useEffect(() => {
     let ignore = false;
 
@@ -31,18 +44,7 @@ function PartyDetail() {
       try {
         const response = await getPartyDetail(partyId);
         if (ignore) return;
-        const party = response.data.data;
-        setDetail({
-          id: party.id,
-          status: party.isRecruiting ? "모집중" : "마감",
-          tags: party.categories.map((cat) => CATEGORY_LABELS[cat] ?? cat),
-          title: party.name,
-          isLocked: !party.isPublic,
-          members: `${party.currentMembers}/${party.maxMembers}`,
-          image: party.imageUrl,
-          introduction: party.description,
-          quest: party.questContent,
-        });
+        applyDetail(response.data.data);
       } catch (err) {
         if (!ignore) {
           console.error("파티 상세 조회 실패", err);
@@ -57,6 +59,15 @@ function PartyDetail() {
     return () => {
       ignore = true;
     };
+  }, [partyId]);
+
+  const refetchDetail = useCallback(async () => {
+    try {
+      const response = await getPartyDetail(partyId);
+      applyDetail(response.data.data);
+    } catch (err) {
+      console.error("파티 상세 재조회 실패", err);
+    }
   }, [partyId]);
 
   if (loading) {
@@ -110,7 +121,7 @@ function PartyDetail() {
         {isJoined ? (
           <JoinedView detail={detail} />
         ) : (
-          <NotJoinedView detail={detail} />
+          <NotJoinedView detail={detail} onJoined={refetchDetail} />
         )}
       </S.ScrollArea>
 
