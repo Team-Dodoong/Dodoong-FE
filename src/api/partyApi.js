@@ -34,6 +34,12 @@ export const getPartyMonthlyStats = (partyId) =>
 export const getPartyVerifications = (partyId) =>
   instance.get(`/api/parties/${partyId}/verifications`);
 
+export const getPartyMonthlyRanking = (partyId) =>
+  instance.get(`/api/parties/${partyId}/ranking/monthly`);
+
+export const leaveParty = (partyId) =>
+  instance.delete(`/api/parties/${partyId}/leave`);
+
 export const submitVerification = (partyId, imageFile) => {
   const formData = new FormData();
   formData.append("image", imageFile);
