@@ -4,6 +4,7 @@ import * as S from "./ChatList.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import LeaveModal from "../components/LeaveModal";
 import { MOCK_CHATS } from "../mockChats";
+import { leaveParty } from "../../../api/partyApi";
 
 const LONG_PRESS_DELAY = 500;
 
@@ -12,14 +13,41 @@ function ChatList() {
   const [search, setSearch] = useState("");
   const [pressedId, setPressedId] = useState(null);
   const pressTimerRef = useRef(null);
+  const justLongPressedRef = useRef(false);
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [selectedChat, setSelectedChat] = useState(null);
+  const [chats, setChats] = useState(MOCK_CHATS);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState(null);
 
-  const filtered = MOCK_CHATS.filter(
+  const filtered = chats.filter(
     (chat) => chat.name.includes(search) || chat.message.includes(search),
   );
 
+  const closeLeaveModal = () => {
+    setShowLeaveModal(false);
+    setSelectedChat(null);
+    setLeaveError(null);
+  };
+
+  const handleLeaveConfirm = async () => {
+    if (!selectedChat) return;
+    setLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveParty(selectedChat.id);
+      setChats((prev) => prev.filter((chat) => chat.id !== selectedChat.id));
+      closeLeaveModal();
+    } catch (err) {
+      console.error("파티 탈퇴 실패", err);
+      setLeaveError(err.response?.data?.message ?? "파티 탈퇴에 실패했습니다.");
+    } finally {
+      setLeaving(false);
+    }
+  };
+
   const handleLongPress = (id) => {
+    justLongPressedRef.current = true;
     setPressedId(id);
   };
 
@@ -35,7 +63,12 @@ function ChatList() {
     clearTimeout(pressTimerRef.current);
   };
 
-  const handleChatClick = (chat) => {
+  const handleChatClick = (e, chat) => {
+    if (justLongPressedRef.current) {
+      justLongPressedRef.current = false;
+      e.stopPropagation();
+      return;
+    }
     if (pressedId !== null) {
       setPressedId(null);
       return;
@@ -67,7 +100,7 @@ function ChatList() {
             onMouseDown={() => startPressTimer(chat.id)}
             onMouseUp={cancelPressTimer}
             onMouseLeave={cancelPressTimer}
-            onClick={() => handleChatClick(chat)}
+            onClick={(e) => handleChatClick(e, chat)}
           >
             <S.ChatImage src={chat.image} alt={chat.name} />
             <S.ChatInfo>
@@ -84,6 +117,7 @@ function ChatList() {
                 onClick={(e) => {
                   e.stopPropagation();
                   setPressedId(null);
+                  setSelectedChat(chat);
                   setShowLeaveModal(true);
                 }}
               >
@@ -95,8 +129,10 @@ function ChatList() {
       </S.ChatListWrapper>
       {showLeaveModal && (
         <LeaveModal
-          onCancel={() => setShowLeaveModal(false)}
-          onConfirm={() => setShowLeaveModal(false)}
+          onCancel={closeLeaveModal}
+          onConfirm={handleLeaveConfirm}
+          submitting={leaving}
+          error={leaveError}
         />
       )}
     </S.Container>

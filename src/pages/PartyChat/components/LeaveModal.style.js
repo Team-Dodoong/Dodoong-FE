@@ -39,6 +39,13 @@ export const ModalSubTitle = styled.p`
   margin-bottom: 1rem;
 `;
 
+export const ErrorMessage = styled.p`
+  ${Medium_14};
+  color: var(--Red);
+  text-align: center;
+  margin-bottom: 0.5rem;
+`;
+
 export const ModalButtonWrapper = styled.div`
   display: flex;
   gap: 0.5rem;
