@@ -30,3 +30,14 @@ export const getMyParties = ({ page = 0, size = 20 } = {}) =>
 
 export const getPartyMonthlyStats = (partyId) =>
   instance.get(`/api/parties/${partyId}/me/monthly`);
+
+export const getPartyVerifications = (partyId) =>
+  instance.get(`/api/parties/${partyId}/verifications`);
+
+export const submitVerification = (partyId, imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+  return instance.post(`/api/parties/${partyId}/verifications`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};

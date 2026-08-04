@@ -1,69 +1,81 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./Certified.style";
+import { getPartyVerifications } from "../../../api/partyApi";
 
 const FILTER_OPTIONS = ["전체 멤버", "인증 멤버", "미인증 멤버"];
 
-const MOCK_PARTY_ID = 1;
+const DAY_LABELS = ["일", "월", "화", "수", "목", "금", "토"];
 
-const MOCK_RECORDS = [
-  {
-    id: 1,
-    name: "김민정",
-    time: "오후 10:41",
-    image: "https://picsum.photos/seed/a/100",
-    certified: true,
-  },
-  {
-    id: 2,
-    name: "김예솔",
-    time: "오후 09:28",
-    image: "https://picsum.photos/seed/b/100",
-    certified: true,
-  },
-  {
-    id: 3,
-    name: "김준석",
-    time: "오후 10:41",
-    image: "https://picsum.photos/seed/c/100",
-    certified: true,
-  },
-  { id: 4, name: "도지영", time: "오후 10:41", image: null, certified: false },
-  {
-    id: 5,
-    name: "마서영",
-    time: "오후 10:41",
-    image: "https://picsum.photos/seed/d/100",
-    certified: true,
-  },
-  {
-    id: 6,
-    name: "박지원",
-    time: "오후 10:41",
-    image: "https://picsum.photos/seed/e/100",
-    certified: true,
-  },
-  { id: 7, name: "박준영", time: "오후 10:41", image: null, certified: false },
-  { id: 8, name: "박한별", time: "오후 10:41", image: null, certified: false },
-  { id: 9, name: "박한별", time: "오후 10:41", image: null, certified: false },
-  { id: 10, name: "박한별", time: "오후 10:41", image: null, certified: false },
-  { id: 11, name: "박한별", time: "오후 10:41", image: null, certified: false },
-  { id: 12, name: "박한별", time: "오후 10:41", image: null, certified: false },
-];
+const formatDateText = (dateStr) => {
+  if (!dateStr) return "";
+  const [year, month, day] = dateStr.split("-");
+  return `${year}. ${month}. ${day}`;
+};
+
+const formatDateLabel = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(`${dateStr}T00:00:00`);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${month}.${day} (${DAY_LABELS[date.getDay()]})`;
+};
+
+const formatTime = (dateTimeStr) => {
+  if (!dateTimeStr) return "";
+  const date = new Date(dateTimeStr);
+  return date.toLocaleTimeString("ko-KR", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
 
 function Certified() {
   const navigate = useNavigate();
   const { partyId } = useParams();
   const [selectedFilter, setSelectedFilter] = useState("전체 멤버");
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const records = Number(partyId) === MOCK_PARTY_ID ? MOCK_RECORDS : [];
+  useEffect(() => {
+    let ignore = false;
+
+    const loadVerifications = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getPartyVerifications(partyId);
+        if (!ignore) setData(response.data.data);
+      } catch (err) {
+        if (!ignore) {
+          console.error("인증 기록 조회 실패", err);
+          setError("인증 기록을 불러오지 못했습니다.");
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    loadVerifications();
+    return () => {
+      ignore = true;
+    };
+  }, [partyId]);
+
+  const records = data?.verifications ?? [];
 
   const filteredRecords = records.filter((record) => {
-    if (selectedFilter === "인증 멤버") return record.certified;
-    if (selectedFilter === "미인증 멤버") return !record.certified;
+    if (selectedFilter === "인증 멤버") return record.verified;
+    if (selectedFilter === "미인증 멤버") return !record.verified;
     return true;
   });
+
+  const percent = data?.totalMemberCount
+    ? Math.round((data.verifiedMemberCount / data.totalMemberCount) * 100)
+    : 0;
 
   return (
     <S.Container>
@@ -102,44 +114,61 @@ function Certified() {
             )}
           </S.FilterWrapper>
 
-          <S.Section>
-            <S.SectionRow>
-              <S.SectionTitle>오늘 인증 현황</S.SectionTitle>
-              <S.DateText>2026. 06. 30</S.DateText>
-            </S.SectionRow>
-            <S.ProgressRow>
-              <S.ProgressLabel>22/50</S.ProgressLabel>
-              <S.ProgressPercent>73%</S.ProgressPercent>
-            </S.ProgressRow>
-            <S.ProgressBar>
-              <S.ProgressFill $percent={73} />
-            </S.ProgressBar>
-          </S.Section>
+          {loading && <S.DateText>불러오는 중...</S.DateText>}
+          {error && <S.DateText>{error}</S.DateText>}
 
-          <S.DateSection>
-            <S.DateLabel>07.02 (목) 22/50</S.DateLabel>
-            <S.Grid>
-              {filteredRecords.map((record) => (
-                <S.RecordCard key={record.id}>
-                  <S.MemberWrapper>
-                    <S.ProfileImage
-                      src="https://picsum.photos/seed/profile/100"
-                      alt={record.name}
-                    />
-                    <S.MemberInfo>
-                      <S.MemberName>{record.name}</S.MemberName>
-                      <S.MemberTime>{record.time}</S.MemberTime>
-                    </S.MemberInfo>
-                  </S.MemberWrapper>
-                  {record.image ? (
-                    <S.CertImage src={record.image} alt="인증사진" />
-                  ) : (
-                    <S.PendingBox>인증{"\n"}대기중</S.PendingBox>
-                  )}
-                </S.RecordCard>
-              ))}
-            </S.Grid>
-          </S.DateSection>
+          {data && (
+            <>
+              <S.Section>
+                <S.SectionRow>
+                  <S.SectionTitle>오늘 인증 현황</S.SectionTitle>
+                  <S.DateText>{formatDateText(data.date)}</S.DateText>
+                </S.SectionRow>
+                <S.ProgressRow>
+                  <S.ProgressLabel>
+                    {data.verifiedMemberCount}/{data.totalMemberCount}
+                  </S.ProgressLabel>
+                  <S.ProgressPercent>{percent}%</S.ProgressPercent>
+                </S.ProgressRow>
+                <S.ProgressBar>
+                  <S.ProgressFill $percent={percent} />
+                </S.ProgressBar>
+              </S.Section>
+
+              <S.DateSection>
+                <S.DateLabel>
+                  {formatDateLabel(data.date)} {data.verifiedMemberCount}/
+                  {data.totalMemberCount}
+                </S.DateLabel>
+                <S.Grid>
+                  {filteredRecords.map((record) => (
+                    <S.RecordCard key={record.partyMemberId}>
+                      <S.MemberWrapper>
+                        <S.ProfileImage
+                          src={
+                            record.profileImageUrl ||
+                            "https://picsum.photos/seed/profile/100"
+                          }
+                          alt={record.nickname}
+                        />
+                        <S.MemberInfo>
+                          <S.MemberName>{record.nickname}</S.MemberName>
+                          <S.MemberTime>
+                            {formatTime(record.verifiedAt)}
+                          </S.MemberTime>
+                        </S.MemberInfo>
+                      </S.MemberWrapper>
+                      {record.verified && record.imageUrl ? (
+                        <S.CertImage src={record.imageUrl} alt="인증사진" />
+                      ) : (
+                        <S.PendingBox>인증{"\n"}대기중</S.PendingBox>
+                      )}
+                    </S.RecordCard>
+                  ))}
+                </S.Grid>
+              </S.DateSection>
+            </>
+          )}
         </S.Body>
       </S.ScrollArea>
     </S.Container>
