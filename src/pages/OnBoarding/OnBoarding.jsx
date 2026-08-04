@@ -1,10 +1,16 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import * as S from "./OnBoarding.style";
 import Input from "../../components/Input/Input";
 import CtaButton from "../../components/Button/CtaButton";
 
-import { signup, login, updateProfile } from "../../api/memberApi";
+import { 
+  signup, 
+  login, 
+  getProfileUploadUrl, 
+  updateProfile 
+} from "../../api/memberApi";
 
 export default function OnBoarding() {
   const [step, setStep] = useState(1);
@@ -121,15 +127,38 @@ export default function OnBoarding() {
     try {
       setLoading(true);
 
-      // 프로필 설정 API 호출 (multipart/form-data)
-      await updateProfile(
-        { nickname, introduction },
-        imageFile
-      );
+      let profileImageKey = null;
+
+      // 1. 이미지를 선택한 경우 Presigned URL 발급 및 S3 업로드 진행
+      if (imageFile) {
+        const contentType = imageFile.type;
+
+        // (1) 업로드 URL & profileImageKey 발급 요청
+        // POST /api/members/me/profile-image/upload-url
+        const uploadUrlData = await getProfileUploadUrl(contentType);
+        const { uploadUrl, profileImageKey: issuedKey } = uploadUrlData;
+
+        // (2) 발급된 URL로 S3에 직접 이미지 바이너리 업로드
+        await axios.put(uploadUrl, imageFile, {
+          headers: {
+            "Content-Type": contentType,
+          },
+        });
+
+        profileImageKey = issuedKey;
+      }
+
+      // 2. 최종 프로필 업데이트 API 호출 (PATCH /api/members/me)
+      await updateProfile({
+        nickname,
+        introduction: introduction || "", // 삭제/빈값일 경우 빈 문자열 전송
+        profileImageKey,
+      });
 
       alert("회원가입 및 프로필 설정이 완료되었습니다!");
       navigate("/"); // 메인/로그인 페이지로 이동
     } catch (error) {
+      console.error(error);
       alert(error.response?.data?.message || "프로필 저장 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
