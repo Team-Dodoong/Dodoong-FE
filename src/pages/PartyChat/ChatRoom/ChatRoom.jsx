@@ -1,41 +1,40 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./ChatRoom.style";
-import { MOCK_CHATS } from "../mockChats";
 import LeaveModal from "../components/LeaveModal";
+import defaultAvatar from "../../../assets/character_두비.png";
+import { getChatHistory, getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
 
-const MOCK_MESSAGES = [
-  { id: 1, type: "notice", text: "하하하렇렇커여등님이 입장하셨습니다." },
-  { id: 2, type: "notice", text: "김이박님이 입장하셨습니다." },
-  { id: 3, type: "date", text: "2026년 6월 17일 수요일" },
-  { id: 4, type: "me", text: "안녕하세요! 알부탁드립니다." },
-  {
-    id: 5,
-    type: "me",
-    text: "메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기 메세지 최대 크기",
-  },
-  {
-    id: 6,
-    type: "other",
-    name: "대학가고싶어용",
-    avatar: "https://picsum.photos/seed/user1/100",
-    text: "안녕하세요~ 잘지내보용",
-  },
-  {
-    id: 7,
-    type: "other",
-    name: "대학가고싶어용",
-    avatar: "https://picsum.photos/seed/user1/100",
-    text: "ㄷㄱ!",
-  },
-];
+const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+
+const formatDateDivider = (isoString) => {
+  const date = new Date(isoString);
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${WEEKDAYS[date.getDay()]}요일`;
+};
+
+const mapMessage = (m) => ({
+  id: m.messageId,
+  type: m.isMine ? "me" : "other",
+  name: m.senderNickname ?? "알 수 없음",
+  avatar: m.senderProfileImageUrl ?? defaultAvatar,
+  text: m.content,
+  createdAt: m.createAt,
+});
+
+const sortByTime = (list) =>
+  [...list].sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
 function ChatRoom() {
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const chat = MOCK_CHATS.find((c) => c.id === Number(roomId));
-  const [messages, setMessages] = useState(MOCK_MESSAGES);
+  const [roomInfo, setRoomInfo] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [hasNext, setHasNext] = useState(false);
+  const [nextCursor, setNextCursor] = useState(null);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [input, setInput] = useState("");
   const [showLeaveModal, setShowLeaveModal] = useState(false);
   const [leaving, setLeaving] = useState(false);
@@ -43,14 +42,78 @@ function ChatRoom() {
   const bottomRef = useRef(null);
 
   useEffect(() => {
+    let ignore = false;
+
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [roomsRes, historyRes] = await Promise.all([
+          getChatRooms(),
+          getChatHistory(roomId, { size: 30 }),
+        ]);
+        if (ignore) return;
+        const room = roomsRes.data.data.find(
+          (r) => r.partyId === Number(roomId),
+        );
+        setRoomInfo(
+          room ? { name: room.partyName, count: room.memberCount } : null,
+        );
+        const history = historyRes.data.data;
+        setMessages(sortByTime(history.messages.map(mapMessage)));
+        setHasNext(history.hasNext);
+        setNextCursor(history.nextCursor);
+      } catch (err) {
+        if (!ignore) {
+          console.error("채팅 내역 조회 실패", err);
+          setError("채팅 내역을 불러오지 못했습니다.");
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      ignore = true;
+    };
+  }, [roomId]);
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleLoadMore = async () => {
+    if (!hasNext || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const response = await getChatHistory(roomId, {
+        cursor: nextCursor,
+        size: 30,
+      });
+      const history = response.data.data;
+      setMessages((prev) =>
+        sortByTime([...prev, ...history.messages.map(mapMessage)]),
+      );
+      setHasNext(history.hasNext);
+      setNextCursor(history.nextCursor);
+    } catch (err) {
+      console.error("이전 메시지 조회 실패", err);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleSend = () => {
     if (!input.trim()) return;
     setMessages((prev) => [
       ...prev,
-      { id: Date.now(), type: "me", text: input.trim() },
+      {
+        id: `local-${Date.now()}`,
+        type: "me",
+        text: input.trim(),
+        createdAt: new Date().toISOString(),
+      },
     ]);
     setInput("");
   };
@@ -76,43 +139,63 @@ function ChatRoom() {
     }
   };
 
+  const displayItems = [];
+  let lastDateKey = null;
+  messages.forEach((msg) => {
+    const dateKey = new Date(msg.createdAt).toDateString();
+    if (dateKey !== lastDateKey) {
+      displayItems.push({
+        id: `date-${dateKey}`,
+        kind: "date",
+        text: formatDateDivider(msg.createdAt),
+      });
+      lastDateKey = dateKey;
+    }
+    displayItems.push({ ...msg, kind: msg.type });
+  });
+
   return (
     <S.Container>
       <S.Header>
         <S.BackIcon onClick={() => navigate(-1)} />
         <S.HeaderInfo>
-          <S.HeaderTitle>{chat?.name}</S.HeaderTitle>
-          <S.HeaderCount>{chat?.count}</S.HeaderCount>
+          <S.HeaderTitle>{roomInfo?.name}</S.HeaderTitle>
+          <S.HeaderCount>{roomInfo?.count}</S.HeaderCount>
         </S.HeaderInfo>
         <S.ExitIcon onClick={() => setShowLeaveModal(true)} />
       </S.Header>
 
       <S.MessageList>
-        {messages.map((msg) => {
-          if (msg.type === "notice") {
-            return <S.NoticeText key={msg.id}>{msg.text}</S.NoticeText>;
+        {loading && <S.NoticeText>불러오는 중...</S.NoticeText>}
+        {error && <S.NoticeText>{error}</S.NoticeText>}
+        {hasNext && (
+          <S.NoticeText
+            onClick={handleLoadMore}
+            style={{ cursor: "pointer" }}
+          >
+            {loadingMore ? "불러오는 중..." : "이전 대화 더 불러오기"}
+          </S.NoticeText>
+        )}
+        {displayItems.map((item) => {
+          if (item.kind === "date") {
+            return <S.DateText key={item.id}>{item.text}</S.DateText>;
           }
-          if (msg.type === "date") {
-            return <S.DateText key={msg.id}>{msg.text}</S.DateText>;
-          }
-          if (msg.type === "me") {
+          if (item.kind === "me") {
             return (
-              <S.MyMessageRow key={msg.id}>
-                <S.MyBubble>{msg.text}</S.MyBubble>
+              <S.MyMessageRow key={item.id}>
+                <S.MyBubble>{item.text}</S.MyBubble>
               </S.MyMessageRow>
             );
           }
-          if (msg.type === "other") {
-            return (
-              <S.OtherMessageRow key={msg.id}>
-                <S.Avatar src={msg.avatar} alt={msg.name} />
-                <S.OtherContent>
-                  <S.OtherName>{msg.name}</S.OtherName>
-                  <S.OtherBubble>{msg.text}</S.OtherBubble>
-                </S.OtherContent>
-              </S.OtherMessageRow>
-            );
-          }
+          return (
+            <S.OtherMessageRow key={item.id}>
+              <S.Avatar src={item.avatar} alt={item.name} />
+              <S.OtherContent>
+                <S.OtherName>{item.name}</S.OtherName>
+                <S.OtherBubble>{item.text}</S.OtherBubble>
+              </S.OtherContent>
+            </S.OtherMessageRow>
+          );
         })}
         <div ref={bottomRef} />
       </S.MessageList>
