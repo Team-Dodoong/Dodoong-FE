@@ -97,6 +97,8 @@ export const reissueToken = async () => {
  * 쿠키에 담긴 accessToken을 이용하여 현재 로그인된 회원의 정보를 조회합니다.
  * @returns {Promise<Object>} - { memberId, loginId, nickname, profileImageUrl, introduction, level, experience, coin }
  */
+
+
 export const getMyInfo = async () => {
   try {
     // GET /api/members/me 요청
@@ -117,42 +119,41 @@ export const getMyInfo = async () => {
 };
 
 /**
+ * 🆕 [추가] 프로필 이미지 업로드 Presigned URL 발급 API
+ * S3에 이미지를 업로드하기 위한 Presigned URL과 profileImageKey를 발급받습니다.
+ * @param {string} contentType - 파일의 MIME 타입 (예: "image/png", "image/jpeg")
+ * @returns {Promise<Object>} - { uploadUrl: string, profileImageKey: string }
+ */
+export const getProfileUploadUrl = async (contentType) => {
+  try {
+    const response = await api.post("/api/members/me/profile-image/upload-url", {
+      contentType,
+    });
+    // response.data.data -> { uploadUrl, profileImageKey }
+    return response.data.data;
+  } catch (error) {
+    if (error.response) {
+      console.error("업로드 URL 발급 실패:", error.response.data.message || "URL 발급 실패");
+    } else {
+      console.error("업로드 URL 발급 요청 중 오류 발생:", error.message);
+    }
+    throw error;
+  }
+};
+
+/**
  * ✅ 프로필 설정 API
  * @param {Object} profileData - { nickname: string, introduction: string }
- * @param {File | null} imageFile - 업로드할 이미지 파일 객체 (선택)
  * @returns {Promise<Object>} - { nickname, profileImageUrl, introduction }
  */
-export const updateProfile = async (profileData, imageFile = null) => {
+export const updateProfile = async (profileData) => {
   try {
-    const formData = new FormData();
-
-    // 1. request (JSON) 데이터 추가
-    // 백엔드에서 JSON 파싱을 위해 Blob 객체로 타입을 지정해서 넣어줍니다.
-    const jsonBlob = new Blob([JSON.stringify(profileData)], {
-      type: "application/json",
-    });
-    formData.append("request", jsonBlob);
-
-    // 2. profileImage (File) 데이터 추가 (파일이 존재할 경우만)
-    if (imageFile) {
-      formData.append("profileImage", imageFile);
-    }
-
-    // 3. multipart/form-data 요청 전송
-    // 보통 프로필 수정은 PUT 또는 PATCH를 사용합니다.
-    const response = await api.patch("/api/members/me", formData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    });
-
+    // PATCH /api/members/me 요청 (application/json)
+    const response = await api.patch("/api/members/me", profileData);
     return response.data;
   } catch (error) {
     if (error.response) {
-      console.error(
-        "프로필 수정 실패:",
-        error.response.data.message || "프로필 수정 중 오류가 발생했습니다."
-      );
+      console.error("프로필 수정 실패:", error.response.data.message || "프로필 수정 중 오류가 발생했습니다.");
     } else {
       console.error("프로필 수정 요청 중 오류 발생:", error.message);
     }
