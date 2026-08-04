@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
 import PointBadge from "../../../components/PointBadge/PointBadge";
-import character1 from "../../../assets/characters/character_hello_1.png";
+import characterDecoration from "../../../assets/character-icon.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
 import {
@@ -13,30 +13,14 @@ import {
   getCharacterDetail,
   purchaseCharacter,
 } from "../../../api/characterApi";
+import { getMyInfo } from "../../../api/memberApi";
+import {
+  getCharacterImage,
+  getCharacterHelloImage,
+  defaultCharacterImage,
+} from "../../../utils/characterImage";
 
-const basicImageModules = import.meta.glob(
-  "../../../assets/characters/character_basic_*.png",
-  { eager: true, import: "default" }
-);
-
-const CHARACTER_IMAGES = Object.fromEntries(
-  Object.entries(basicImageModules).map(([path, src]) => {
-    const id = Number(path.match(/character_basic_(\d+)\.png$/)[1]);
-    return [id, src];
-  })
-);
-
-const getCharacterImage = (characterId) =>
-  CHARACTER_IMAGES[characterId] ?? character1;
-
-const MOCK_USER = {
-  name: "두비",
-  point: 1270,
-  message: "안녕! 나는 두비야 만나서 반가워!",
-  image: character1,
-  exp: 300,
-  maxExp: 1000,
-};
+const MAX_EXP = 1000;
 
 function Character() {
   const navigate = useNavigate();
@@ -53,7 +37,8 @@ function Character() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [detailCharacter, setDetailCharacter] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
-  const [point, setPoint] = useState(MOCK_USER.point);
+  const [point, setPoint] = useState(0);
+  const [exp, setExp] = useState(0);
   const [purchasing, setPurchasing] = useState(false);
 
   const cacheRef = useRef({});
@@ -104,6 +89,27 @@ function Character() {
   useEffect(() => {
     let ignore = false;
 
+    const loadMyInfo = async () => {
+      try {
+        const response = await getMyInfo();
+        const data = response.data || response;
+        if (ignore) return;
+        setPoint(data?.coin ?? 0);
+        setExp(data?.experience ?? 0);
+      } catch (err) {
+        if (!ignore) console.error("내 정보 조회 실패", err);
+      }
+    };
+
+    loadMyInfo();
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
     const loadEquippedCharacter = async () => {
       try {
         const response = await getEquippedCharacter();
@@ -112,7 +118,7 @@ function Character() {
         setEquippedCharacter({
           id: characterId,
           name,
-          image: getCharacterImage(characterId),
+          image: getCharacterHelloImage(characterId),
         });
       } catch (err) {
         if (ignore) return;
@@ -140,7 +146,7 @@ function Character() {
       setEquippedCharacter({
         id: characterId,
         name,
-        image: getCharacterImage(characterId),
+        image: getCharacterHelloImage(characterId),
       });
 
       const applyEquip = (list) =>
@@ -227,18 +233,20 @@ function Character() {
             ? `안녕! 나는 ${equippedCharacter.name}야 만나서 반가워!`
             : "아직 장착한 캐릭터가 없어요."}
         </S.CharacterMessage>
-        <S.MainCharacterImage
-          src={equippedCharacter?.image ?? character1}
-          alt={equippedCharacter?.name ?? "캐릭터"}
-        />
+        <S.CharacterArea>
+          <S.Decoration src={characterDecoration} alt="" />
+          <S.MainCharacterImage
+            src={equippedCharacter?.image ?? defaultCharacterImage}
+            alt={equippedCharacter?.name ?? "캐릭터"}
+          />
+        </S.CharacterArea>
         <S.CharacterName>{equippedCharacter?.name ?? "-"}</S.CharacterName>
         <S.ExpBarWrapper>
           <S.ExpBar>
-            <S.ExpFill $percent={(MOCK_USER.exp / MOCK_USER.maxExp) * 100} />
+            <S.ExpFill $percent={(exp / MAX_EXP) * 100} />
           </S.ExpBar>
           <S.ExpText>
-            <S.ExpCurrent>{MOCK_USER.exp}</S.ExpCurrent>/
-            {MOCK_USER.maxExp.toLocaleString()}
+            <S.ExpCurrent>{exp}</S.ExpCurrent>/{MAX_EXP.toLocaleString()}
           </S.ExpText>
         </S.ExpBarWrapper>
       </S.CharacterSection>

@@ -25,6 +25,8 @@ import {
   deleteRoutine,
 } from '../../../../api/dailyQuestApi';
 import { getStreaks } from '../../../../api/streakApi';
+import { getEquippedCharacter } from '../../../../api/characterApi';
+import { getCharacterHelloImage } from '../../../../utils/characterImage';
 
 // 오늘 날짜 구하기 (YYYY-MM-DD)
 const getTodayString = () => {
@@ -65,6 +67,7 @@ function Home() {
 
   // 회원, 캐릭터 데이터, 스트릭 일수
   const [userInfo, setUserInfo] = useState(null);
+  const [equippedCharacter, setEquippedCharacter] = useState(null);
   const [streakDays, setStreakDays] = useState(0);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -109,6 +112,35 @@ function Home() {
     };
 
     fetchInitialData();
+  }, []);
+
+  // 🟢 장착한 캐릭터 조회
+  useEffect(() => {
+    let ignore = false;
+
+    const fetchEquippedCharacter = async () => {
+      try {
+        const response = await getEquippedCharacter();
+        if (ignore) return;
+        const { characterId, name } = response.data.data;
+        setEquippedCharacter({
+          id: characterId,
+          name,
+          image: getCharacterHelloImage(characterId),
+        });
+      } catch (error) {
+        if (ignore) return;
+        if (error.response?.status !== 404) {
+          console.error('장착 캐릭터 조회 실패:', error);
+        }
+        setEquippedCharacter(null);
+      }
+    };
+
+    fetchEquippedCharacter();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   const quests = activeTab === 'daily' ? dailyQuests : partyQuests;
@@ -235,7 +267,8 @@ function Home() {
 
         <CharacterCard
           userName={userInfo?.nickname || '사용자'}
-          characterName={userInfo?.characterName || '두비'}
+          characterName={equippedCharacter?.name || '두비'}
+          characterImage={equippedCharacter?.image}
           exp={userInfo?.experience ?? 0}
           maxExp={1000} // 레벨별 필요 경험치에 맞게 설정
         />
