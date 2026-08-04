@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./ChatRoom.style";
 import { MOCK_CHATS } from "../mockChats";
 import LeaveModal from "../components/LeaveModal";
+import { leaveParty } from "../../../api/partyApi";
 
 const MOCK_MESSAGES = [
   { id: 1, type: "notice", text: "하하하렇렇커여등님이 입장하셨습니다." },
@@ -37,6 +38,8 @@ function ChatRoom() {
   const [messages, setMessages] = useState(MOCK_MESSAGES);
   const [input, setInput] = useState("");
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState(null);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -56,6 +59,20 @@ function ChatRoom() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
+    }
+  };
+
+  const handleLeaveConfirm = async () => {
+    setLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveParty(roomId);
+      navigate("/party/chat");
+    } catch (err) {
+      console.error("파티 탈퇴 실패", err);
+      setLeaveError(err.response?.data?.message ?? "파티 탈퇴에 실패했습니다.");
+    } finally {
+      setLeaving(false);
     }
   };
 
@@ -122,8 +139,13 @@ function ChatRoom() {
 
       {showLeaveModal && (
         <LeaveModal
-          onCancel={() => setShowLeaveModal(false)}
-          onConfirm={() => navigate("/party/chat")}
+          onCancel={() => {
+            setShowLeaveModal(false);
+            setLeaveError(null);
+          }}
+          onConfirm={handleLeaveConfirm}
+          submitting={leaving}
+          error={leaveError}
         />
       )}
     </S.Container>

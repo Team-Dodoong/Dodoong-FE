@@ -1,20 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import CtaButton from "../../../components/Button/CtaButton";
-
-const MOCK_STATS = {
-  monthlyRank: 3,
-  streak: 5,
-  questComplete: "미완료",
-  monthlyCount: 24,
-};
-
-const MOCK_RECORDS = [
-  "https://picsum.photos/seed/a/100",
-  "https://picsum.photos/seed/b/100",
-  "https://picsum.photos/seed/c/100",
-];
+import {
+  getPartyMonthlyStats,
+  getPartyVerifications,
+  submitVerification,
+} from "../../../api/partyApi";
 
 function JoinedView({ detail }) {
   const navigate = useNavigate();
@@ -23,16 +15,91 @@ function JoinedView({ detail }) {
   const [showVerifySheet, setShowVerifySheet] = useState(false);
   const [sheetChecked, setSheetChecked] = useState(false);
   const [verifyImage, setVerifyImage] = useState(null);
+  const [verifyImageFile, setVerifyImageFile] = useState(null);
+  const [verifyError, setVerifyError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
   const imageInputRef = useRef(null);
+  const [monthlyStats, setMonthlyStats] = useState(null);
+  const [verifications, setVerifications] = useState([]);
+
+  const loadVerifications = useCallback(async () => {
+    try {
+      const response = await getPartyVerifications(partyId);
+      setVerifications(response.data.data.verifications ?? []);
+    } catch (err) {
+      console.error("인증 기록 조회 실패", err);
+    }
+  }, [partyId]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadMonthlyStats = async () => {
+      try {
+        const response = await getPartyMonthlyStats(partyId);
+        if (!ignore) setMonthlyStats(response.data.data);
+      } catch (err) {
+        console.error("월간 통계 조회 실패", err);
+      }
+    };
+
+    loadMonthlyStats();
+    loadVerifications();
+    return () => {
+      ignore = true;
+    };
+  }, [partyId, loadVerifications]);
+
+  const recordPreview = verifications
+    .filter((v) => v.verified && v.imageUrl)
+    .slice(0, 4);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) setVerifyImage(URL.createObjectURL(file));
+    if (file) {
+      setVerifyImage(URL.createObjectURL(file));
+      setVerifyImageFile(file);
+    }
   };
 
-  const handleSubmit = () => {
-    setIsVerified(sheetChecked);
+  const closeVerifySheet = () => {
     setShowVerifySheet(false);
+    setVerifyImage(null);
+    setVerifyImageFile(null);
+    setSheetChecked(false);
+    setVerifyError(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!verifyImageFile) {
+      setVerifyError("인증 이미지가 필요합니다.");
+      return;
+    }
+
+    setSubmitting(true);
+    setVerifyError(null);
+    try {
+      await submitVerification(partyId, verifyImageFile);
+      setIsVerified(sheetChecked);
+      setMonthlyStats((prev) =>
+        prev
+          ? {
+              ...prev,
+              todayQuestCompleted: true,
+              monthlyParticipationCount: prev.monthlyParticipationCount + 1,
+            }
+          : prev,
+      );
+      loadVerifications();
+      closeVerifySheet();
+    } catch (err) {
+      console.error("인증 제출 실패", err);
+      setVerifyError(
+        err.response?.data?.message ?? "인증 제출에 실패했습니다.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -42,17 +109,27 @@ function JoinedView({ detail }) {
           <S.StatItem>
             <S.TrophyIcon />
             <S.StatLabel>월간 랭킹</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.monthlyRank}위</S.StatValue>
+            <S.StatValue>
+              {monthlyStats ? `${monthlyStats.rank}위` : "-"}
+            </S.StatValue>
           </S.StatItem>
           <S.StatItem>
             <S.DartIcon />
             <S.StatLabel>퀘스트 달성</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.questComplete}</S.StatValue>
+            <S.StatValue>
+              {monthlyStats
+                ? monthlyStats.todayQuestCompleted
+                  ? "완료"
+                  : "미완료"
+                : "-"}
+            </S.StatValue>
           </S.StatItem>
           <S.StatItem>
             <S.SmileIcon />
             <S.StatLabel>월별 인증 횟수</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.monthlyCount}회</S.StatValue>
+            <S.StatValue>
+              {monthlyStats ? `${monthlyStats.monthlyParticipationCount}회` : "-"}
+            </S.StatValue>
           </S.StatItem>
         </S.StatsRow>
 
@@ -87,8 +164,12 @@ function JoinedView({ detail }) {
             </S.RecordMore>
           </S.RecordHeader>
           <S.RecordRow>
-            {MOCK_RECORDS.map((src, i) => (
-              <S.RecordImage key={i} src={src} alt={`record-${i}`} />
+            {recordPreview.map((record) => (
+              <S.RecordImage
+                key={record.verificationId}
+                src={record.imageUrl}
+                alt={record.nickname}
+              />
             ))}
           </S.RecordRow>
         </S.Section>
@@ -96,7 +177,7 @@ function JoinedView({ detail }) {
 
       {showVerifySheet && (
         <>
-          <S.Overlay onClick={() => setShowVerifySheet(false)} />
+          <S.Overlay onClick={closeVerifySheet} />
           <S.VerifySheet>
             <S.MenuHandle />
             <S.VerifyTitle>인증 사진을 올려주세요</S.VerifyTitle>
@@ -140,11 +221,15 @@ function JoinedView({ detail }) {
               </S.VerifyNoticeItem>
             </S.VerifyNotice>
 
+            {verifyError && <S.ErrorMessage>{verifyError}</S.ErrorMessage>}
+
             <S.ButtonWrapper>
-              <S.ApplyButton $cancel onClick={() => setShowVerifySheet(false)}>
+              <S.ApplyButton $cancel onClick={closeVerifySheet}>
                 취소
               </S.ApplyButton>
-              <S.ApplyButton onClick={handleSubmit}>제출하기</S.ApplyButton>
+              <S.ApplyButton onClick={handleSubmit} disabled={submitting}>
+                {submitting ? "제출 중..." : "제출하기"}
+              </S.ApplyButton>
             </S.ButtonWrapper>
           </S.VerifySheet>
         </>

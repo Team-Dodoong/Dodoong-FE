@@ -1,39 +1,90 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import NotJoinedView from "./NotJoinedView";
 import JoinedView from "./JoinedView";
+import { getPartyDetail } from "../../../api/partyApi";
 
-const MOCK_DETAIL = {
-  id: 1,
-  status: "모집중",
-  tags: ["공부", "취업"],
-  title: "공부종류 상관없이 스터디원 모집",
-  isLocked: true,
-  members: "22/50",
-  time: "32분 전",
-  image: "https://picsum.photos/seed/study/600/300",
-  introduction: `🌱 함께 공부할 사람 모집합니다!
-혼자 공부하면 금방 지치고 미루게 된다면 같이 해요 🙌
-공부 종류는 상관없어요! 시험 준비, 자격증, 과제, 취업 준비, 독서 등 각자 목표를 가지고 자유롭게 공부하는 스터디입니다.
-
-✅ 서로 인증하며 꾸준히 공부하기
-✅ 가끔 소통하며 동기부여 받기
-✅ 부담 없는 분위기
-
-열심히 공부할 의지만 있다면 누구나 환영합니다 😊`,
-  quest: ["매일 8시에 스터디 인증창에 인증하기"],
+const CATEGORY_LABELS = {
+  STUDY: "공부",
+  CAREER: "취업",
+  DAILY: "일상",
+  LANGUAGE: "외국어",
+  FITNESS: "운동",
 };
 
 function PartyDetail() {
   const [showMoreMenu, setShowMoreMenu] = useState(false);
-  const [showApplyMenu, setShowApplyMenu] = useState(false);
-  const [showPasswordMenu, setShowPasswordMenu] = useState(false);
-  const [value, setValue] = useState("");
   const navigate = useNavigate();
   const { partyId } = useParams();
-  const detail = MOCK_DETAIL.id === Number(partyId) ? MOCK_DETAIL : null;
+  const [detail, setDetail] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const isJoined = true;
+
+  const applyDetail = (party) =>
+    setDetail({
+      id: party.id,
+      status: party.isRecruiting ? "모집중" : "마감",
+      tags: party.categories.map((cat) => CATEGORY_LABELS[cat] ?? cat),
+      title: party.name,
+      isLocked: !party.isPublic,
+      members: `${party.currentMembers}/${party.maxMembers}`,
+      image: party.imageUrl,
+      introduction: party.description,
+      quest: party.questContent,
+    });
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadDetail = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getPartyDetail(partyId);
+        if (ignore) return;
+        applyDetail(response.data.data);
+      } catch (err) {
+        if (!ignore) {
+          console.error("파티 상세 조회 실패", err);
+          setError("파티 정보를 불러오지 못했습니다.");
+        }
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
+
+    loadDetail();
+    return () => {
+      ignore = true;
+    };
+  }, [partyId]);
+
+  const refetchDetail = useCallback(async () => {
+    try {
+      const response = await getPartyDetail(partyId);
+      applyDetail(response.data.data);
+    } catch (err) {
+      console.error("파티 상세 재조회 실패", err);
+    }
+  }, [partyId]);
+
+  if (loading) {
+    return (
+      <S.Container>
+        <S.Body>불러오는 중...</S.Body>
+      </S.Container>
+    );
+  }
+
+  if (error || !detail) {
+    return (
+      <S.Container>
+        <S.Body>{error ?? "파티를 찾을 수 없습니다."}</S.Body>
+      </S.Container>
+    );
+  }
 
   return (
     <S.Container>
@@ -57,16 +108,12 @@ function PartyDetail() {
               ))}
             </S.TagRow>
             <S.Title>
-              <S.LockIcon />
+              {detail.isLocked && <S.LockIcon />}
               {detail.title}
             </S.Title>
             <S.MetaRow>
               <S.SocialIcon />
               <S.MemberCount>{detail.members}</S.MemberCount>
-              <S.Divider />
-              <S.LastConversation>
-                마지막 대화 <S.TimeHighlight>{detail.time}</S.TimeHighlight>
-              </S.LastConversation>
             </S.MetaRow>
           </S.ImageContent>
         </S.ImageSection>
@@ -74,7 +121,7 @@ function PartyDetail() {
         {isJoined ? (
           <JoinedView detail={detail} />
         ) : (
-          <NotJoinedView detail={detail} />
+          <NotJoinedView detail={detail} onJoined={refetchDetail} />
         )}
       </S.ScrollArea>
 

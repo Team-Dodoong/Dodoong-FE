@@ -1,11 +1,38 @@
 import { useState } from "react";
 import * as S from "./PartyDetail.style";
 import CtaButton from "../../../components/Button/CtaButton";
+import { joinParty } from "../../../api/partyApi";
 
-function NotJoinedView({ detail }) {
+function NotJoinedView({ detail, onJoined }) {
   const [showApplyMenu, setShowApplyMenu] = useState(false);
   const [showPasswordMenu, setShowPasswordMenu] = useState(false);
   const [value, setValue] = useState("");
+  const [joining, setJoining] = useState(false);
+
+  const handleJoin = async (partyPassword) => {
+    setJoining(true);
+    try {
+      const response = await joinParty(detail.id, partyPassword);
+      alert(`"${response.data.data.partyName}" 파티에 가입되었습니다.`);
+      setShowApplyMenu(false);
+      setShowPasswordMenu(false);
+      setValue("");
+      onJoined?.();
+    } catch (err) {
+      alert(err.response?.data?.message ?? "파티 가입에 실패했습니다.");
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  const handleApply = () => {
+    if (detail.isLocked) {
+      setShowApplyMenu(false);
+      setShowPasswordMenu(true);
+    } else {
+      handleJoin(null);
+    }
+  };
 
   return (
     <>
@@ -44,12 +71,7 @@ function NotJoinedView({ detail }) {
               <S.ApplyButton $cancel onClick={() => setShowApplyMenu(false)}>
                 취소
               </S.ApplyButton>
-              <S.ApplyButton
-                onClick={() => {
-                  setShowApplyMenu(false);
-                  setShowPasswordMenu(true);
-                }}
-              >
+              <S.ApplyButton onClick={handleApply} disabled={joining}>
                 가입신청
               </S.ApplyButton>
             </S.ButtonWrapper>
@@ -77,7 +99,10 @@ function NotJoinedView({ detail }) {
               <S.ApplyButton $cancel onClick={() => setShowPasswordMenu(false)}>
                 취소
               </S.ApplyButton>
-              <S.ApplyButton onClick={() => setShowPasswordMenu(false)}>
+              <S.ApplyButton
+                onClick={() => handleJoin(value)}
+                disabled={joining || value.length !== 4}
+              >
                 가입신청
               </S.ApplyButton>
             </S.ButtonWrapper>

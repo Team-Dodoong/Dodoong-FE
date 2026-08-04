@@ -3,12 +3,24 @@ import { useNavigate } from "react-router-dom";
 import * as S from "../PartyCreate/PartyCreate.style";
 import Input from "../../../components/Input/Input";
 
+import { createParty } from "../../../api/partyApi";
+
 const CATEGORIES = ["공부", "운동", "일상", "외국어", "취업"];
+const CATEGORY_MAP = {
+  공부: "STUDY",
+  취업: "CAREER",
+  일상: "DAILY",
+  외국어: "LANGUAGE",
+  운동: "FITNESS",
+};
 
 function PartyCreate() {
   const navigate = useNavigate();
+  const [partyName, setPartyName] = useState("");
+  const [description, setDescription] = useState("");
+  const [questContent, setQuestContent] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [maxMembers, setMaxMembers] = useState(50);
+  const [maxMembers, setMaxMembers] = useState(2);
   const [isPublic, setIsPublic] = useState(true);
   const [password, setPassword] = useState("");
   const [image, setImage] = useState(null);
@@ -33,12 +45,59 @@ function PartyCreate() {
     }
   };
 
+  const handleComplete = async () => {
+    if (!partyName.trim()) {
+      alert("파티명을 입력해주세요.");
+      return;
+    }
+    if (selectedCategories.length === 0) {
+      alert("카테고리를 1개 이상 선택해주세요.");
+      return;
+    }
+    if (!questContent.trim()) {
+      alert("파티퀘스트를 입력해주세요.");
+      return;
+    }
+    if (!description.trim()) {
+      alert("파티소개를 입력해주세요.");
+      return;
+    }
+    if (Number(maxMembers) < 2) {
+      alert("최대 인원은 2명 이상이어야 합니다.");
+      return;
+    }
+    if (!isPublic && password.length !== 4) {
+      alert("비밀번호는 4자리 숫자로 입력해주세요.");
+      return;
+    }
+
+    try {
+      const requestBody = {
+        name: partyName,
+        description: description,
+        categories: selectedCategories.map((cat) => CATEGORY_MAP[cat]),
+        maxMembers: Number(maxMembers),
+        isPublic: isPublic,
+        partyPassword: !isPublic ? password : undefined,
+        questContent: questContent,
+        imageUrl: image || "https://test-image.com/temp.png",
+      };
+
+      const response = await createParty(requestBody);
+      console.log("파티 생성 성공", response.data);
+      navigate("/party");
+    } catch (error) {
+      console.error("파티 생성 실패", error);
+      alert("파티 생성에 실패했습니다. 입력값을 확인해주세요.");
+    }
+  };
+
   return (
     <div>
       <S.HeaderWrapper>
         <S.BackIcon onClick={() => navigate(-1)} />
         <S.HeaderTitle>파티 개설</S.HeaderTitle>
-        <S.CompleteButton onClick={() => navigate(-1)}>완료</S.CompleteButton>
+        <S.CompleteButton onClick={handleComplete}>완료</S.CompleteButton>
       </S.HeaderWrapper>
       <S.ScrollArea>
         <S.BodyWrapper>
@@ -47,6 +106,8 @@ function PartyCreate() {
             <Input
               placeholder="띄어쓰기 포함 10자 이내로 입력해주세요."
               maxLength={10}
+              value={partyName}
+              onChange={(e) => setPartyName(e.target.value)}
             />
           </div>
           <div>
@@ -70,7 +131,11 @@ function PartyCreate() {
           </div>
           <div>
             <S.BodyTitle>파티퀘스트</S.BodyTitle>
-            <Input placeholder="파티퀘스트를 입력해주세요." />
+            <Input
+              placeholder="파티퀘스트를 입력해주세요."
+              value={questContent}
+              onChange={(e) => setQuestContent(e.target.value)}
+            />
           </div>
           <div>
             <S.BodyTitle>파티소개</S.BodyTitle>
@@ -78,6 +143,8 @@ function PartyCreate() {
               placeholder="파티소개글을 입력해주세요."
               as="textarea"
               $height="10rem"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div>
@@ -90,7 +157,7 @@ function PartyCreate() {
                   type="number"
                   value={maxMembers}
                   onChange={(e) => setMaxMembers(e.target.value)}
-                  min={1}
+                  min={2}
                 />
               </S.SettingWrapper>
             </S.SettingRow>
