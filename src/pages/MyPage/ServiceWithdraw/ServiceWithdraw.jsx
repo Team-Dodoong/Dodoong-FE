@@ -1,18 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import * as S from './ServiceWithdraw.style';
 import CtaButton from "../../../components/Button/CtaButton";
 import Check from '../../../assets/ic_regular_check_24.svg?react';
-
+import { getMyInfo, deleteAccount } from '../../../api/memberApi';
 
 const ServiceWithdraw = () => {
   const navigate = useNavigate();
   const [checked1, setChecked1] = useState(false);
   const [checked2, setChecked2] = useState(false);
 
+  // 1. 보유 포인트 및 정보 상태
+  const [point, setPoint] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  // 2. 마운트 시 내 정보 조회 (보유 포인트 확인용)
+  useEffect(() => {
+    const fetchMyInfo = async () => {
+      try {
+        setLoading(true);
+        const response = await getMyInfo();
+        const data = response.data || response;
+        // 서버 응답 구조에 따라 coin 또는 point 사용
+        setPoint(data?.coin ?? data?.point ?? 0);
+      } catch (error) {
+        console.error("회원 정보 조회 실패:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMyInfo();
+  }, []);
+
   const handleBack = () => {
     navigate(-1); // 이전 페이지(마이페이지)로 이동
   };
+
+  // 3. 탈퇴 처리 함수
+  const handleDeleteAccount = async () => {
+    if (!checked1 || !checked2) return;
+
+    // 사용자 실수 방지 final 컨펌창
+    const isConfirmed = window.confirm("정말로 탈퇴하시겠습니까? 탈퇴 후에는 계정 복구가 불가능합니다.");
+    if (!isConfirmed) return;
+
+    try {
+      await deleteAccount(); // 회원 탈퇴 API 호출
+      alert("회원 탈퇴가 완료되었습니다. 그동안 이용해 주셔서 감사합니다.");
+      
+      // 토큰 및 인증 정보 정리
+      localStorage.removeItem("token");
+      
+      // 메인/온보딩 화면으로 이동 (history 쌓이지 않게 replace 사용)
+      navigate('/', { replace: true });
+    } catch (error) {
+      console.error("회원 탈퇴 실패:", error);
+      alert("탈퇴 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    }
+  };
+
+  if (loading) {
+    return <S.Container>로딩 중...</S.Container>;
+  }
 
   return (
     <S.Container>
@@ -30,8 +80,11 @@ const ServiceWithdraw = () => {
           <S.NoticeItem>탈퇴 시 회원님이 보유하셨던 포인트는 소멸되며, 소멸된 포인트는 복원 및 환불되지 않습니다.</S.NoticeItem>
         </S.NoticeList>
 
-        <S.PointHighlight>유료 700 포인트를 보유 중입니다.</S.PointHighlight>
-        <S.PointLink>포인트 내역 <span>→</span></S.PointLink>
+        {/* 동적으로 가져온 포인트 표시 */}
+        <S.PointHighlight>유료 {point} 포인트를 보유 중입니다.</S.PointHighlight>
+        <S.PointLink onClick={() => navigate('/points')}>
+          포인트 내역 <span>→</span>
+        </S.PointLink>
       </S.Content>
 
       <S.CheckboxSection>
@@ -46,7 +99,13 @@ const ServiceWithdraw = () => {
         </S.CheckboxRow>
       </S.CheckboxSection>
 
-      <CtaButton $variant="bottom" disabled={!(checked1 && checked2)} onClick={() => navigate('/')}>탈퇴하기</CtaButton>
+      <CtaButton 
+        $variant="bottom" 
+        disabled={!(checked1 && checked2)} 
+        onClick={handleDeleteAccount}
+        >
+          탈퇴하기
+        </CtaButton>
     </S.Container>
   );
 };

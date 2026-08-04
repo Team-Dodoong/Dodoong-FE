@@ -1,5 +1,5 @@
 // import { motion, useAnimation } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Header from '../../../../components/Header/Header'
@@ -13,65 +13,207 @@ import FloatingAddButton from './components/FloatingAddButton/FloatingAddButton'
 
 
 import * as S from './Home.style';
-
 import bgGradient from '../../../../assets/Rectangle 3410.png';
 
-// 실제로는 API에서 받아올 목데이터입니다.
-const INITIAL_DAILY_QUESTS = Array.from({ length: 8 }, (_, i) => ({
-  id: `daily-${i + 1}`,
-  title: 'EFUB 세미나 과제 제출',
-  checked: false,
-}));
+// 🟢 1. 필요한 API 불러오기
+import { getMyInfo, levelUp } from '../../../../api/memberApi';
+import {
+  getDailyQuestsByDate,
+  toggleCheckDailyQuest,
+  postponeDailyQuest,
+  deleteDailyQuest,
+  deleteRoutine,
+} from '../../../../api/dailyQuestApi';
+import { getStreaks } from '../../../../api/streakApi';
 
-const INITIAL_PARTY_QUESTS = Array.from({ length: 4 }, (_, i) => ({
-  id: `party-${i + 1}`,
-  tag: '운동 한시간인증',
-  title: '런닝 1시간 인증하기',
-  checked: false,
-}));
+// 오늘 날짜 구하기 (YYYY-MM-DD)
+const getTodayString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+// 🟢 [추가] 요일 계산 헬퍼
+const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+// 오늘 요일 가져오기 (예: 'Mon')
+const getTodayName = () => DAYS_OF_WEEK[new Date().getDay()];
+
+// streakDays 일수에 따라 활성화될 요일 배열 생성
+const getCheckedDays = (streakDays) => {
+  if (!streakDays || streakDays <= 0) return [];
+  const todayIndex = new Date().getDay();
+  const checkedList = [];
+  
+  for (let i = 0; i < streakDays && i < 7; i++) {
+    const targetIndex = (todayIndex - i + 7) % 7;
+    checkedList.unshift(DAYS_OF_WEEK[targetIndex]);
+  }
+  return checkedList;
+};
 
 function Home() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'party'
-  const [dailyQuests, setDailyQuests] = useState(INITIAL_DAILY_QUESTS);
-  const [partyQuests, setPartyQuests] = useState(INITIAL_PARTY_QUESTS);
+  
+  // 🟢 목데이터 대신 API 데이터 상태로 관리
+  const [dailyQuests, setDailyQuests] = useState([]);
+  const [partyQuests, setPartyQuests] = useState([]);
 
-  const [level, setLevel] = useState(9);
+  // 회원, 캐릭터 데이터, 스트릭 일수
+  const [userInfo, setUserInfo] = useState(null);
+  const [streakDays, setStreakDays] = useState(0);
   const [showLevelUp, setShowLevelUp] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  // 🟢 2. 마운트 시 초기 데이터 조회 (내 정보, 오늘 퀘스트, 스트릭)
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      try {
+        setLoading(true);
+        const todayStr = getTodayString();
+
+        // 3개 API 병렬 호출
+        const [myInfoRes, questsRes, streakRes] = await Promise.all([
+          getMyInfo(),
+          getDailyQuestsByDate(todayStr),
+          getStreaks(),
+        ]);
+
+        // 내 정보 반영
+        setUserInfo(myInfoRes.data || myInfoRes);
+
+        // 일일 퀘스트 목록 변환 및 반영
+        const fetchedQuests = (questsRes.data?.quests || []).map((q) => ({
+          id: q.dailyQuestId,
+          title: q.content,
+          checked: q.isChecked,
+          isRoutine: q.isRoutine,
+          routineId: q.routineId,
+          category: q.questCategory,
+        }));
+        setDailyQuests(fetchedQuests);
+
+        // 스트릭 반영
+        if (streakRes.data) {
+          setStreakDays(streakRes.data.consecutiveDays || 0);
+        }
+      } catch (error) {
+        console.error('Home 데이터 불러오기 실패:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, []);
 
   const quests = activeTab === 'daily' ? dailyQuests : partyQuests;
-  const setQuests = activeTab === 'daily' ? setDailyQuests : setPartyQuests;
 
-  const updateQuests = (updater) => setQuests((prev) => updater(prev));
+  // 레벨업 처리
+  const handleLevelUp = async () => {
+    try {
+      const updatedData = await levelUp();
+      const data = updatedData.data || updatedData;
 
-  const handleToggle = (id) => {
-    updateQuests((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, checked: !q.checked } : q))
+      setUserInfo((prev) => ({
+        ...prev,
+        level: data.level,
+        coin: data.coin,
+        experience: data.experience,
+      }));
+      setShowLevelUp(true);
+    } catch (error) {
+      console.error('레벨업 요청 실패:', error);
+    }
+  };
+
+  // 🟢 3. 퀘스트 체크 / 체크 해제 API 연동
+  const handleToggle = async (id) => {
+    if (activeTab === 'party') {
+      // 파티 퀘스트 토글 로직
+      setPartyQuests((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, checked: !q.checked } : q))
+      );
+      return;
+    }
+
+    const targetQuest = dailyQuests.find((q) => q.id === id);
+    if (!targetQuest) return;
+
+    const newCheckedState = !targetQuest.checked;
+
+    // UI 먼저 변경 (Optimistic UI)
+    setDailyQuests((prev) =>
+      prev.map((q) => (q.id === id ? { ...q, checked: newCheckedState } : q))
     );
-    // TODO: 완료 처리 API 연동, 경험치 반영, 레벨업 시 setShowLevelUp(true)
+
+    try {
+      const res = await toggleCheckDailyQuest(id, newCheckedState);
+      
+      // 경험치/코인 변경 반영 (API 응답 데이터 활용)
+      if (res.data) {
+        setUserInfo((prev) => ({
+          ...prev,
+          experience: res.data.experience ?? prev?.experience,
+        }));
+
+        // 필요 시 경험치에 따라 레벨업 감지/호출
+        // if (res.data.experience >= 필요경험치) handleLevelUp();
+      }
+    } catch (error) {
+      console.error('퀘스트 체크 상태 변경 실패:', error);
+      // 실패 시 다시 롤백
+      setDailyQuests((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, checked: targetQuest.checked } : q))
+      );
+    }
   };
 
   const handleEdit = (id) => {
     navigate('/questdetail', { state: { id } });
   };
 
-  const handlePostpone = (id) => {
-    // TODO: 내일로 미루기 API 연동
-    console.log('내일로 미루기', id);
+  // 🟢 4. 일정 내일로 미루기 API 연동
+  const handlePostpone = async (id) => {
+    try {
+      await postponeDailyQuest(id);
+      // 오늘의 퀘스트 목록에서 제거
+      setDailyQuests((prev) => prev.filter((q) => q.id !== id));
+    } catch (error) {
+      console.error('일정 미루기 실패:', error);
+    }
   };
 
-  const handleDeleteToday = (id) => {
-    updateQuests((prev) => prev.filter((q) => q.id !== id));
+  // 🟢 5. 오늘 삭제 API 연동
+  const handleDeleteToday = async (id) => {
+    try {
+      await deleteDailyQuest(id);
+      setDailyQuests((prev) => prev.filter((q) => q.id !== id));
+    } catch (error) {
+      console.error('퀘스트 삭제 실패:', error);
+    }
   };
 
-  const handleDeleteForever = (id) => {
-    updateQuests((prev) => prev.filter((q) => q.id !== id));
-    // TODO: 반복 등록 자체를 삭제하는 API 호출
+  // 🟢 6. 반복(루틴) 전체 삭제 API 연동
+  const handleDeleteForever = async (id) => {
+    const targetQuest = dailyQuests.find((q) => q.id === id);
+    try {
+      if (targetQuest?.routineId) {
+        await deleteRoutine(targetQuest.routineId);
+      } else {
+        await deleteDailyQuest(id);
+      }
+      setDailyQuests((prev) => prev.filter((q) => q.id !== id));
+    } catch (error) {
+      console.error('루틴/퀘스트 완전 삭제 실패:', error);
+    }
   };
 
   const handleLeaveParty = (id) => {
-    // TODO: 파티 탈퇴 API 연동
     console.log('파티탈퇴', id);
   };
 
@@ -79,24 +221,29 @@ function Home() {
     navigate('/floatingadd_questdetail', { state: { type: activeTab } });
   };
 
+  if (loading) {
+    return <S.Wrapper>로딩 중...</S.Wrapper>;
+  }
+
   return (
     <S.Wrapper>
       <Header />
 
       <S.Content $bgImage={bgGradient} >
-        <PointBadge point={1270} />
+        {/* 포인트 동적 연결 */}
+        <PointBadge point={userInfo?.coin ?? 0} />
 
         <CharacterCard
-          userName="김이화"
-          characterName="두비"
-          exp={360}
-          maxExp={1000}
+          userName={userInfo?.nickname || '사용자'}
+          characterName={userInfo?.characterName || '두비'}
+          exp={userInfo?.experience ?? 0}
+          maxExp={1000} // 레벨별 필요 경험치에 맞게 설정
         />
 
         <StreakTracker
-          streakDays={3}
-          checkedDays={['Sun', 'Mon', 'Tue']}
-          today="Wed"
+          streakDays={streakDays}
+          checkedDays={getCheckedDays(streakDays)}
+          today={getTodayName()}
         />
       </S.Content>
 
@@ -118,7 +265,10 @@ function Home() {
       <BottomNav active="home" onNavigate={(key) => navigate(`/${key}`)} />
 
       {showLevelUp && (
-        <LevelUpModal level={level} onConfirm={() => setShowLevelUp(false)} />
+        <LevelUpModal 
+          level={userInfo?.level ?? 1}
+          onConfirm={() => setShowLevelUp(false)} 
+        />
       )}
     </S.Wrapper>
   );
