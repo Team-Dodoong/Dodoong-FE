@@ -7,6 +7,7 @@ import CharacterIcon_Img from '../../../../../../assets/character-icon.png'; // 
 function CharacterCard({
   userName,
   characterName,
+  characterImage,
   exp,
   maxExp,
 }) {
@@ -20,7 +21,7 @@ function CharacterCard({
 
       <S.CharacterArea $bgImage={bgGradient}>
         <S.Decoration  src={CharacterIcon_Img} alt="character-icon" />
-        <S.CharacterImage src={character_doobi} alt={characterName} />
+        <S.CharacterImage src={characterImage ?? character_doobi} alt={characterName} />
       </S.CharacterArea>
 
       <S.CharacterName>{characterName}</S.CharacterName>
