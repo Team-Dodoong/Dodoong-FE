@@ -27,3 +27,6 @@ export const searchParties = ({
 
 export const getMyParties = ({ page = 0, size = 20 } = {}) =>
   instance.get("/api/parties/my", { params: { page, size } });
+
+export const getPartyMonthlyStats = (partyId) =>
+  instance.get(`/api/parties/${partyId}/me/monthly`);

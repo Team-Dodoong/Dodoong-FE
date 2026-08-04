@@ -1,14 +1,8 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import CtaButton from "../../../components/Button/CtaButton";
-
-const MOCK_STATS = {
-  monthlyRank: 3,
-  streak: 5,
-  questComplete: "미완료",
-  monthlyCount: 24,
-};
+import { getPartyMonthlyStats } from "../../../api/partyApi";
 
 const MOCK_RECORDS = [
   "https://picsum.photos/seed/a/100",
@@ -24,6 +18,25 @@ function JoinedView({ detail }) {
   const [sheetChecked, setSheetChecked] = useState(false);
   const [verifyImage, setVerifyImage] = useState(null);
   const imageInputRef = useRef(null);
+  const [monthlyStats, setMonthlyStats] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadMonthlyStats = async () => {
+      try {
+        const response = await getPartyMonthlyStats(partyId);
+        if (!ignore) setMonthlyStats(response.data.data);
+      } catch (err) {
+        console.error("월간 통계 조회 실패", err);
+      }
+    };
+
+    loadMonthlyStats();
+    return () => {
+      ignore = true;
+    };
+  }, [partyId]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -42,17 +55,27 @@ function JoinedView({ detail }) {
           <S.StatItem>
             <S.TrophyIcon />
             <S.StatLabel>월간 랭킹</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.monthlyRank}위</S.StatValue>
+            <S.StatValue>
+              {monthlyStats ? `${monthlyStats.rank}위` : "-"}
+            </S.StatValue>
           </S.StatItem>
           <S.StatItem>
             <S.DartIcon />
             <S.StatLabel>퀘스트 달성</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.questComplete}</S.StatValue>
+            <S.StatValue>
+              {monthlyStats
+                ? monthlyStats.todayQuestCompleted
+                  ? "완료"
+                  : "미완료"
+                : "-"}
+            </S.StatValue>
           </S.StatItem>
           <S.StatItem>
             <S.SmileIcon />
             <S.StatLabel>월별 인증 횟수</S.StatLabel>
-            <S.StatValue>{MOCK_STATS.monthlyCount}회</S.StatValue>
+            <S.StatValue>
+              {monthlyStats ? `${monthlyStats.monthlyParticipationCount}회` : "-"}
+            </S.StatValue>
           </S.StatItem>
         </S.StatsRow>
 
