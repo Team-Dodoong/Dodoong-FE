@@ -90,5 +90,6 @@ export const ButtonSection = styled.div`
 export const ErrorMessage = styled.span`
   font-size: 12px;
   color: #ff3b30;
+  min-height : 16px;
   margin-top: 6px;
 `;

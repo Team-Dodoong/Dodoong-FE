@@ -97,7 +97,7 @@ export const TermRow = styled.div`
   align-items: center;
   padding: 14px 0;
   cursor: pointer;
-  margin-bottom: ${(props) => (props.isHeader ? '8px' : '0px')};
+  margin-bottom: ${(props) => (props.$isHeader ? '8px' : '0px')};
 `;
 
 export const CheckIcon = styled(Check)`
@@ -109,9 +109,9 @@ export const CheckIcon = styled(Check)`
 
 export const TermText = styled.span`
   font-family : "Pretendard";
-  font-size: ${(props) => (props.isHeader ? '18px' : '14px')};
-  font-weight: ${(props) => (props.isHeader ? '700' : '500')};
-  color: ${(props) => (props.isHeader ? '#1E1E1E' : '#5E5E5E')};
+  font-size: ${(props) => (props.$isHeader ? '18px' : '14px')};
+  font-weight: ${(props) => (props.$isHeader ? '700' : '500')};
+  color: ${(props) => (props.$isHeader ? '#1E1E1E' : '#5E5E5E')};
   flex: 1;
 `;
 
