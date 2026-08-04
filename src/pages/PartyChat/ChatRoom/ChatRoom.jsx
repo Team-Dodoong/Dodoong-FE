@@ -4,6 +4,7 @@ import * as S from "./ChatRoom.style";
 import LeaveModal from "../components/LeaveModal";
 import defaultAvatar from "../../../assets/character_두비.png";
 import { getChatHistory, getChatRooms } from "../../../api/chatApi";
+import { leaveParty } from "../../../api/partyApi";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -36,6 +37,8 @@ function ChatRoom() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [input, setInput] = useState("");
   const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState(null);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -122,6 +125,20 @@ function ChatRoom() {
     }
   };
 
+  const handleLeaveConfirm = async () => {
+    setLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveParty(roomId);
+      navigate("/party/chat");
+    } catch (err) {
+      console.error("파티 탈퇴 실패", err);
+      setLeaveError(err.response?.data?.message ?? "파티 탈퇴에 실패했습니다.");
+    } finally {
+      setLeaving(false);
+    }
+  };
+
   const displayItems = [];
   let lastDateKey = null;
   messages.forEach((msg) => {
@@ -205,8 +222,13 @@ function ChatRoom() {
 
       {showLeaveModal && (
         <LeaveModal
-          onCancel={() => setShowLeaveModal(false)}
-          onConfirm={() => navigate("/party/chat")}
+          onCancel={() => {
+            setShowLeaveModal(false);
+            setLeaveError(null);
+          }}
+          onConfirm={handleLeaveConfirm}
+          submitting={leaving}
+          error={leaveError}
         />
       )}
     </S.Container>

@@ -53,16 +53,50 @@ export const CharacterSection = styled.div`
 
 export const CharacterMessage = styled.p`
   ${Regular_12};
+  position: relative;
   color: var(--Gray_6);
   background: white;
   padding: 0.5rem 1rem;
   border-radius: 999px;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 5px 0 5px;
+    border-style: solid;
+    border-color: white transparent transparent transparent;
+  }
+`;
+
+export const CharacterArea = styled.div`
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0;
+`;
+
+export const Decoration = styled.img`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 17.5rem;
+  pointer-events: none;
+  z-index: 1;
 `;
 
 export const MainCharacterImage = styled.img`
   width: 8rem;
   height: 8rem;
   object-fit: contain;
+  position: relative;
+  z-index: 2;
 `;
 
 export const CharacterName = styled.p`
