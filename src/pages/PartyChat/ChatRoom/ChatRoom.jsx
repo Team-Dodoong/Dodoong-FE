@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useChatRoom } from "../../../hooks/useChatRoom";
 import * as S from "./ChatRoom.style";
 import LeaveModal from "../components/LeaveModal";
 import defaultAvatar from "../../../assets/character_두비.png";
 import { getChatHistory, getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
+import { getMyInfo } from "../../../api/memberApi";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
@@ -40,6 +42,32 @@ function ChatRoom() {
   const [leaving, setLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState(null);
   const bottomRef = useRef(null);
+  const syncedRealtimeCountRef = useRef(0);
+  const {
+    messages: realtimeMessages,
+    sendMessage,
+    isConnected,
+  } = useChatRoom(Number(roomId));
+  const [myId, setMyId] = useState(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadMyId = async () => {
+      try {
+        const response = await getMyInfo();
+        const data = response.data || response;
+        if (!ignore) setMyId(data?.id ?? null);
+      } catch (err) {
+        if (!ignore) console.error("내 정보 조회 실패", err);
+      }
+    };
+
+    loadMyId();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     let ignore = false;
@@ -60,7 +88,8 @@ function ChatRoom() {
           room ? { name: room.partyName, count: room.memberCount } : null,
         );
         const history = historyRes.data.data;
-        setMessages(sortByTime(history.messages.map(mapMessage)));
+        const mapped = history.messages.map(mapMessage);
+        setMessages(sortByTime(mapped));
         setHasNext(history.hasNext);
         setNextCursor(history.nextCursor);
       } catch (err) {
@@ -104,17 +133,25 @@ function ChatRoom() {
     }
   };
 
+  useEffect(() => {
+    const newOnes = realtimeMessages.slice(syncedRealtimeCountRef.current);
+    syncedRealtimeCountRef.current = realtimeMessages.length;
+    if (newOnes.length === 0) return;
+
+    const mapped = newOnes.map((m) => ({
+      id: m.messageId,
+      type: m.senderId === myId ? "me" : "other",
+      name: m.senderNickname,
+      avatar: m.senderProfileImageUrl ?? defaultAvatar,
+      text: m.content,
+      createdAt: m.createdAt,
+    }));
+    setMessages((prev) => sortByTime([...prev, ...mapped]));
+  }, [realtimeMessages, myId]);
+
   const handleSend = () => {
     if (!input.trim()) return;
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: `local-${Date.now()}`,
-        type: "me",
-        text: input.trim(),
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+    sendMessage(input.trim());
     setInput("");
   };
 
@@ -169,10 +206,7 @@ function ChatRoom() {
         {loading && <S.NoticeText>불러오는 중...</S.NoticeText>}
         {error && <S.NoticeText>{error}</S.NoticeText>}
         {hasNext && (
-          <S.NoticeText
-            onClick={handleLoadMore}
-            style={{ cursor: "pointer" }}
-          >
+          <S.NoticeText onClick={handleLoadMore} style={{ cursor: "pointer" }}>
             {loadingMore ? "불러오는 중..." : "이전 대화 더 불러오기"}
           </S.NoticeText>
         )}
