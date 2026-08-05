@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import * as S from './QuadrantView.style';
 import QuadrantModal from '../QuadrantModal/QuadrantModal';
-
 import { getQuadrantQuests, toggleCheckDailyQuest } from '../../../../api/dailyQuestApi';
 
 const QUADRANTS = [
@@ -11,7 +11,8 @@ const QUADRANTS = [
   { id: 'q4', categoryKey: 'NOT_IMPORTANT_NOT_URGENT', title: '긴급하지 않아요!', bgColor: '#EFEFEF', color: '#888888' },
 ];
 
-function QuadrantView() {
+function QuadrantView({ selectedDate, refreshTrigger }) {
+  const location = useLocation();
   // 🟢 3. 기본 상태를 q1, q2, q3, q4 빈 배열로 초기화 (undefined 에러 방지)
   const [todoData, setTodoData] = useState({
     q1: [],
@@ -36,12 +37,20 @@ function QuadrantView() {
         quadrantList.forEach((group) => {
           const matchedQuadrant = QUADRANTS.find((q) => q.categoryKey === group.category);
           if (matchedQuadrant) {
-            newTodoData[matchedQuadrant.id] = (group.quests || []).map((quest) => ({
-              id: quest.dailyQuestId,
-              title: quest.content,
-              completed: quest.isChecked,
-              isRoutine: quest.isRoutine,
-            }));
+            newTodoData[matchedQuadrant.id] = (group.quests || []).map((quest) => {
+              const isChecked = quest.isChecked ?? quest.completed ?? false;
+              const contentText = quest.content || quest.title || '';
+              
+              return {
+                id: quest.dailyQuestId || quest.id,
+                dailyQuestId: quest.dailyQuestId || quest.id,
+                title: contentText,
+                content: contentText,
+                completed: isChecked,
+                isChecked: isChecked,
+                isRoutine: quest.isRoutine,
+              };
+            });
           }
         });
 
@@ -54,11 +63,23 @@ function QuadrantView() {
     };
 
     fetchQuadrants();
-  }, []);
+  }, [location.key, refreshTrigger]);
 
-  // 🟢 5. 체크 토글 처리 (UI 반영 + 서버 PATCH)
+  // 체크 토글 처리 (UI 선반영 + 서버 PATCH)
   const handleToggle = async (quadrantId, itemId) => {
-    const targetList = todoData[quadrantId] || [];
+    // 만약 모달 등에서 quadrantId 없이 itemId만 들어올 경우를 대비한 안전 장치
+    let targetQuadId = quadrantId;
+    if (!itemId) {
+      itemId = quadrantId;
+      // itemId만 들어온 경우 전체 사분면에서 해당 아이템을 검색
+      targetQuadId = Object.keys(todoData).find((qKey) =>
+        todoData[qKey].some((item) => item.id === itemId)
+      );
+    }
+
+    if (!targetQuadId) return;
+
+    const targetList = todoData[targetQuadId] || [];
     const targetItem = targetList.find((item) => item.id === itemId);
     if (!targetItem) return;
 
@@ -67,8 +88,10 @@ function QuadrantView() {
     // UI 선반영
     setTodoData((prevData) => ({
       ...prevData,
-      [quadrantId]: (prevData[quadrantId] || []).map((item) =>
-        item.id === itemId ? { ...item, completed: nextCompleted } : item
+      [quadrantId]: (prevData[targetQuadId] || []).map((item) =>
+        item.id === itemId 
+          ? { ...item, completed: nextCompleted, isChecked: nextCompleted }
+          : item
       ),
     }));
 
@@ -79,8 +102,10 @@ function QuadrantView() {
       // 실패 시 롤백
       setTodoData((prevData) => ({
         ...prevData,
-        [quadrantId]: (prevData[quadrantId] || []).map((item) =>
-          item.id === itemId ? { ...item, completed: !nextCompleted } : item
+        [targetQuadId]: (prevData[targetQuadId] || []).map((item) =>
+          item.id === itemId 
+            ? { ...item, completed: !nextCompleted, isChecked: !nextCompleted } 
+            : item
         ),
       }));
       alert('상태 변경에 실패했습니다.');
@@ -121,7 +146,14 @@ function QuadrantView() {
           category={selectedQuadrant}
           items={todoData[selectedQuadrant.id] || []}
           onClose={() => setSelectedQuadrant(null)}
-          onToggle={handleToggle} // 체크 토글 함수 전달
+          // 모달에서 (quadrantId, itemId) 형태로 넘기거나 (itemId)만 넘겨도 모두 대응 가능
+          onToggle={(catIdOrItemId, itemId) => {
+            if (itemId) {
+              handleToggle(catIdOrItemId, itemId);
+            } else {
+              handleToggle(selectedQuadrant.id, catIdOrItemId);
+            }
+          }}
         />
       )}
     </S.Container>

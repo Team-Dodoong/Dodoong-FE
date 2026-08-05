@@ -22,6 +22,7 @@ function BottomSheet({
   onDeleteToday,
   onDeleteForever,
   onLeaveParty,
+  onSuccess,
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const controls = useAnimation();
@@ -79,6 +80,7 @@ function BottomSheet({
           onDeleteToday={onDeleteToday}
           onDeleteForever={onDeleteForever}
           onLeaveParty={onLeaveParty}
+          onSuccess={onSuccess}
         />
       </S.BottomSheetScrollArea>
     </S.BottomSheetContainer>

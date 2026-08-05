@@ -37,7 +37,7 @@ const DAY_MAP_FROM_SERVER = {
 };
 
 // 🟢 2. UI용 카테고리 -> 백엔드 카테고리 Enum 매핑 (CategorySelector 구조에 맞게 매칭)
-const CATEGORY_MAP_TO_SERVER = {
+/* const CATEGORY_MAP_TO_SERVER = {
   'important': 'IMPORTANT_URGENT',             // 👈 추가! (현재 'important'가 들어가고 있었음)
   'important_urgent': 'IMPORTANT_URGENT',
   'important_not_urgent': 'IMPORTANT_NOT_URGENT',
@@ -49,7 +49,16 @@ const CATEGORY_MAP_TO_SERVER = {
   'q4': 'NOT_IMPORTANT_NOT_URGENT',
   // 만약 selector value가 이미 'IMPORTANT_URGENT' 등이라면 그대로 전달
   'urgent': 'IMPORTANT_URGENT',
+}; */
+
+// 오늘 날짜 기준으로 YYYY-MM-DD 구하는 함수
+const getDefaultEndDate = () => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1); // 오늘 기준 1달 뒤로 설정
+  return date.toISOString().split('T')[0]; // "YYYY-MM-DD" 형태로 반환
 };
+
+
 
 // 퀘스트 상세보기 / 수정 페이지
 function QuestDetail() {
@@ -61,13 +70,15 @@ function QuestDetail() {
   const isNew = !id || id === 'new';
 
   const [content, setContent] = useState('');
-  const [category, setCategory] = useState('urgent');
-  const [isVisible, setIsVisible] = useState(true);
+  
+  const [category, setCategory] = useState('IMPORTANT_URGENT');
+  
+  // const [isVisible, setIsVisible] = useState(true);
 
   //반복 설정 관련 상태
   const [isRepeating, setIsRepeating] = useState(false);
   const [selectedDays, setSelectedDays] = useState(['월', '화', '수', '목', '금']);
-  const [endDate, setEndDate] = useState('2026.12.31');
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
   const [isLoading, setIsLoading] = useState(false);
 
   // 🟢 기존 데이터가 있는 경우 (수정 모드) 초기 상태 설정
@@ -106,11 +117,10 @@ function QuestDetail() {
     }
 
     // 서버용 데이터 변환
-    const questCategory = CATEGORY_MAP_TO_SERVER[category] || category;
+    // const questCategory = CATEGORY_MAP_TO_SERVER[category] || category;
     
     // YYYY.MM.DD -> YYYY-MM-DD 포맷 변환
     const formattedEndDate = endDate ? endDate.replace(/\./g, '-') : null;
-
     const serverRepeatDays = selectedDays.map((d) => DAY_MAP_TO_SERVER[d] || d);
 
     try {
@@ -120,14 +130,14 @@ function QuestDetail() {
         // 🟢 1. 기존 퀘스트 수정 (PATCH /api/daily-quests/{id})
         await updateDailyQuest(id, {
           content: content.trim(),
-          questCategory: questCategory, // 예: 'IMPORTANT_URGENT'
+          questCategory: category, // 예: 'IMPORTANT_URGENT'
         });
       } else {
         // 🟢 2. 신규 퀘스트 생성 (POST /api/daily-quests)
         // 백엔드 요청 DTO 명세에 맞춘 데이터 구성
         const requestBody = {
+          questCategory: category,
           content: content.trim(),
-          questCategory: questCategory,
           isRoutine: isRepeating,         // 일회성 퀘스트인 경우 false
           repeatDays: isRepeating ? serverRepeatDays : [],           // 빈 배열 또는 null (백엔드 명세에 맞춤)
           endDate: isRepeating ? formattedEndDate : null,            // 일회성일 경우 null
@@ -215,10 +225,23 @@ function QuestDetail() {
               ))}
             </S.DaysGroup>
 
-            <S.EndDateRow onClick={() => console.log('날짜 피커 연동')}>
+            <S.EndDateRow>
               <S.EndDateLabel>반복종료</S.EndDateLabel>
               <S.EndDateValue>
-                {endDate} <span>&gt;</span>
+                <input 
+                  type="date" 
+                  value={(endDate || '').replace(/\./g, '-')} 
+                  onChange={(e) => setEndDate(e.target.value)}
+                  onClick={(e) => e.target.showPicker?.()}
+                  style={{ 
+                      border: 'none', 
+                      background: 'transparent', 
+                      cursor: 'pointer',
+                      fontFamily: 'inherit',
+                      fontSize: 'inherit',
+                      color: 'inherit'
+                  }}
+                />
               </S.EndDateValue>
             </S.EndDateRow>
           </>

@@ -24,20 +24,25 @@ export const DayHeader = styled.div`
 `;
 
 export const DateCell = styled.div`
-  height: 36px;
-  height: 36px;
+  width: 36px;
+  height: 42px;
+  // margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 4px;
+
   font-size: 13px;
   background: ${({ $isSelected }) => ($isSelected ? '#FFF8F0' : 'transparent')};
-  // border-radius: ${({ $isSelected }) => ($isSelected ? '50%' : '0')};
+  border-radius: 8px; /* 👈 요 숫자로 꺾임 정도를 조절 가능 (예: 6px ~ 10px) */
+
   position: relative;
 
   span {
     font-weight: ${({ $isSelected }) => ($isSelected ? '700' : '400')};
     color: ${({ $isSelected }) => ($isSelected ? '#FF8A3D' : '#333333')};
+    line-height: 1;
   }
 `;
 
@@ -47,7 +52,7 @@ export const Dot = styled.div`
   border-radius: 50%;
   background-color: ${({ $color }) => $color || '#FF8A3D'};
   position: absolute;
-  bottom: 3px;
+  bottom: 7px;
 `;
 
 export const StreakBanner = styled.div`

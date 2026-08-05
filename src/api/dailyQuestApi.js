@@ -208,7 +208,7 @@ export const toggleCheckDailyQuest = async (dailyQuestId, isChecked) => {
 export const postponeDailyQuest = async (dailyQuestId) => {
   try {
     // POST /api/daily-quests/{dailyQuestId}/postpone 요청
-    const response = await api.post(`/api/daily-quests/${dailyQuestId}/postpone`);
+    const response = await api.patch(`/api/daily-quests/${dailyQuestId}/postpone`);
     return response.data;
   } catch (error) {
     if (error.response) {

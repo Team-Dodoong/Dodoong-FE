@@ -225,6 +225,26 @@ function Home() {
     return <S.Wrapper>로딩 중...</S.Wrapper>;
   }
 
+  // 🟢 퀘스트 목록 재조회 함수 추가
+const refetchQuests = async () => {
+  try {
+    const todayStr = getTodayString();
+    const questsRes = await getDailyQuestsByDate(todayStr);
+    const fetchedQuests = (questsRes.data?.quests || []).map((q) => ({
+      id: q.dailyQuestId,
+      dailyQuestId: q.dailyQuestId, // 💡 두 식별자 모두 챙겨두면 안전합니다.
+      title: q.content,
+      checked: q.isChecked,
+      isRoutine: q.isRoutine,
+      routineId: q.routineId,
+      category: q.questCategory,
+    }));
+    setDailyQuests(fetchedQuests);
+  } catch (error) {
+    console.error('퀘스트 목록 재조회 실패:', error);
+  }
+};
+
   return (
     <S.Wrapper>
       <Header />
@@ -258,6 +278,7 @@ function Home() {
         onDeleteToday={handleDeleteToday}
         onDeleteForever={handleDeleteForever}
         onLeaveParty={handleLeaveParty}
+        onSuccess={refetchQuests}
       />
 
 
