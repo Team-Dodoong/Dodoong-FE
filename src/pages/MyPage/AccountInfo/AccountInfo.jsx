@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import * as S from './AccountInfo.style';
 import MyPageProfileImage from '../../../assets/mypage-profile-image.png' ;
 import { getMyInfo, logout } from '../../../api/memberApi';
+import { deactivateStomp } from '../../../api/stompClient';
 
 const AccountInfo = () => {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ const AccountInfo = () => {
     } finally {
       // API 성공 여부와 상관없이 클라이언트 토큰 정리 후 로그인/온보딩 페이지로 이동
       localStorage.removeItem("token");
+      deactivateStomp();
       setShowLogoutModal(false);
       navigate('/');
     }
