@@ -40,6 +40,9 @@ export const getPartyMonthlyRanking = (partyId) =>
 export const leaveParty = (partyId) =>
   instance.delete(`/api/parties/${partyId}/leave`);
 
+export const deleteParty = (partyId) =>
+  instance.delete(`/api/parties/${partyId}`);
+
 export const updateParty = (partyId, requestDto, imageFile) => {
   const formData = new FormData();
   formData.append(
