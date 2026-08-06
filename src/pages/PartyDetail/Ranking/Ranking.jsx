@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getPartyMonthlyRanking } from "../../../api/partyApi";
+import { getCharacterHelloImage } from "../../../utils/characterImage";
 import * as S from "./Ranking.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
-import character1 from "../../../assets/characters/character_hello_1.png";
-import character2 from "../../../assets/characters/character_basic_3.png";
-import character3 from "../../../assets/characters/character_basic_6.png";
 import podium1 from "./images/podium_1.png";
 import podium2 from "./images/podium_2.png";
 import podium3 from "./images/podium_3.png";
@@ -32,6 +31,7 @@ function Ranking() {
               rank: item.rank,
               name: item.nickname,
               score: item.score,
+              characterId: item.characterId,
             })),
           );
         }
@@ -72,7 +72,10 @@ function Ranking() {
           {top3[1] && (
             <>
               <S.RankName>{top3[1].name}</S.RankName>
-              <S.CharacterImage src={character2} alt="2등" />
+              <S.CharacterImage
+                src={getCharacterHelloImage(top3[1].characterId)}
+                alt="2등"
+              />
             </>
           )}
           <S.PodiumBase src={podium2} alt="2등 단상" />
@@ -82,7 +85,10 @@ function Ranking() {
           {top3[0] && (
             <>
               <S.RankName>{top3[0].name}</S.RankName>
-              <S.CharacterImage src={character1} alt="1등" />
+              <S.CharacterImage
+                src={getCharacterHelloImage(top3[0].characterId)}
+                alt="1등"
+              />
             </>
           )}
           <S.PodiumBase src={podium1} alt="1등 단상" />
@@ -92,7 +98,10 @@ function Ranking() {
           {top3[2] && (
             <>
               <S.RankName>{top3[2].name}</S.RankName>
-              <S.CharacterImage src={character3} alt="3등" />
+              <S.CharacterImage
+                src={getCharacterHelloImage(top3[2].characterId)}
+                alt="3등"
+              />
             </>
           )}
           <S.PodiumBase src={podium3} alt="3등 단상" />
