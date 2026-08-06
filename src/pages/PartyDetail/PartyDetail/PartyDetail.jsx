@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import NotJoinedView from "./NotJoinedView";
 import JoinedView from "./JoinedView";
-import { getPartyDetail } from "../../../api/partyApi";
+import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
+import { getPartyDetail, leaveParty, deleteParty } from "../../../api/partyApi";
 
 const CATEGORY_LABELS = {
   STUDY: "공부",
@@ -20,7 +21,12 @@ function PartyDetail() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const isJoined = true;
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [showLeaveModal, setShowLeaveModal] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState(null);
 
   const applyDetail = (party) =>
     setDetail({
@@ -33,6 +39,8 @@ function PartyDetail() {
       image: party.imageUrl,
       introduction: party.description,
       quest: party.questContent,
+      isJoined: party.isJoined,
+      isOwner: party.isOwner,
     });
 
   useEffect(() => {
@@ -69,6 +77,44 @@ function PartyDetail() {
       console.error("파티 상세 재조회 실패", err);
     }
   }, [partyId]);
+
+  const closeLeaveModal = () => {
+    setShowLeaveModal(false);
+    setLeaveError(null);
+  };
+
+  const handleLeaveConfirm = async () => {
+    setLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveParty(partyId);
+      navigate("/party");
+    } catch (err) {
+      console.error("파티 탈퇴 실패", err);
+      setLeaveError(err.response?.data?.message ?? "파티 탈퇴에 실패했습니다.");
+    } finally {
+      setLeaving(false);
+    }
+  };
+
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setDeleteError(null);
+  };
+
+  const handleDeleteConfirm = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      await deleteParty(partyId);
+      navigate("/party");
+    } catch (err) {
+      console.error("파티 삭제 실패", err);
+      setDeleteError(err.response?.data?.message ?? "파티 삭제에 실패했습니다.");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -118,14 +164,14 @@ function PartyDetail() {
           </S.ImageContent>
         </S.ImageSection>
 
-        {isJoined ? (
+        {detail.isJoined ? (
           <JoinedView detail={detail} />
         ) : (
           <NotJoinedView detail={detail} onJoined={refetchDetail} />
         )}
       </S.ScrollArea>
 
-      {isJoined && (
+      {detail.isJoined && (
         <S.RankingButton onClick={() => navigate(`/party/${partyId}/ranking`)}>
           <S.RankIcon />
         </S.RankingButton>
@@ -135,15 +181,68 @@ function PartyDetail() {
         <>
           <S.Overlay $menu onClick={() => setShowMoreMenu(false)} />
           <S.MenuContainer>
-            <S.MenuItem onClick={() => setShowMoreMenu(false)}>
-              파티 숨기기
-            </S.MenuItem>
+            {detail.isOwner ? (
+              <>
+                <S.MenuItem
+                  onClick={() => {
+                    setShowMoreMenu(false);
+                    navigate(`/party/${partyId}/edit`);
+                  }}
+                >
+                  파티 수정하기
+                </S.MenuItem>
+                <S.MenuDivider />
+                <S.MenuItem
+                  onClick={() => {
+                    setShowMoreMenu(false);
+                    setShowDeleteModal(true);
+                  }}
+                >
+                  파티 삭제하기
+                </S.MenuItem>
+              </>
+            ) : (
+              <S.MenuItem
+                onClick={() => {
+                  setShowMoreMenu(false);
+                  setShowLeaveModal(true);
+                }}
+              >
+                파티 탈퇴하기
+              </S.MenuItem>
+            )}
             <S.MenuDivider />
             <S.MenuItem $report onClick={() => setShowMoreMenu(false)}>
               신고하기
             </S.MenuItem>
           </S.MenuContainer>
         </>
+      )}
+
+      {showDeleteModal && (
+        <ConfirmModal
+          title={"파티를 삭제하면 모든 데이터가\n영구적으로 삭제되며 복구할 수 없습니다."}
+          subTitle="파티를 삭제하시겠습니까?"
+          confirmLabel="삭제하기"
+          confirmingLabel="삭제 중..."
+          onCancel={closeDeleteModal}
+          onConfirm={handleDeleteConfirm}
+          submitting={deleting}
+          error={deleteError}
+        />
+      )}
+
+      {showLeaveModal && (
+        <ConfirmModal
+          title={"파티를 탈퇴하면 그동안의\n인증 기록과 랭킹이 모두 사라집니다."}
+          subTitle="파티를 탈퇴하시겠습니까?"
+          confirmLabel="탈퇴하기"
+          confirmingLabel="탈퇴 중..."
+          onCancel={closeLeaveModal}
+          onConfirm={handleLeaveConfirm}
+          submitting={leaving}
+          error={leaveError}
+        />
       )}
     </S.Container>
   );

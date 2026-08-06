@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useChatRoom } from "../../../hooks/useChatRoom";
 import * as S from "./ChatRoom.style";
-import LeaveModal from "../components/LeaveModal";
+import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import defaultAvatar from "../../../assets/character_두비.png";
 import { getChatHistory, getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
@@ -255,7 +255,11 @@ function ChatRoom() {
       </S.InputWrapper>
 
       {showLeaveModal && (
-        <LeaveModal
+        <ConfirmModal
+          title={"채팅방을 나가면 파티도 탈퇴되고\n대화내역이 모두 삭제됩니다."}
+          subTitle="파티를 탈퇴하시겠습니까?"
+          confirmLabel="탈퇴하기"
+          confirmingLabel="탈퇴 중..."
           onCancel={() => {
             setShowLeaveModal(false);
             setLeaveError(null);

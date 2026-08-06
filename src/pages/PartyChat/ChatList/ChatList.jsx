@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./ChatList.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
-import LeaveModal from "../components/LeaveModal";
+import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import defaultChatImage from "../../../assets/character_두비.png";
 import { getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
@@ -195,7 +195,11 @@ function ChatList() {
         ))}
       </S.ChatListWrapper>
       {showLeaveModal && (
-        <LeaveModal
+        <ConfirmModal
+          title={"채팅방을 나가면 파티도 탈퇴되고\n대화내역이 모두 삭제됩니다."}
+          subTitle="파티를 탈퇴하시겠습니까?"
+          confirmLabel="탈퇴하기"
+          confirmingLabel="탈퇴 중..."
           onCancel={closeLeaveModal}
           onConfirm={handleLeaveConfirm}
           submitting={leaving}
