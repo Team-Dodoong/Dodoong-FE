@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./PartyDetail.style";
 import NotJoinedView from "./NotJoinedView";
 import JoinedView from "./JoinedView";
-import { getPartyDetail } from "../../../api/partyApi";
+import { getPartyDetail, leaveParty } from "../../../api/partyApi";
 
 const CATEGORY_LABELS = {
   STUDY: "공부",
@@ -70,6 +70,19 @@ function PartyDetail() {
       console.error("파티 상세 재조회 실패", err);
     }
   }, [partyId]);
+
+  const handleLeaveParty = async () => {
+    setShowMoreMenu(false);
+    if (!window.confirm("정말로 파티를 탈퇴하시겠습니까?")) return;
+
+    try {
+      await leaveParty(partyId);
+      navigate("/party");
+    } catch (err) {
+      console.error("파티 탈퇴 실패", err);
+      alert(err.response?.data?.message ?? "파티 탈퇴에 실패했습니다.");
+    }
+  };
 
   if (loading) {
     return (
@@ -147,9 +160,7 @@ function PartyDetail() {
                 </S.MenuItem>
               </>
             ) : (
-              <S.MenuItem onClick={() => setShowMoreMenu(false)}>
-                파티 탈퇴하기
-              </S.MenuItem>
+              <S.MenuItem onClick={handleLeaveParty}>파티 탈퇴하기</S.MenuItem>
             )}
             <S.MenuDivider />
             <S.MenuItem $report onClick={() => setShowMoreMenu(false)}>
