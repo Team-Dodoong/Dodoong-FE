@@ -151,7 +151,12 @@ function PartyDetail() {
           <S.MenuContainer>
             {detail.isOwner ? (
               <>
-                <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                <S.MenuItem
+                  onClick={() => {
+                    setShowMoreMenu(false);
+                    navigate(`/party/${partyId}/edit`);
+                  }}
+                >
                   파티 수정하기
                 </S.MenuItem>
                 <S.MenuDivider />

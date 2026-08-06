@@ -70,6 +70,7 @@ const router = createBrowserRouter([
       { path: "party/:partyId/ranking", element: <Ranking /> },
       { path: "party/:partyId/certified", element: <Certified /> },
       { path: "party/create", element: <PartyCreate /> },
+      { path: "party/:partyId/edit", element: <PartyCreate /> },
       { path: "character", element: <Character /> },
       { path: "profile/edit", element: <ProfileEdit /> },
       { path: "mypage", element: <MyPage /> },

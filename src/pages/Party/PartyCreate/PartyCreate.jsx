@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import * as S from "../PartyCreate/PartyCreate.style";
 import Input from "../../../components/Input/Input";
 
-import { createParty } from "../../../api/partyApi";
+import { createParty, getPartyDetail, updateParty } from "../../../api/partyApi";
 
 const CATEGORIES = ["공부", "운동", "일상", "외국어", "취업"];
 const CATEGORY_MAP = {
@@ -13,9 +13,15 @@ const CATEGORY_MAP = {
   외국어: "LANGUAGE",
   운동: "FITNESS",
 };
+const CATEGORY_LABEL_BY_CODE = Object.fromEntries(
+  Object.entries(CATEGORY_MAP).map(([label, code]) => [code, label]),
+);
 
 function PartyCreate() {
   const navigate = useNavigate();
+  const { partyId } = useParams();
+  const isEditMode = Boolean(partyId);
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [partyName, setPartyName] = useState("");
   const [description, setDescription] = useState("");
   const [questContent, setQuestContent] = useState("");
@@ -24,11 +30,46 @@ function PartyCreate() {
   const [isPublic, setIsPublic] = useState(true);
   const [password, setPassword] = useState("");
   const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [showImageMenu, setShowImageMenu] = useState(false);
   const galleryInputRef = useRef(null);
   const cameraInputRef = useRef(null);
 
+  useEffect(() => {
+    if (!isEditMode) return;
+    let ignore = false;
+
+    const loadParty = async () => {
+      try {
+        const response = await getPartyDetail(partyId);
+        if (ignore) return;
+        const party = response.data.data;
+        setPartyName(party.name);
+        setDescription(party.description);
+        setQuestContent(party.questContent);
+        setSelectedCategories(
+          party.categories.map((code) => CATEGORY_LABEL_BY_CODE[code] ?? code),
+        );
+        setMaxMembers(party.maxMembers);
+        setIsPublic(party.isPublic);
+        setImage(party.imageUrl);
+      } catch (err) {
+        console.error("파티 정보 조회 실패", err);
+        alert("파티 정보를 불러오지 못했습니다.");
+        navigate(-1);
+      } finally {
+        if (!ignore) setInitialLoading(false);
+      }
+    };
+
+    loadParty();
+    return () => {
+      ignore = true;
+    };
+  }, [isEditMode, partyId, navigate]);
+
   const handleCategory = (cat) => {
+    if (isEditMode) return;
     if (selectedCategories.includes(cat)) {
       setSelectedCategories(selectedCategories.filter((c) => c !== cat));
     } else {
@@ -42,21 +83,24 @@ function PartyCreate() {
     const file = e.target.files[0];
     if (file) {
       setImage(URL.createObjectURL(file));
+      setImageFile(file);
     }
   };
 
   const handleComplete = async () => {
-    if (!partyName.trim()) {
-      alert("파티명을 입력해주세요.");
-      return;
-    }
-    if (selectedCategories.length === 0) {
-      alert("카테고리를 1개 이상 선택해주세요.");
-      return;
-    }
-    if (!questContent.trim()) {
-      alert("파티퀘스트를 입력해주세요.");
-      return;
+    if (!isEditMode) {
+      if (!partyName.trim()) {
+        alert("파티명을 입력해주세요.");
+        return;
+      }
+      if (selectedCategories.length === 0) {
+        alert("카테고리를 1개 이상 선택해주세요.");
+        return;
+      }
+      if (!questContent.trim()) {
+        alert("파티퀘스트를 입력해주세요.");
+        return;
+      }
     }
     if (!description.trim()) {
       alert("파티소개를 입력해주세요.");
@@ -72,31 +116,60 @@ function PartyCreate() {
     }
 
     try {
-      const requestBody = {
-        name: partyName,
-        description: description,
-        categories: selectedCategories.map((cat) => CATEGORY_MAP[cat]),
-        maxMembers: Number(maxMembers),
-        isPublic: isPublic,
-        partyPassword: !isPublic ? password : undefined,
-        questContent: questContent,
-        imageUrl: image || "https://test-image.com/temp.png",
-      };
+      if (isEditMode) {
+        const requestDto = {
+          description,
+          maxMembers: Number(maxMembers),
+          isPublic,
+          partyPassword: !isPublic ? password : undefined,
+        };
 
-      const response = await createParty(requestBody);
-      console.log("파티 생성 성공", response.data);
-      navigate("/party");
+        const response = await updateParty(partyId, requestDto, imageFile);
+        console.log("파티 수정 성공", response.data);
+        navigate(`/party/${partyId}`);
+      } else {
+        const requestBody = {
+          name: partyName,
+          description: description,
+          categories: selectedCategories.map((cat) => CATEGORY_MAP[cat]),
+          maxMembers: Number(maxMembers),
+          isPublic: isPublic,
+          partyPassword: !isPublic ? password : undefined,
+          questContent: questContent,
+          imageUrl: image || "https://test-image.com/temp.png",
+        };
+
+        const response = await createParty(requestBody);
+        console.log("파티 생성 성공", response.data);
+        navigate("/party");
+      }
     } catch (error) {
-      console.error("파티 생성 실패", error);
-      alert("파티 생성에 실패했습니다. 입력값을 확인해주세요.");
+      console.error(isEditMode ? "파티 수정 실패" : "파티 생성 실패", error);
+      alert(
+        isEditMode
+          ? "파티 수정에 실패했습니다. 입력값을 확인해주세요."
+          : "파티 생성에 실패했습니다. 입력값을 확인해주세요.",
+      );
     }
   };
+
+  if (initialLoading) {
+    return (
+      <div>
+        <S.HeaderWrapper>
+          <S.BackIcon onClick={() => navigate(-1)} />
+          <S.HeaderTitle>파티 수정</S.HeaderTitle>
+          <div />
+        </S.HeaderWrapper>
+      </div>
+    );
+  }
 
   return (
     <div>
       <S.HeaderWrapper>
         <S.BackIcon onClick={() => navigate(-1)} />
-        <S.HeaderTitle>파티 개설</S.HeaderTitle>
+        <S.HeaderTitle>{isEditMode ? "파티 수정" : "파티 개설"}</S.HeaderTitle>
         <S.CompleteButton onClick={handleComplete}>완료</S.CompleteButton>
       </S.HeaderWrapper>
       <S.ScrollArea>
@@ -108,13 +181,16 @@ function PartyCreate() {
               maxLength={10}
               value={partyName}
               onChange={(e) => setPartyName(e.target.value)}
+              disabled={isEditMode}
             />
           </div>
           <div>
             <S.BodyTitleWrapper>
               <S.BodyTitle>카테고리</S.BodyTitle>
               <S.BodySubTitle>
-                *최대 4개의 카테고리를 선택할 수 있습니다.
+                {isEditMode
+                  ? "*카테고리는 파티 개설 이후 변경할 수 없습니다."
+                  : "*최대 4개의 카테고리를 선택할 수 있습니다."}
               </S.BodySubTitle>
             </S.BodyTitleWrapper>
             <S.CategoryRow>
@@ -135,6 +211,7 @@ function PartyCreate() {
               placeholder="파티퀘스트를 입력해주세요."
               value={questContent}
               onChange={(e) => setQuestContent(e.target.value)}
+              disabled={isEditMode}
             />
           </div>
           <div>
@@ -249,6 +326,7 @@ function PartyCreate() {
               $delete
               onClick={() => {
                 setImage(null);
+                setImageFile(null);
                 setShowImageMenu(false);
               }}
             >

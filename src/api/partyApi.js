@@ -40,6 +40,20 @@ export const getPartyMonthlyRanking = (partyId) =>
 export const leaveParty = (partyId) =>
   instance.delete(`/api/parties/${partyId}/leave`);
 
+export const updateParty = (partyId, requestDto, imageFile) => {
+  const formData = new FormData();
+  formData.append(
+    "requestDto",
+    new Blob([JSON.stringify(requestDto)], { type: "application/json" }),
+  );
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+  return instance.patch(`/api/parties/${partyId}`, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
 export const submitVerification = (partyId, imageFile) => {
   const formData = new FormData();
   formData.append("image", imageFile);
