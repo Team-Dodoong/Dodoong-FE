@@ -16,14 +16,30 @@ import { updateDailyQuest } from '../../../../api/dailyQuestApi';
 function QuestDetail() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { id } = useParams();
+  //const { id } = useParams();
 
-  // state로 넘어온 초기값 혹은 기본값 세팅
+  // 🟢 1. location.state에서 quest 객체와 targetId(id)를 안전하게 꺼냅니다.
   const initialQuest = location.state?.quest || {};
+  const targetId = location.state?.id || initialQuest.dailyQuestId || initialQuest.id;
 
-  const [content, setContent] = useState(initialQuest.content || initialQuest.title || '');
-  const [category, setCategory] = useState(initialQuest.category || 'IMPORTANT_URGENT');
+  // 🟢 2. 전달받은 데이터로 초기 상태(State) 설정
+  const [content, setContent] = useState(
+    initialQuest.content || initialQuest.title || ''
+  );
+  // category 필드명이 questCategory일 수 있으므로 둘 다 대응
+  const [category, setCategory] = useState(
+    initialQuest.questCategory || initialQuest.category || 'IMPORTANT_URGENT'
+  );
   const [loading, setLoading] = useState(false);
+
+  // 🟢 카테고리 값 변환 매핑 테이블
+  const CATEGORY_MAP = {
+    important: 'IMPORTANT_URGENT',
+    notImportant: 'IMPORTANT_NOT_URGENT', // 사용하시는 카테고리 Key값에 맞춰 수정하세요
+    urgent: 'NOT_IMPORTANT_URGENT',
+    notUrgent: 'NOT_IMPORTANT_NOT_URGENT',
+  };
+
 
   // 🟢 2. 저장(수정) 처리 함수
   const handleSave = async () => {
@@ -35,7 +51,7 @@ function QuestDetail() {
     try {
       setLoading(true);
       
-      // 🟢 수정/생성 API에 맞춘 데이터 객체 구성
+     /*  // 🟢 수정/생성 API에 맞춘 데이터 객체 구성
       // isRoutine은 필수값일 확률이 높으므로 false를 기본값으로 추가했습니다.
       const payload = {
         content: content,
@@ -60,7 +76,43 @@ function QuestDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }; */
+
+  // 🟢 targetId가 존재하면 수정(UPDATE), 없으면 새로 생성(CREATE)
+      if (targetId) {
+      // 🟢 API 명세서에 명시된 Request Body 규격 그대로 작성
+      const formattedCategory = CATEGORY_MAP[category] || category;
+      
+      const updatePayload = {
+        questCategory: formattedCategory,
+        content: content,
+      };
+
+      await updateDailyQuest(targetId, updatePayload);
+      alert('퀘스트가 수정되었습니다.');
+    } else {
+      // 생성 시 필요한 Body
+      const formattedCategory = CATEGORY_MAP[category] || category;
+
+      const createPayload = {
+        content: content,
+        questCategory: formattedCategory,
+        isRoutine: false,
+        repeatDays: null,
+        endDate: null,
+      };
+      await createDailyQuest(createPayload);
+      alert('퀘스트가 생성되었습니다.');
+    }
+
+    navigate(-1);
+  } catch (error) {
+    console.error('퀘스트 저장 실패:', error);
+    alert(error.response?.data?.message || '퀘스트 저장 중 오류가 발생했습니다.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <S.Wrapper>

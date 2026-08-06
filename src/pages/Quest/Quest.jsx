@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import LevelUpModal from "../../pages/Home/pages/Home/components/LevelUpModal/LevelUpModal.jsx";
 import * as S from "./Quest.style.js";
 import { useNavigate } from "react-router-dom";
 
@@ -43,6 +44,18 @@ function QuestPage() {
   const [partyQuests, setPartyQuests] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [calendarRefreshKey, setCalendarRefreshKey] = useState(0);
+
+  const refreshCalendar = () => {
+    setCalendarRefreshKey((prev) => prev + 1);
+  };
+
+  const [quadrantRefreshKey, setQuadrantRefreshKey] = useState(0);
+
+  const refreshQuadrant = () => {
+    setQuadrantRefreshKey((prev) => prev + 1);
+  };
+
   // 현재 활성화된 탭에 따라 리스트 선택
   const quests = activeTab === "daily" ? dailyQuests : partyQuests;
 
@@ -72,6 +85,12 @@ function QuestPage() {
       setIsLoading(false);
     }
   }, []);
+  
+ /*  useEffect(() => {
+  const formattedMonth = String(month).padStart(2, "0");
+  setSelectedDate(`${year}-${formattedMonth}-01`);
+}, [year, month]);*/
+
 
   // 🟢 3. 선택된 날짜가 변경될 때마다 서버 데이터 조회
   useEffect(() => {
@@ -81,6 +100,9 @@ function QuestPage() {
   }, [selectedDate, activeTab, viewMode, fetchDailyQuests]);
 
   // 🟢 4. 달성 / 달성 취소 토글
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpValue, setLevelUpValue] = useState(1);
+
   const handleToggle = async (id) => {
     const targetQuest = dailyQuests.find((q) => q.dailyQuestId === id);
     if (!targetQuest) return;
@@ -95,7 +117,14 @@ function QuestPage() {
     );
 
     try {
-      await toggleCheckDailyQuest(id, nextChecked);
+      const res = await toggleCheckDailyQuest(id, nextChecked);
+      refreshCalendar();
+      refreshQuadrant();
+
+      if (res.data?.leveledUp) {
+      setLevelUpValue(res.data.level);
+      setShowLevelUp(true);
+      }
     } catch (error) {
       // 실패 시 UI 롤백
       setDailyQuests((prev) =>
@@ -119,6 +148,8 @@ function QuestPage() {
       await postponeDailyQuest(id);
       alert("일정이 내일로 미뤄졌습니다.");
       fetchDailyQuests(selectedDate); // 목록 새로고침
+      refreshCalendar(); // 🟢 캘린더 dot도 갱신
+      refreshQuadrant(); // 🟢 사분면도 날짜가 바뀌었으니 갱신
     } catch (error) {
       alert("일정 미루기에 실패했습니다.");
     }
@@ -163,7 +194,7 @@ function QuestPage() {
   // 8. 페이지 이동 관련 이벤트 핸들러
   const handleEdit = (id) => {
   const targetQuest = dailyQuests.find((q) => q.dailyQuestId === id);
-  navigate(`/questdetail/${id}`, { state: { quest: targetQuest } });
+  navigate("/questdetail", { state: { id, quest: targetQuest } });
 };
 
   const handleAddQuest = () => {
@@ -173,6 +204,12 @@ function QuestPage() {
   const handleLeaveParty = (id) => {
     console.log("파티 탈퇴", id);
   };
+
+
+  
+
+
+
 
   return (
     <S.PageWrapper>
@@ -214,15 +251,25 @@ function QuestPage() {
 
         {/* 캘린더 / 사분면 메인 영역 */}
         <S.ViewContainer>
-          {viewMode === "calendar" ? (
+          <div style={{ display: viewMode === "calendar" ? "block" : "none" }}>
             <CalendarView
               currentYear={year}
               currentMonth={month}
               onSelectDate={(date) => setSelectedDate(date)}
+              refreshTrigger={calendarRefreshKey}
             />
-          ) : (
-            <QuadrantView />
-          )}
+          </div>
+
+          <div style={{ display: viewMode === "quadrant" ? "block" : "none" }}>
+            <QuadrantView
+              selectedDate={selectedDate}
+              refreshTrigger={quadrantRefreshKey}
+              onLevelUp={(level) => {
+                setLevelUpValue(level);
+                setShowLevelUp(true);
+              }}
+            />
+          </div>
         </S.ViewContainer>
       </S.ContentArea>
 
@@ -236,14 +283,27 @@ function QuestPage() {
           onToggle={handleToggle}
           onEdit={handleEdit}
           onPostpone={handlePostpone}
-          onDeleteToday={handleDeleteToday}
-          onDeleteForever={handleDeleteForever}
+          // onDeleteToday={handleDeleteToday}
+          // onDeleteForever={handleDeleteForever}
           onLeaveParty={handleLeaveParty}
+          onSuccess={() => {
+            // 🟢 퀘스트 목록 갱신 + 캘린더 점(Dot)도 즉시 새로고침!
+            fetchDailyQuests(selectedDate);
+            refreshCalendar(); 
+            refreshQuadrant();
+          }}
         />
       )}
 
       <FloatingButton onClick={handleAddQuest} />
       <BottomNav active="quest" onNavigate={(key) => navigate(`/${key}`)} />
+
+      {showLevelUp && (
+        <LevelUpModal
+        level={levelUpValue}
+        onConfirm={() => setShowLevelUp(false)}
+      />
+    )}
     </S.PageWrapper>
   );
 }

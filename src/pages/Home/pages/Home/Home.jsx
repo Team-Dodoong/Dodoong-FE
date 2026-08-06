@@ -16,7 +16,7 @@ import * as S from './Home.style';
 import bgGradient from '../../../../assets/Rectangle 3410.png';
 
 // 🟢 1. 필요한 API 불러오기
-import { getMyInfo, levelUp } from '../../../../api/memberApi';
+import { getMyInfo } from '../../../../api/memberApi';
 import {
   getDailyQuestsByDate,
   toggleCheckDailyQuest,
@@ -44,13 +44,18 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const getTodayName = () => DAYS_OF_WEEK[new Date().getDay()];
 
 // streakDays 일수에 따라 활성화될 요일 배열 생성
-const getCheckedDays = (streakDays) => {
-  if (!streakDays || streakDays <= 0) return [];
-  const todayIndex = new Date().getDay();
+const getCheckedDays = (streakDays, lastCheckedDate) => {
+  if (!streakDays || streakDays <= 0 || !lastCheckedDate) return [];
+  
+  // 날짜 문자열 파싱 (YYYY-MM-DD 대응)
+  const [year, month, day] = lastCheckedDate.split('-').map(Number);
+  const lastDate = new Date(year, month - 1, day);
+  
+  const lastDayIndex = lastDate.getDay(); // 마지막 체크 날짜의 요일 인덱스
   const checkedList = [];
   
   for (let i = 0; i < streakDays && i < 7; i++) {
-    const targetIndex = (todayIndex - i + 7) % 7;
+    const targetIndex = (lastDayIndex - i + 7) % 7;
     checkedList.unshift(DAYS_OF_WEEK[targetIndex]);
   }
   return checkedList;
@@ -69,6 +74,7 @@ function Home() {
   const [userInfo, setUserInfo] = useState(null);
   const [equippedCharacter, setEquippedCharacter] = useState(null);
   const [streakDays, setStreakDays] = useState(0);
+  const [lastCheckedDate, setLastCheckedDate] = useState(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -103,6 +109,7 @@ function Home() {
         // 스트릭 반영
         if (streakRes.data) {
           setStreakDays(streakRes.data.consecutiveDays || 0);
+          setLastCheckedDate(streakRes.data.lastCheckedDate || null); // 추가
         }
       } catch (error) {
         console.error('Home 데이터 불러오기 실패:', error);
@@ -146,7 +153,7 @@ function Home() {
   const quests = activeTab === 'daily' ? dailyQuests : partyQuests;
 
   // 레벨업 처리
-  const handleLevelUp = async () => {
+  /* const handleLevelUp = async () => {
     try {
       const updatedData = await levelUp();
       const data = updatedData.data || updatedData;
@@ -161,7 +168,7 @@ function Home() {
     } catch (error) {
       console.error('레벨업 요청 실패:', error);
     }
-  };
+  };*/
 
   // 🟢 3. 퀘스트 체크 / 체크 해제 API 연동
   const handleToggle = async (id) => {
@@ -188,13 +195,18 @@ function Home() {
       
       // 경험치/코인 변경 반영 (API 응답 데이터 활용)
       if (res.data) {
+        const { level, experience, leveledUp } = res.data;
+
         setUserInfo((prev) => ({
           ...prev,
-          experience: res.data.experience ?? prev?.experience,
+          level: level ?? prev?.level,
+          experience: experience ?? prev?.experience,
         }));
 
-        // 필요 시 경험치에 따라 레벨업 감지/호출
-        // if (res.data.experience >= 필요경험치) handleLevelUp();
+        // 서버가 leveledUp을 직접 내려주므로 별도 계산/호출 없이 바로 모달 표시
+        if (leveledUp) {
+          setShowLevelUp(true);
+        }
       }
     } catch (error) {
       console.error('퀘스트 체크 상태 변경 실패:', error);
@@ -257,6 +269,26 @@ function Home() {
     return <S.Wrapper>로딩 중...</S.Wrapper>;
   }
 
+  // 🟢 퀘스트 목록 재조회 함수 추가
+const refetchQuests = async () => {
+  try {
+    const todayStr = getTodayString();
+    const questsRes = await getDailyQuestsByDate(todayStr);
+    const fetchedQuests = (questsRes.data?.quests || []).map((q) => ({
+      id: q.dailyQuestId,
+      dailyQuestId: q.dailyQuestId, // 💡 두 식별자 모두 챙겨두면 안전합니다.
+      title: q.content,
+      checked: q.isChecked,
+      isRoutine: q.isRoutine,
+      routineId: q.routineId,
+      category: q.questCategory,
+    }));
+    setDailyQuests(fetchedQuests);
+  } catch (error) {
+    console.error('퀘스트 목록 재조회 실패:', error);
+  }
+};
+
   return (
     <S.Wrapper>
       <Header />
@@ -275,7 +307,7 @@ function Home() {
 
         <StreakTracker
           streakDays={streakDays}
-          checkedDays={getCheckedDays(streakDays)}
+          checkedDays={getCheckedDays(streakDays, lastCheckedDate)}
           today={getTodayName()}
         />
       </S.Content>
@@ -291,6 +323,7 @@ function Home() {
         onDeleteToday={handleDeleteToday}
         onDeleteForever={handleDeleteForever}
         onLeaveParty={handleLeaveParty}
+        onSuccess={refetchQuests}
       />
 
 

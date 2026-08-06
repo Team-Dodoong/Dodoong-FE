@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 
+
 export const Container = styled.div`
   width: 100%;
   max-width: 430px;
@@ -121,12 +122,26 @@ export const MenuLeft = styled.div`
 `;
 
 export const MenuIcon = styled.span`
-  font-size: 18px;
-  color: #666666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+
+  /* SVG 내부 크기 및 반응형 정렬 처리 */
+  svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    color: var(--Gray_5);
+
+    /* 필요시 아이콘 고유 색상 변경 (SVG 내부 path fill/stroke 처리 방식에 따라) */
+    // path { fill: #666666; }
+  }
 `;
 
 export const MenuText = styled.span`
   font-size: 16px;
-  color: #444444;
+  color: var(--Gray_6);
   font-weight: 500;
 `;

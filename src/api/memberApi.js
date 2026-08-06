@@ -191,7 +191,7 @@ export const deleteAccount = async () => {
  * 쿠키에 담긴 accessToken을 이용하여 캐릭터/회원의 레벨업을 진행합니다.
  * @returns {Promise<Object>} - { level: number, coin: number, experience: number }
  */
-export const levelUp = async () => {
+/* export const levelUp = async () => {
   try {
     // POST /api/members/levelup 요청 (Body는 비어있음)
     const response = await api.patch("/api/members/levelup");
@@ -208,4 +208,4 @@ export const levelUp = async () => {
     }
     throw error;
   }
-};
+};*/

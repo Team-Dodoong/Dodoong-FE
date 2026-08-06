@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import QuestItem from '../QuestItem/QuestItem';
 import * as S from './QuestList.style';
 
@@ -14,9 +14,16 @@ function QuestList({
   onDeleteToday,
   onDeleteForever,
   onLeaveParty,
+  onSuccess,
 }) {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [deleteExpandedId, setDeleteExpandedId] = useState(null);
+
+  // 🟢 [수정 2] 날짜 변경이나 탭 변경 등으로 quests 데이터 리스트가 바뀌면 열려있던 메뉴 닫기!
+  useEffect(() => {
+    setOpenMenuId(null);
+    setDeleteExpandedId(null);
+  }, [quests]);
 
   const closeMenu = () => {
     setOpenMenuId(null);
@@ -24,6 +31,7 @@ function QuestList({
   };
 
   const handleToggleMenu = (id) => {
+    const targetId = String(id);
     if (openMenuId === id) {
       closeMenu();
       return;
@@ -38,38 +46,47 @@ function QuestList({
 
   return (
     <S.List>
-      {quests?.map((quest) => (
-        <QuestItem
-          key={quest.id}
-          quest={quest}
-          type={type}
-          isMenuOpen={openMenuId === quest.id}
-          deleteExpanded={deleteExpandedId === quest.id}
-          onToggle={onToggle}
-          onToggleMenu={handleToggleMenu}
-          onEdit={(id) => {
+      {quests?.map((quest) => {
+        const questId = String(quest.dailyQuestId ?? quest.id);
+
+
+        return (
+          <QuestItem
+            key={questId}
+            quest={quest} // 🟢 QuestItemMenu에서 사용할 전체 데이터 객체 전달
+            type={type}
+            isMenuOpen={openMenuId !== null && String(openMenuId) === questId}
+            deleteExpanded={deleteExpandedId === questId}
+            onToggle={onToggle}
+            onToggleMenu={() => handleToggleMenu(questId)}
+            onEdit={() => {
             closeMenu();
-            onEdit(id);
+            onEdit(questId);
           }}
-          onPostpone={(id) => {
+          onPostpone={() => {
             closeMenu();
-            onPostpone(id);
+            onPostpone(questId);
           }}
-          onRequestDeleteOptions={(id) => setDeleteExpandedId(id)}
-          onDeleteToday={(id) => {
+          onRequestDeleteOptions={() => setDeleteExpandedId(questId)}
+          onDeleteToday={() => {
             closeMenu();
-            onDeleteToday(id);
+            if (onDeleteToday) onDeleteToday(questId);
           }}
-          onDeleteForever={(id) => {
+          onDeleteForever={() => {
             closeMenu();
-            onDeleteForever(id);
+            if (onDeleteForever) onDeleteForever(quest.routineId);
           }}
-          onLeaveParty={(id) => {
+          onLeaveParty={() => {
             closeMenu();
-            onLeaveParty(id);
+            if (onLeaveParty) onLeaveParty(questId);
           }}
+          onSuccess={() => {
+              closeMenu();
+              if (onSuccess) onSuccess();
+            }}
         />
-      ))}
+        );
+      })}
     </S.List>
   );
 }

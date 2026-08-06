@@ -15,6 +15,7 @@ function CalendarView({
   currentYear = defaultYear,
   currentMonth = defaultMonth,
   onSelectDate,
+  refreshTrigger,
 }) {
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   
@@ -22,6 +23,9 @@ function CalendarView({
   const [selectedDateNum, setSelectedDateNum] = useState(defaultDateNum);
   const [calendarData, setCalendarData] = useState({});
   const [streakDays, setStreakDays] = useState(0);
+  const [lastCheckedDate, setLastCheckedDate] = useState(null);
+
+  // const todayDayIndex = today.getDay();
 
   // 🟢 2. 연/월 변경 시 백엔드 캘린더 데이터 조회
   useEffect(() => {
@@ -44,7 +48,7 @@ function CalendarView({
     };
 
     fetchCalendar();
-  }, [currentYear, currentMonth]);
+  }, [currentYear, currentMonth, refreshTrigger]);
 
   // 2. 스트릭 정보 조회 API
   useEffect(() => {
@@ -53,6 +57,7 @@ function CalendarView({
         const res = await getStreaks();
         if (res.data) {
           setStreakDays(res.data.consecutiveDays || 0);
+          setLastCheckedDate(res.data.lastCheckedDate || null);
         }
       } catch (error) {
         console.error('스트릭 조회 중 오류 발생:', error);
@@ -60,7 +65,7 @@ function CalendarView({
     };
 
     fetchStreakInfo();
-  }, []);
+  }, [refreshTrigger]);
 
 // 1. 해당 월의 1일 시작 요일 (0: 일요일 ~ 6: 토요일)
   const firstDayOfWeek = new Date(currentYear, currentMonth - 1, 1).getDay();
@@ -76,18 +81,47 @@ function CalendarView({
     calendarDays.push(d); // 실제 날짜
   }
 
+   // 날짜 숫자를 YYYY-MM-DD 문자열로 변환하는 헬퍼
+  const formatDateStr = (dateNum) => {
+    const formattedMonth = String(currentMonth).padStart(2, '0');
+    const formattedDay = String(dateNum).padStart(2, '0');
+    return `${currentYear}-${formattedMonth}-${formattedDay}`;
+  };
+
   // 🟢 4. 날짜 클릭 핸들러 (부모 QuestPage로 YYYY-MM-DD 전달)
   const handleDateClick = (dateNum) => {
     setSelectedDateNum(dateNum);
 
     if (onSelectDate) {
-      const formattedMonth = String(currentMonth).padStart(2, '0');
-      const formattedDay = String(dateNum).padStart(2, '0');
-      const fullDateStr = `${currentYear}-${formattedMonth}-${formattedDay}`;
-      
-      onSelectDate(fullDateStr);
+      onSelectDate(formatDateStr(dateNum));
     }
   };
+
+  // 🟢 마운트 시 오늘 날짜를 부모에게 알려서 바텀시트에 오늘 퀘스트가 바로 보이도록 처리
+  useEffect(() => {
+    if (onSelectDate) {
+      onSelectDate(formatDateStr(defaultDateNum));
+    }
+  }, []); // 최초 마운트 시 1회만 실행
+
+  // 🟢 3. lastCheckedDate 기준으로 이번 주 활성화될 요일 배열 산출
+  const getCheckedDays = () => {
+    if (!streakDays || streakDays <= 0 || !lastCheckedDate) return [];
+
+    const [year, month, day] = lastCheckedDate.split('-').map(Number);
+    const lastDate = new Date(year, month - 1, day);
+    const lastDayIndex = lastDate.getDay();
+
+    const checkedList = [];
+    for (let i = 0; i < streakDays && i < 7; i++) {
+      const targetIndex = (lastDayIndex - i + 7) % 7;
+      checkedList.unshift(days[targetIndex]);
+    }
+    return checkedList;
+  };
+
+  const activeDaysList = getCheckedDays();
+
 
   return (
     <S.Container>
@@ -118,7 +152,7 @@ function CalendarView({
             <S.DateCell
               key={date}
               $isSelected={isSelected}
-              onClick={() => setSelectedDate(date)}
+              onClick={() => handleDateClick(date)}
             >
               <span>{date}</span>
 
@@ -143,14 +177,20 @@ function CalendarView({
           🔥 연속 <span>{streakDays}일째</span>에요!
         </S.StreakTitle>
         <S.StreakDays>
-          {days.map((day, i) => (
-            <S.StreakItem key={day} $isActive={i < streakDays}>
-              <span>{day}</span>
-              <S.CheckCircle $isActive={i < streakDays}>
-                {i < streakDays ? '✓' : ''}
-              </S.CheckCircle>
-            </S.StreakItem>
-          ))}
+          {days.map((day) => {
+            {/* 🟢 [수정] 단순 인덱스(i < streakDays) 비교 대신 오늘 기준 요일 거리 계산 로직 적용 */}
+            // const distance = (todayDayIndex - i + 7) % 7;
+            const isActive = activeDaysList.includes(day);
+
+            return (
+              <S.StreakItem key={day} $isActive={isActive}>
+                <span>{day}</span>
+                <S.CheckCircle $isActive={isActive}>
+                  {isActive ? '✓' : ''}
+                </S.CheckCircle>
+              </S.StreakItem>
+            );
+          })}
         </S.StreakDays>
       </S.StreakBanner>
     </S.Container>
