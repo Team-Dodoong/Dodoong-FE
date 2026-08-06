@@ -136,9 +136,21 @@ function PartyDetail() {
         <>
           <S.Overlay $menu onClick={() => setShowMoreMenu(false)} />
           <S.MenuContainer>
-            <S.MenuItem onClick={() => setShowMoreMenu(false)}>
-              파티 숨기기
-            </S.MenuItem>
+            {detail.isOwner ? (
+              <>
+                <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                  파티 수정하기
+                </S.MenuItem>
+                <S.MenuDivider />
+                <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                  파티 삭제하기
+                </S.MenuItem>
+              </>
+            ) : (
+              <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                파티 탈퇴하기
+              </S.MenuItem>
+            )}
             <S.MenuDivider />
             <S.MenuItem $report onClick={() => setShowMoreMenu(false)}>
               신고하기
