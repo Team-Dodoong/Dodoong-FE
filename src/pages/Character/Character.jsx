@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
-import PointBadge from "../../../components/PointBadge/PointBadge";
-import characterDecoration from "../../../assets/character-icon.png";
+import PointBadge from "../../components/PointBadge/PointBadge";
+import characterDecoration from "../../assets/character-icon.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
 import {
@@ -12,13 +12,13 @@ import {
   equipCharacter,
   getCharacterDetail,
   purchaseCharacter,
-} from "../../../api/characterApi";
-import { getMyInfo } from "../../../api/memberApi";
+} from "../../api/characterApi";
+import { getMyInfo } from "../../api/memberApi";
 import {
   getCharacterImage,
   getCharacterHelloImage,
   defaultCharacterImage,
-} from "../../../utils/characterImage";
+} from "../../utils/characterImage";
 
 const MAX_EXP = 1000;
 

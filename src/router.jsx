@@ -7,7 +7,7 @@ import Home from "./pages/Home/pages/Home/Home.jsx";
 import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
 import FloatingAddButtonPage from "./pages/Quest/QuestDetail/QuestDetail.jsx"
 import Quest from "./pages/Quest/Quest.jsx";
-import Character from "./pages/Character/Character/Character.jsx";
+import Character from "./pages/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
 import ChatList from "./pages/PartyChat/ChatList/ChatList.jsx";
 import ChatRoom from "./pages/PartyChat/ChatRoom/ChatRoom.jsx";

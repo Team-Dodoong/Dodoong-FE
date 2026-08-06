@@ -1,13 +1,13 @@
 import styled from "styled-components";
-import Chat from "../../../assets/ic_chat_24.svg?react";
-import Search from "../../../assets/ic_search_24.svg?react";
+import Chat from "../../assets/ic_chat_24.svg?react";
+import Search from "../../assets/ic_search_24.svg?react";
 import {
   SemiBold_16,
   Medium_14,
   Regular_14,
   Regular_12,
   Medium_12,
-} from "../../../styles/Fonts";
+} from "../../styles/Fonts";
 
 export const Container = styled.div`
   width: 100%;

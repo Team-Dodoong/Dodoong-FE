@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { SemiBold_16, Regular_14, Medium_14 } from "../../../../styles/Fonts";
+import { SemiBold_16, Regular_14, Medium_14 } from "../../../styles/Fonts";
 
 export const Overlay = styled.div`
   position: fixed;
