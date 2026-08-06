@@ -42,13 +42,18 @@ const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const getTodayName = () => DAYS_OF_WEEK[new Date().getDay()];
 
 // streakDays 일수에 따라 활성화될 요일 배열 생성
-const getCheckedDays = (streakDays) => {
-  if (!streakDays || streakDays <= 0) return [];
-  const todayIndex = new Date().getDay();
+const getCheckedDays = (streakDays, lastCheckedDate) => {
+  if (!streakDays || streakDays <= 0 || !lastCheckedDate) return [];
+  
+  // 날짜 문자열 파싱 (YYYY-MM-DD 대응)
+  const [year, month, day] = lastCheckedDate.split('-').map(Number);
+  const lastDate = new Date(year, month - 1, day);
+  
+  const lastDayIndex = lastDate.getDay(); // 마지막 체크 날짜의 요일 인덱스
   const checkedList = [];
   
   for (let i = 0; i < streakDays && i < 7; i++) {
-    const targetIndex = (todayIndex - i + 7) % 7;
+    const targetIndex = (lastDayIndex - i + 7) % 7;
     checkedList.unshift(DAYS_OF_WEEK[targetIndex]);
   }
   return checkedList;
@@ -66,6 +71,7 @@ function Home() {
   // 회원, 캐릭터 데이터, 스트릭 일수
   const [userInfo, setUserInfo] = useState(null);
   const [streakDays, setStreakDays] = useState(0);
+  const [lastCheckedDate, setLastCheckedDate] = useState(null);
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -100,6 +106,7 @@ function Home() {
         // 스트릭 반영
         if (streakRes.data) {
           setStreakDays(streakRes.data.consecutiveDays || 0);
+          setLastCheckedDate(streakRes.data.lastCheckedDate || null); // 추가
         }
       } catch (error) {
         console.error('Home 데이터 불러오기 실패:', error);
@@ -267,7 +274,7 @@ const refetchQuests = async () => {
 
         <StreakTracker
           streakDays={streakDays}
-          checkedDays={getCheckedDays(streakDays)}
+          checkedDays={getCheckedDays(streakDays, lastCheckedDate)}
           today={getTodayName()}
         />
       </S.Content>

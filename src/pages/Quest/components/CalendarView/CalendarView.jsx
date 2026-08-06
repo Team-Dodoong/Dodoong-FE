@@ -23,8 +23,9 @@ function CalendarView({
   const [selectedDateNum, setSelectedDateNum] = useState(defaultDateNum);
   const [calendarData, setCalendarData] = useState({});
   const [streakDays, setStreakDays] = useState(0);
+  const [lastCheckedDate, setLastCheckedDate] = useState(null);
 
-  const todayDayIndex = today.getDay();
+  // const todayDayIndex = today.getDay();
 
   // 🟢 2. 연/월 변경 시 백엔드 캘린더 데이터 조회
   useEffect(() => {
@@ -56,6 +57,7 @@ function CalendarView({
         const res = await getStreaks();
         if (res.data) {
           setStreakDays(res.data.consecutiveDays || 0);
+          setLastCheckedDate(res.data.lastCheckedDate || null);
         }
       } catch (error) {
         console.error('스트릭 조회 중 오류 발생:', error);
@@ -63,7 +65,7 @@ function CalendarView({
     };
 
     fetchStreakInfo();
-  }, []);
+  }, [refreshTrigger]);
 
 // 1. 해당 월의 1일 시작 요일 (0: 일요일 ~ 6: 토요일)
   const firstDayOfWeek = new Date(currentYear, currentMonth - 1, 1).getDay();
@@ -102,7 +104,23 @@ function CalendarView({
     }
   }, []); // 최초 마운트 시 1회만 실행
 
+  // 🟢 3. lastCheckedDate 기준으로 이번 주 활성화될 요일 배열 산출
+  const getCheckedDays = () => {
+    if (!streakDays || streakDays <= 0 || !lastCheckedDate) return [];
 
+    const [year, month, day] = lastCheckedDate.split('-').map(Number);
+    const lastDate = new Date(year, month - 1, day);
+    const lastDayIndex = lastDate.getDay();
+
+    const checkedList = [];
+    for (let i = 0; i < streakDays && i < 7; i++) {
+      const targetIndex = (lastDayIndex - i + 7) % 7;
+      checkedList.unshift(days[targetIndex]);
+    }
+    return checkedList;
+  };
+
+  const activeDaysList = getCheckedDays();
 
 
   return (
@@ -159,10 +177,10 @@ function CalendarView({
           🔥 연속 <span>{streakDays}일째</span>에요!
         </S.StreakTitle>
         <S.StreakDays>
-          {days.map((day, i) => {
+          {days.map((day) => {
             {/* 🟢 [수정] 단순 인덱스(i < streakDays) 비교 대신 오늘 기준 요일 거리 계산 로직 적용 */}
-            const distance = (todayDayIndex - i + 7) % 7;
-            const isActive = streakDays > 0 && distance < streakDays;
+            // const distance = (todayDayIndex - i + 7) % 7;
+            const isActive = activeDaysList.includes(day);
 
             return (
               <S.StreakItem key={day} $isActive={isActive}>
