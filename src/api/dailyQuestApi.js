@@ -171,12 +171,24 @@ export const updateDailyQuest = async (dailyQuestId, updateData) => {
 /**
  * ✅ 일일퀘스트 달성 / 달성 취소 API
  * 특정 일일퀘스트의 달성 여부(isChecked)를 변경합니다.
+ * (08/05 수정: level, leveledUp 필드가 추가되었습니다. leveledUp은 이번 달성으로 레벨업을 했는지 여부이며,
+ *  true일 경우 레벨업 모달을 띄워야 합니다.)
  * 
  * @param {number|string} dailyQuestId - 상태를 변경할 퀘스트 ID (Path Variable)
  * @param {boolean} isChecked - 달성 여부 (true: 달성, false: 달성 취소)
  * 
- * @returns {Promise<Object>} - { status, code, message, data: { quest: { dailyQuestId, questCategory, content, isChecked, isRoutine, routineId }, experience, experienceDelta } }
+ * @returns {Promise<Object>} - {
+ *   status, code, message,
+ *   data: {
+ *     quest: { dailyQuestId, questCategory, content, isChecked, isRoutine, routineId },
+ *     level,            // 변경 후 현재 레벨
+ *     experience,        // 변경 후 현재 경험치
+ *     experienceDelta,   // 이번 요청으로 증감된 경험치 (+10 / -10 등)
+ *     leveledUp          // 이번 달성으로 레벨업했는지 여부 (true면 레벨업 모달 표시)
+ *   }
+ * }
  */
+
 export const toggleCheckDailyQuest = async (dailyQuestId, isChecked) => {
   try {
     // PATCH /api/daily-quests/{dailyQuestId}/check 요청

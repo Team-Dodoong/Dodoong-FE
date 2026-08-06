@@ -11,7 +11,7 @@ const QUADRANTS = [
   { id: 'q4', categoryKey: 'NOT_IMPORTANT_NOT_URGENT', title: '긴급하지 않아요!', bgColor: '#EFEFEF', color: '#888888' },
 ];
 
-function QuadrantView({ selectedDate, refreshTrigger }) {
+function QuadrantView({ selectedDate, refreshTrigger , onLevelUp }) {
   const location = useLocation();
   // 🟢 3. 기본 상태를 q1, q2, q3, q4 빈 배열로 초기화 (undefined 에러 방지)
   const [todoData, setTodoData] = useState({
@@ -97,7 +97,11 @@ function QuadrantView({ selectedDate, refreshTrigger }) {
 
     // API 호출
     try {
-      await toggleCheckDailyQuest(itemId, nextCompleted);
+      const res = await toggleCheckDailyQuest(itemId, nextCompleted);
+      
+      if (res.data?.leveledUp) {
+      onLevelUp?.(res.data.level);
+      }
     } catch (error) {
       // 실패 시 롤백
       setTodoData((prevData) => ({

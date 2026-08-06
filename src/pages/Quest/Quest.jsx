@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import LevelUpModal from "../../pages/Home/pages/Home/components/LevelUpModal/LevelUpModal.jsx";
 import * as S from "./Quest.style.js";
 import { useNavigate } from "react-router-dom";
 
@@ -99,6 +100,9 @@ function QuestPage() {
   }, [selectedDate, activeTab, viewMode, fetchDailyQuests]);
 
   // 🟢 4. 달성 / 달성 취소 토글
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpValue, setLevelUpValue] = useState(1);
+
   const handleToggle = async (id) => {
     const targetQuest = dailyQuests.find((q) => q.dailyQuestId === id);
     if (!targetQuest) return;
@@ -113,9 +117,14 @@ function QuestPage() {
     );
 
     try {
-      await toggleCheckDailyQuest(id, nextChecked);
+      const res = await toggleCheckDailyQuest(id, nextChecked);
       refreshCalendar();
       refreshQuadrant();
+
+      if (res.data?.leveledUp) {
+      setLevelUpValue(res.data.level);
+      setShowLevelUp(true);
+      }
     } catch (error) {
       // 실패 시 UI 롤백
       setDailyQuests((prev) =>
@@ -196,6 +205,12 @@ function QuestPage() {
     console.log("파티 탈퇴", id);
   };
 
+
+  
+
+
+
+
   return (
     <S.PageWrapper>
       <Header title="퀘스트" />
@@ -246,7 +261,14 @@ function QuestPage() {
           </div>
 
           <div style={{ display: viewMode === "quadrant" ? "block" : "none" }}>
-            <QuadrantView selectedDate={selectedDate} refreshTrigger={quadrantRefreshKey} />
+            <QuadrantView
+              selectedDate={selectedDate}
+              refreshTrigger={quadrantRefreshKey}
+              onLevelUp={(level) => {
+                setLevelUpValue(level);
+                setShowLevelUp(true);
+              }}
+            />
           </div>
         </S.ViewContainer>
       </S.ContentArea>
@@ -275,6 +297,13 @@ function QuestPage() {
 
       <FloatingButton onClick={handleAddQuest} />
       <BottomNav active="quest" onNavigate={(key) => navigate(`/${key}`)} />
+
+      {showLevelUp && (
+        <LevelUpModal
+        level={levelUpValue}
+        onConfirm={() => setShowLevelUp(false)}
+      />
+    )}
     </S.PageWrapper>
   );
 }

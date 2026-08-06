@@ -16,7 +16,7 @@ import * as S from './Home.style';
 import bgGradient from '../../../../assets/Rectangle 3410.png';
 
 // 🟢 1. 필요한 API 불러오기
-import { getMyInfo, levelUp } from '../../../../api/memberApi';
+import { getMyInfo } from '../../../../api/memberApi';
 import {
   getDailyQuestsByDate,
   toggleCheckDailyQuest,
@@ -114,7 +114,7 @@ function Home() {
   const quests = activeTab === 'daily' ? dailyQuests : partyQuests;
 
   // 레벨업 처리
-  const handleLevelUp = async () => {
+  /* const handleLevelUp = async () => {
     try {
       const updatedData = await levelUp();
       const data = updatedData.data || updatedData;
@@ -129,7 +129,7 @@ function Home() {
     } catch (error) {
       console.error('레벨업 요청 실패:', error);
     }
-  };
+  };*/
 
   // 🟢 3. 퀘스트 체크 / 체크 해제 API 연동
   const handleToggle = async (id) => {
@@ -156,13 +156,18 @@ function Home() {
       
       // 경험치/코인 변경 반영 (API 응답 데이터 활용)
       if (res.data) {
+        const { level, experience, leveledUp } = res.data;
+
         setUserInfo((prev) => ({
           ...prev,
-          experience: res.data.experience ?? prev?.experience,
+          level: level ?? prev?.level,
+          experience: experience ?? prev?.experience,
         }));
 
-        // 필요 시 경험치에 따라 레벨업 감지/호출
-        // if (res.data.experience >= 필요경험치) handleLevelUp();
+        // 서버가 leveledUp을 직접 내려주므로 별도 계산/호출 없이 바로 모달 표시
+        if (leveledUp) {
+          setShowLevelUp(true);
+        }
       }
     } catch (error) {
       console.error('퀘스트 체크 상태 변경 실패:', error);
