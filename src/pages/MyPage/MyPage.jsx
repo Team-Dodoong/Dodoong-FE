@@ -4,6 +4,12 @@ import * as S from './MyPage.style';
 import MyPageProfileImage from '../../assets/mypage-profile-image.png' ;
 import { getMyInfo } from '../../api/memberApi';
 
+import TermsIcon from '../../assets/ic_docs_24.svg?react'
+import PointIcon from '../../assets/ic_coin_24.svg?react';
+import NoticeIcon from '../../assets/ic_notice_24.svg?react';
+import InquiryIcon from '../../assets/ic_contact_24.svg?react';
+import AccountIcon from '../../assets/ic_linear_lock_24.svg?react';
+
 
 const MyPage = () => {
   const navigate = useNavigate();
@@ -67,7 +73,9 @@ const MyPage = () => {
       <S.MenuList>
         <S.MenuItem onClick={() => navigate('/terms')}>
           <S.MenuLeft>
-            <S.MenuIcon>📄</S.MenuIcon>
+            <S.MenuIcon>
+              <TermsIcon width={24} height={24} /> {/* 🟢 SVG 컴포넌트 사용 */}
+            </S.MenuIcon>
             <S.MenuText>약관 및 정책</S.MenuText>
           </S.MenuLeft>
           <S.ArrowIcon />
@@ -75,7 +83,9 @@ const MyPage = () => {
         
         <S.MenuItem onClick={() => navigate('/points')}>
           <S.MenuLeft>
-            <S.MenuIcon>🪙</S.MenuIcon>
+            <S.MenuIcon>
+              <PointIcon width={24} height={24} />
+            </S.MenuIcon>
             <S.MenuText>포인트 내역</S.MenuText>
           </S.MenuLeft>
           <S.ArrowIcon />
@@ -83,7 +93,9 @@ const MyPage = () => {
 
         <S.MenuItem onClick={() => navigate('/notice')}>
           <S.MenuLeft>
-            <S.MenuIcon>📢</S.MenuIcon>
+            <S.MenuIcon>
+              <NoticeIcon width={24} height={24} />
+            </S.MenuIcon>
             <S.MenuText>공지사항</S.MenuText>
           </S.MenuLeft>
           <S.ArrowIcon />
@@ -91,7 +103,9 @@ const MyPage = () => {
 
         <S.MenuItem onClick={() => navigate('/inquiry')}>
           <S.MenuLeft>
-            <S.MenuIcon>🎧</S.MenuIcon>
+            <S.MenuIcon>
+              <InquiryIcon width={24} height={24} />
+            </S.MenuIcon>
             <S.MenuText>문의하기</S.MenuText>
           </S.MenuLeft>
           <S.ArrowIcon />
@@ -99,7 +113,9 @@ const MyPage = () => {
 
         <S.MenuItem onClick={() => navigate('/account')}>
           <S.MenuLeft>
-            <S.MenuIcon>🔒</S.MenuIcon>
+            <S.MenuIcon>
+              <AccountIcon width={24} height={24} />
+            </S.MenuIcon>
             <S.MenuText>계정관리</S.MenuText>
           </S.MenuLeft>
           <S.ArrowIcon /> 
