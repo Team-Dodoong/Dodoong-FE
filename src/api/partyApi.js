@@ -1,6 +1,18 @@
 import instance from "./instance";
 
-export const createParty = (data) => instance.post("/api/parties", data);
+export const createParty = (requestDto, imageFile) => {
+  const formData = new FormData();
+  formData.append(
+    "requestDto",
+    new Blob([JSON.stringify(requestDto)], { type: "application/json" }),
+  );
+  if (imageFile) {
+    formData.append("image", imageFile);
+  }
+  return instance.post("/api/parties", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
 
 export const getPartyDetail = (partyId) =>
   instance.get(`/api/parties/${partyId}`);

@@ -128,7 +128,7 @@ function PartyCreate() {
         console.log("파티 수정 성공", response.data);
         navigate(`/party/${partyId}`);
       } else {
-        const requestBody = {
+        const requestDto = {
           name: partyName,
           description: description,
           categories: selectedCategories.map((cat) => CATEGORY_MAP[cat]),
@@ -136,10 +136,9 @@ function PartyCreate() {
           isPublic: isPublic,
           partyPassword: !isPublic ? password : undefined,
           questContent: questContent,
-          imageUrl: image || "https://test-image.com/temp.png",
         };
 
-        const response = await createParty(requestBody);
+        const response = await createParty(requestDto, imageFile);
         console.log("파티 생성 성공", response.data);
         navigate("/party");
       }
