@@ -158,6 +158,7 @@ export const SheetHandle = styled.span`
 
 export const SearchWrapper = styled.div`
   padding: 0 1.25rem;
+  margin-bottom: 0.75rem;
 `;
 
 export const TabRow = styled.div`
