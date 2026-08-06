@@ -4,8 +4,10 @@ import * as S from './PointBadge.style';
 function PointBadge({ point }) {
   return (
     <S.Wrapper>
-      <S.Coin>P</S.Coin>
-      <S.Amount>{point.toLocaleString()} P</S.Amount>
+      <S.Coin />
+      <S.Amount>
+        <S.AmountNumber>{point.toLocaleString()}</S.AmountNumber> P
+      </S.Amount>
     </S.Wrapper>
   );
 }

@@ -1,12 +1,9 @@
 import styled from "styled-components";
-import Chat from "../../assets/ic_chat_24.svg?react";
-import Search from "../../assets/ic_search_24.svg?react";
 import {
-  SemiBold_16,
-  Medium_14,
   Regular_14,
   Regular_12,
-  Medium_12,
+  SemiBold_16,
+  SemiBold_14,
 } from "../../styles/Fonts";
 
 export const Container = styled.div`
@@ -17,33 +14,24 @@ export const Container = styled.div`
   background: white;
 `;
 
-export const Header = styled.div`
-  padding: 0.75rem 1.25rem;
+export const TopSection = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-export const HeaderTitle = styled.h3`
-  ${SemiBold_16};
-  color: var(--Black);
-`;
-
-export const ChatIcon = styled(Chat)`
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--Gray_5);
-  cursor: pointer;
+  flex-direction: column;
+  padding-bottom: 2rem; /* Sheet 모서리(border-radius 24px)가 항상 크림 배경 위에 걸치도록 여유 확보 */
+  background-color: #fff8f0;
+  background-image: url(${(props) => props.$bgImage});
+  background-size: 100% auto;
+  background-position: top center;
+  background-repeat: no-repeat;
 `;
 
 export const PointRow = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding: 0 1.25rem;
+  padding: 0.75rem 1.25rem 0;
 `;
 
 export const CharacterSection = styled.div`
-  background: #fff8f0;
   padding: 1rem 0;
   display: flex;
   flex-direction: column;
@@ -52,12 +40,17 @@ export const CharacterSection = styled.div`
 `;
 
 export const CharacterMessage = styled.p`
-  ${Regular_12};
+  ${Regular_14};
+  letter-spacing: 0;
   position: relative;
-  color: var(--Gray_6);
+  color: #707070;
   background: white;
-  padding: 0.5rem 1rem;
-  border-radius: 999px;
+  padding: 0.75rem 0.75rem;
+  align-self: stretch;
+  margin: 0 20px;
+  text-align: center;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
 
   &::after {
     content: "";
@@ -92,15 +85,17 @@ export const Decoration = styled.img`
 `;
 
 export const MainCharacterImage = styled.img`
-  width: 8rem;
-  height: 8rem;
+  width: auto;
+  height: 8.9375rem;
   object-fit: contain;
   position: relative;
   z-index: 2;
 `;
 
 export const CharacterName = styled.p`
-  ${SemiBold_16};
+  font-family: "Jalnan2";
+  font-size: 16px;
+  font-weight: 400;
   color: var(--Black);
 `;
 
@@ -139,39 +134,36 @@ export const ExpCurrent = styled.span`
   color: var(--Main);
 `;
 
-export const SearchWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0.75rem 1.25rem;
-  padding: 0.625rem 1rem;
-  background: var(--Gray_0);
-  border-radius: 999px;
-  border: 1px solid var(--Gray_2);
-`;
-
-export const SearchInput = styled.input`
+export const Sheet = styled.div`
   flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
-  ${Regular_14};
-  color: var(--Black);
-  &::placeholder {
-    color: var(--Gray_4);
-  }
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: white;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+  margin-top: -24px;
+  position: relative;
+  z-index: 2;
 `;
 
-export const SearchIcon = styled(Search)`
-  width: 1.25rem;
-  height: 1.25rem;
-  color: var(--Gray_4);
+export const SheetHandle = styled.span`
+  display: block;
+  width: 52px;
+  height: 4px;
+  margin: 12px auto 12px;
+  border-radius: 40px;
+  background: var(--Gray_2);
+`;
+
+export const SearchWrapper = styled.div`
+  padding: 0 1.25rem;
 `;
 
 export const TabRow = styled.div`
   display: flex;
-  border-bottom: 1px solid var(--Gray_1);
-  margin: 0 1.25rem;
+  border-bottom: 1px solid var(--Gray_2);
+  margin: 0;
 `;
 
 export const Tab = styled.button`
@@ -180,39 +172,41 @@ export const Tab = styled.button`
   background: none;
   border: none;
   border-bottom: ${({ $active }) =>
-    $active ? "2px solid var(--Black)" : "2px solid transparent"};
-  ${Medium_14};
-  color: ${({ $active }) => ($active ? "var(--Black)" : "var(--Gray_4)")};
+    $active ? "2px solid var(--Main)" : "2px solid transparent"};
+  ${SemiBold_16};
+  color: ${({ $active }) => ($active ? "var(--Black)" : "var(--Gray_5)")};
   cursor: pointer;
 `;
 
 export const ScrollArea = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.25rem 6rem;
 `;
 
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 1.25rem;
 `;
 
 export const CharacterCard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.5rem;
 `;
 
 export const CardImage = styled.img`
-  width: 7rem;
-  height: 7rem;
+  width: auto;
+  height: 8.25rem;
   object-fit: contain;
 `;
 
 export const CardName = styled.p`
-  ${Medium_14};
+  font-family: "Jalnan2";
+  font-size: 14px;
+  font-weight: 400;
   color: var(--Black);
 `;
 
@@ -220,21 +214,26 @@ export const ActionButton = styled.button`
   width: 100%;
   padding: 0.5rem;
   border-radius: 4px;
-  border: none;
-  ${Medium_12};
+  border: ${({ $equipped }) =>
+    $equipped ? "1px solid var(--Gray_2)" : "none"};
+  ${SemiBold_14};
   cursor: pointer;
   background: ${({ $equipped, $buy }) =>
-    $buy ? "var(--Black)" : $equipped ? "var(--Gray_2)" : "var(--Black)"};
+    $buy ? "var(--Black)" : $equipped ? "var(--Gray_1)" : "var(--Black)"};
   color: ${({ $equipped }) => ($equipped ? "var(--Gray_5)" : "white")};
+`;
+
+export const CharacterCost = styled.span`
+  color: var(--Main);
 `;
 
 export const DetailButton = styled.button`
   width: 100%;
   padding: 0.5rem;
   border-radius: 4px;
-  border: 1px solid var(--Gray_2);
+  border: 1px solid var(--Gray_1);
   background: white;
-  ${Medium_12};
+  ${SemiBold_14};
   color: var(--Gray_5);
   cursor: pointer;
 `;
