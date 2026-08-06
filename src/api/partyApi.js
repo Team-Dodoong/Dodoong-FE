@@ -9,9 +9,7 @@ export const createParty = (requestDto, imageFile) => {
   if (imageFile) {
     formData.append("image", imageFile);
   }
-  return instance.post("/api/parties", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return instance.post("/api/parties", formData);
 };
 
 export const getPartyDetail = (partyId) =>
@@ -64,15 +62,11 @@ export const updateParty = (partyId, requestDto, imageFile) => {
   if (imageFile) {
     formData.append("image", imageFile);
   }
-  return instance.patch(`/api/parties/${partyId}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return instance.patch(`/api/parties/${partyId}`, formData);
 };
 
 export const submitVerification = (partyId, imageFile) => {
   const formData = new FormData();
   formData.append("image", imageFile);
-  return instance.post(`/api/parties/${partyId}/verifications`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
+  return instance.post(`/api/parties/${partyId}/verifications`, formData);
 };
