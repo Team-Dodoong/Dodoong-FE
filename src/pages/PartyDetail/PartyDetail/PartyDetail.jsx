@@ -20,7 +20,6 @@ function PartyDetail() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const isJoined = true;
 
   const applyDetail = (party) =>
     setDetail({
@@ -33,6 +32,8 @@ function PartyDetail() {
       image: party.imageUrl,
       introduction: party.description,
       quest: party.questContent,
+      isJoined: party.isJoined,
+      isOwner: party.isOwner,
     });
 
   useEffect(() => {
@@ -118,14 +119,14 @@ function PartyDetail() {
           </S.ImageContent>
         </S.ImageSection>
 
-        {isJoined ? (
+        {detail.isJoined ? (
           <JoinedView detail={detail} />
         ) : (
           <NotJoinedView detail={detail} onJoined={refetchDetail} />
         )}
       </S.ScrollArea>
 
-      {isJoined && (
+      {detail.isJoined && (
         <S.RankingButton onClick={() => navigate(`/party/${partyId}/ranking`)}>
           <S.RankIcon />
         </S.RankingButton>
