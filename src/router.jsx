@@ -1,5 +1,10 @@
 // src/router.jsx
-import { createBrowserRouter, Outlet, useLocation } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Outlet,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import BottomNav from "./components/BottomNav/BottomNav.jsx";
 import Login from "./pages/Login/Login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
@@ -23,6 +28,9 @@ import ServiceWithdraw from "./pages/MyPage/ServiceWithdraw/ServiceWithdraw.jsx"
 // 공통 레이아웃 컴포넌트
 const Layout = () => {
   const location = useLocation(); // 현재 브라우저의 주소 경로를 가져옴
+  const navigate = useNavigate();
+
+  const activeNav = location.pathname.split("/")[1];
 
   // 현재 경로가 '/' (로그인 화면)이 아닐 때만 BottomNav를 노출하도록 설정
   const showBottomNav =
