@@ -14,7 +14,7 @@ export const Container = styled.div`
   background-color: var(--White, #ffffff);
   box-sizing: border-box;
   position: relative;
-  overflow-y: auto; /* 이중 높이로 인한 스크롤 방지 */
+  overflow-y: hidden; /* 이중 높이로 인한 스크롤 방지 */
 `;
 
 export const NavBar = styled.div` // 상단 navbar
@@ -72,6 +72,7 @@ export const StepWrapper = styled.div`
   flex-direction: column;
   height: 100%;
   flex: 1;
+  main-height: 0;
 `;
 
 export const Title = styled.h2`
@@ -90,6 +91,8 @@ export const TermsContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  min-height: 0; 
+  overflow-y: auto;
 `;
 
 export const TermRow = styled.div`
