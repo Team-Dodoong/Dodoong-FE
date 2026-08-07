@@ -3,12 +3,22 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useChatRoom } from "../../../hooks/useChatRoom";
 import * as S from "./ChatRoom.style";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
-import defaultAvatar from "../../../assets/character_두비.png";
+import defaultAvatar from "../../../assets/img_basic_profile.png";
 import { getChatHistory, getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
 import { getMyInfo } from "../../../api/memberApi";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const MESSAGE_LINE_LENGTH = 15;
+
+const breakEveryNChars = (text, size) => {
+  if (!text) return text;
+  const lines = [];
+  for (let i = 0; i < text.length; i += size) {
+    lines.push(text.slice(i, i + size));
+  }
+  return lines.join("\n");
+};
 
 const formatDateDivider = (isoString) => {
   const date = new Date(isoString);
@@ -42,7 +52,9 @@ function ChatRoom() {
   const [leaving, setLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState(null);
   const bottomRef = useRef(null);
+  const messageListRef = useRef(null);
   const syncedRealtimeCountRef = useRef(0);
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const {
     messages: realtimeMessages,
     sendMessage,
@@ -112,6 +124,12 @@ function ChatRoom() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const handleMessageListScroll = () => {
+    const el = messageListRef.current;
+    if (!el) return;
+    setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 40);
+  };
+
   const handleLoadMore = async () => {
     if (!hasNext || loadingMore) return;
     setLoadingMore(true);
@@ -178,6 +196,7 @@ function ChatRoom() {
 
   const displayItems = [];
   let lastDateKey = null;
+  let lastGroupKey = null;
   messages.forEach((msg) => {
     const dateKey = new Date(msg.createdAt).toDateString();
     if (dateKey !== lastDateKey) {
@@ -187,8 +206,26 @@ function ChatRoom() {
         text: formatDateDivider(msg.createdAt),
       });
       lastDateKey = dateKey;
+      lastGroupKey = null;
     }
-    displayItems.push({ ...msg, kind: msg.type });
+
+    const minuteKey = Math.floor(new Date(msg.createdAt).getTime() / 60000);
+    const groupKey = `${msg.type}-${msg.name}-${minuteKey}`;
+    const grouped = groupKey === lastGroupKey;
+
+    displayItems.push({
+      ...msg,
+      kind: msg.type,
+      groupKey,
+      showHeader: msg.type === "other" ? !grouped : undefined,
+    });
+    lastGroupKey = groupKey;
+  });
+
+  displayItems.forEach((item, index) => {
+    if (item.kind !== "other" && item.kind !== "me") return;
+    const next = displayItems[index + 1];
+    item.isLastInGroup = next?.groupKey !== item.groupKey;
   });
 
   return (
@@ -202,7 +239,7 @@ function ChatRoom() {
         <S.ExitIcon onClick={() => setShowLeaveModal(true)} />
       </S.Header>
 
-      <S.MessageList>
+      <S.MessageList ref={messageListRef} onScroll={handleMessageListScroll}>
         {loading && <S.NoticeText>불러오는 중...</S.NoticeText>}
         {error && <S.NoticeText>{error}</S.NoticeText>}
         {hasNext && (
@@ -217,16 +254,24 @@ function ChatRoom() {
           if (item.kind === "me") {
             return (
               <S.MyMessageRow key={item.id}>
-                <S.MyBubble>{item.text}</S.MyBubble>
+                <S.MyBubble $last={item.isLastInGroup}>
+                  {breakEveryNChars(item.text, MESSAGE_LINE_LENGTH)}
+                </S.MyBubble>
               </S.MyMessageRow>
             );
           }
           return (
             <S.OtherMessageRow key={item.id}>
-              <S.Avatar src={item.avatar} alt={item.name} />
+              {item.showHeader ? (
+                <S.Avatar src={item.avatar} alt={item.name} />
+              ) : (
+                <S.AvatarSpacer />
+              )}
               <S.OtherContent>
-                <S.OtherName>{item.name}</S.OtherName>
-                <S.OtherBubble>{item.text}</S.OtherBubble>
+                {item.showHeader && <S.OtherName>{item.name}</S.OtherName>}
+                <S.OtherBubble $last={item.isLastInGroup}>
+                  {breakEveryNChars(item.text, MESSAGE_LINE_LENGTH)}
+                </S.OtherBubble>
               </S.OtherContent>
             </S.OtherMessageRow>
           );
@@ -234,13 +279,16 @@ function ChatRoom() {
         <div ref={bottomRef} />
       </S.MessageList>
 
-      <S.ScrollButton
-        onClick={() =>
-          bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        <S.ChevronIcon />
-      </S.ScrollButton>
+      {!isAtBottom && (
+        <S.ScrollButton
+          onClick={() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            setIsAtBottom(true);
+          }}
+        >
+          <S.ChevronIcon />
+        </S.ScrollButton>
+      )}
 
       <S.InputWrapper>
         <S.Input

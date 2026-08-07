@@ -5,10 +5,9 @@ import Chevron from "../../../assets/ic_regular_chevron_down_24.svg?react";
 import Send from "../../../assets/ic_send_24.svg?react";
 import {
   SemiBold_16,
-  Medium_14,
-  Regular_14,
   Regular_12,
   Medium_12,
+  SemiBold_12,
 } from "../../../styles/Fonts";
 
 export const Container = styled.div`
@@ -23,7 +22,8 @@ export const Header = styled.div`
   padding: 0.75rem 1.25rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  display: flex;
+  justify-content: space-between;
   border-bottom: 1px solid var(--Gray_1);
 `;
 
@@ -36,10 +36,9 @@ export const BackIcon = styled(Back)`
 `;
 
 export const HeaderInfo = styled.div`
-  flex: 1;
   display: flex;
   align-items: center;
-  gap: 0.375rem;
+  gap: 0.5rem;
 `;
 
 export const HeaderTitle = styled.h3`
@@ -48,14 +47,17 @@ export const HeaderTitle = styled.h3`
 `;
 
 export const HeaderCount = styled.span`
-  ${Regular_14};
-  color: var(--Main);
+  ${SemiBold_12};
+  color: var(--Gray_9);
+  padding: 0.125rem 0.25rem;
+  background: var(--Gray_1);
+  border-radius: 0.25rem;
 `;
 
 export const ExitIcon = styled(Exit)`
   width: 1.5rem;
   height: 1.5rem;
-  color: var(--Gray_5);
+  color: var(--Red);
   cursor: pointer;
   flex-shrink: 0;
 `;
@@ -63,10 +65,10 @@ export const ExitIcon = styled(Exit)`
 export const MessageList = styled.div`
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1.25rem;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 `;
 
 export const NoticeText = styled.p`
@@ -77,9 +79,13 @@ export const NoticeText = styled.p`
 
 export const DateText = styled.p`
   ${Regular_12};
-  color: var(--Gray_4);
+  color: var(--Gray_6);
+  padding: 0.25rem 0.75rem;
+  background: var(--Gray_0);
+  border-radius: 50px;
   text-align: center;
-  margin: 0.5rem 0;
+  margin: 0.75rem 0;
+  align-self: center;
 `;
 
 export const MyMessageRow = styled.div`
@@ -88,20 +94,25 @@ export const MyMessageRow = styled.div`
 `;
 
 export const MyBubble = styled.div`
-  ${Regular_14};
+  ${Regular_12};
   background: var(--Black);
   color: white;
-  padding: 0.625rem 0.875rem;
-  border-radius: 1rem 0 1rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: ${({ $last }) => ($last ? "1rem 1rem 0 1rem" : "1rem")};
   max-width: 70%;
-  line-height: 1.5;
   word-break: break-word;
+  white-space: pre-line;
 `;
 
 export const OtherMessageRow = styled.div`
   display: flex;
   gap: 0.5rem;
   align-items: flex-start;
+`;
+
+export const AvatarSpacer = styled.div`
+  width: 2.25rem;
+  flex-shrink: 0;
 `;
 
 export const Avatar = styled.img`
@@ -115,35 +126,37 @@ export const Avatar = styled.img`
 export const OtherContent = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
+  max-width: 70%;
+  min-width: 0;
 `;
 
 export const OtherName = styled.p`
-  ${Medium_12};
-  color: var(--Gray_6);
+  ${Regular_12};
+  color: var(--Black);
 `;
 
 export const OtherBubble = styled.div`
-  ${Regular_14};
+  ${Regular_12};
   background: var(--Gray_1);
   color: var(--Black);
-  padding: 0.625rem 0.875rem;
-  border-radius: 0 1rem 1rem 1rem;
-  max-width: 70%;
-  line-height: 1.5;
+  padding: 0.5rem 0.75rem;
+  border-radius: ${({ $last }) => ($last ? "1rem 1rem 1rem 0" : "1rem")};
+  width: fit-content;
+  max-width: 100%;
   word-break: break-word;
+  white-space: pre-line;
 `;
 
 export const ScrollButton = styled.button`
   position: absolute;
-  bottom: 5rem;
-  right: 1.25rem;
+  bottom: 6.5rem;
+  right: 0.75rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
   background: white;
-  border: 1px solid var(--Gray_2);
-  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -154,25 +167,29 @@ export const ScrollButton = styled.button`
 export const ChevronIcon = styled(Chevron)`
   width: 1.25rem;
   height: 1.25rem;
-  color: var(--Gray_5);
+  color: #6f6f6f;
 `;
 
 export const InputWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.25rem;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem 2.5rem;
   border-top: 1px solid var(--Gray_1);
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
 `;
 
 export const Input = styled.input`
   flex: 1;
   border: none;
   outline: none;
-  ${Regular_14};
+  ${Medium_12};
+  padding: 0.75rem 1.25rem;
+  border-radius: 40px;
+  background: var(--Gray_0);
   color: var(--Black);
   &::placeholder {
-    color: var(--Gray_4);
+    color: var(--Gray_5);
   }
 `;
 
