@@ -5,6 +5,8 @@ import NotJoinedView from "./NotJoinedView";
 import JoinedView from "./JoinedView";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import { getPartyDetail, leaveParty, deleteParty } from "../../../api/partyApi";
+import { getPartyImage } from "../../../utils/partyImage";
+import defaultPartyImage from "../../../assets/img_party_background_basic.png";
 
 const CATEGORY_LABELS = {
   STUDY: "공부",
@@ -36,7 +38,7 @@ function PartyDetail() {
       title: party.name,
       isLocked: !party.isPublic,
       members: `${party.currentMembers}/${party.maxMembers}`,
-      image: party.imageUrl,
+      image: getPartyImage(party.imageUrl, defaultPartyImage),
       introduction: party.description,
       quest: party.questContent,
       isJoined: party.isJoined,

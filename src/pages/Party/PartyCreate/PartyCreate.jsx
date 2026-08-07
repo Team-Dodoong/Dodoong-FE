@@ -4,6 +4,7 @@ import * as S from "../PartyCreate/PartyCreate.style";
 import Input from "../../../components/Input/Input";
 
 import { createParty, getPartyDetail, updateParty } from "../../../api/partyApi";
+import { getPartyImage } from "../../../utils/partyImage";
 
 const CATEGORIES = ["공부", "운동", "일상", "외국어", "취업"];
 const CATEGORY_MAP = {
@@ -52,7 +53,7 @@ function PartyCreate() {
         );
         setMaxMembers(party.maxMembers);
         setIsPublic(party.isPublic);
-        setImage(party.imageUrl);
+        setImage(getPartyImage(party.imageUrl, null));
       } catch (err) {
         console.error("파티 정보 조회 실패", err);
         alert("파티 정보를 불러오지 못했습니다.");
