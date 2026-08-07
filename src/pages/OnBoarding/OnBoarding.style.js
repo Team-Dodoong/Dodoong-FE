@@ -10,11 +10,11 @@ export const Container = styled.div`
   flex-direction: column;
   align-items: center;
   width: 100%;
-  height: 100vh; 
+  min-height: 100vh; 
   background-color: var(--White, #ffffff);
   box-sizing: border-box;
   position: relative;
-  overflow: hidden; /* 이중 높이로 인한 스크롤 방지 */
+  overflow-y: auto; /* 이중 높이로 인한 스크롤 방지 */
 `;
 
 export const NavBar = styled.div` // 상단 navbar
