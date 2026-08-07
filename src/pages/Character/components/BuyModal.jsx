@@ -17,13 +17,14 @@ function BuyModal({ character, userPoint, onCancel, onConfirm }) {
             <S.InfoLabel>소모 예정 포인트</S.InfoLabel>
             <S.InfoValue>{character.price}P</S.InfoValue>
           </S.InfoRow>
+          <S.Divider />
           <S.InfoRow>
             <S.InfoLabel>남은 포인트</S.InfoLabel>
             <S.InfoValue>{remaining.toLocaleString()}P</S.InfoValue>
           </S.InfoRow>
         </S.InfoTable>
         <S.BuyButton onClick={onConfirm}>
-          {character.price}P 구매하기
+          <S.CharacterCost>{character.price}P</S.CharacterCost> 구매하기
         </S.BuyButton>
         <S.CancelButton onClick={onCancel}>취소</S.CancelButton>
       </S.Modal>

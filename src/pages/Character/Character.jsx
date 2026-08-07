@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import * as S from "./Character.style";
-import PointBadge from "../../../components/PointBadge/PointBadge";
-import characterDecoration from "../../../assets/character-icon.png";
+import Header from "../../components/Header/Header";
+import PointBadge from "../../components/PointBadge/PointBadge";
+import characterDecoration from "../../assets/character-icon.png";
+import SearchBar from "../../components/SearchBar/SearchBar";
+import bgGradient from "../../assets/Rectangle 3410.png";
 import BuyModal from "./components/BuyModal";
 import DetailModal from "./components/DetailModal";
 import {
@@ -12,18 +14,17 @@ import {
   equipCharacter,
   getCharacterDetail,
   purchaseCharacter,
-} from "../../../api/characterApi";
-import { getMyInfo } from "../../../api/memberApi";
+} from "../../api/characterApi";
+import { getMyInfo } from "../../api/memberApi";
 import {
   getCharacterImage,
   getCharacterHelloImage,
   defaultCharacterImage,
-} from "../../../utils/characterImage";
+} from "../../utils/characterImage";
 
 const MAX_EXP = 1000;
 
 function Character() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("전체캐릭터");
   const [search, setSearch] = useState("");
   const [characters, setCharacters] = useState([]);
@@ -182,7 +183,9 @@ function Character() {
       });
       setShowDetailModal(true);
     } catch (err) {
-      alert(err.response?.data?.message ?? "캐릭터 정보를 불러오지 못했습니다.");
+      alert(
+        err.response?.data?.message ?? "캐릭터 정보를 불러오지 못했습니다.",
+      );
     } finally {
       setDetailLoading(false);
     }
@@ -199,11 +202,11 @@ function Character() {
       setShowBuyModal(false);
 
       setCharacters((prev) =>
-        prev.map((c) => (c.id === characterId ? { ...c, owned: true } : c))
+        prev.map((c) => (c.id === characterId ? { ...c, owned: true } : c)),
       );
       if (cacheRef.current["전체캐릭터"]) {
         cacheRef.current["전체캐릭터"] = cacheRef.current["전체캐릭터"].map(
-          (c) => (c.id === characterId ? { ...c, owned: true } : c)
+          (c) => (c.id === characterId ? { ...c, owned: true } : c),
         );
       }
       delete cacheRef.current["보유캐릭터"];
@@ -218,102 +221,105 @@ function Character() {
 
   return (
     <S.Container>
-      <S.Header>
-        <S.HeaderTitle>캐릭터 관리</S.HeaderTitle>
-        <S.ChatIcon onClick={() => navigate('/party/chat')} />
-      </S.Header>
+      <Header title="캐릭터 관리" />
 
-      <S.PointRow>
-        <PointBadge point={point} />
-      </S.PointRow>
+      <S.TopSection $bgImage={bgGradient}>
+        <S.PointRow>
+          <PointBadge point={point} />
+        </S.PointRow>
 
-      <S.CharacterSection>
-        <S.CharacterMessage>
-          {equippedCharacter
-            ? `안녕! 나는 ${equippedCharacter.name}야 만나서 반가워!`
-            : "아직 장착한 캐릭터가 없어요."}
-        </S.CharacterMessage>
-        <S.CharacterArea>
-          <S.Decoration src={characterDecoration} alt="" />
-          <S.MainCharacterImage
-            src={equippedCharacter?.image ?? defaultCharacterImage}
-            alt={equippedCharacter?.name ?? "캐릭터"}
+        <S.CharacterSection>
+          <S.CharacterMessage>
+            {equippedCharacter
+              ? `안녕! 나는 ${equippedCharacter.name}야 만나서 반가워!`
+              : "아직 장착한 캐릭터가 없어요."}
+          </S.CharacterMessage>
+          <S.CharacterArea>
+            <S.Decoration src={characterDecoration} alt="" />
+            <S.MainCharacterImage
+              src={equippedCharacter?.image ?? defaultCharacterImage}
+              alt={equippedCharacter?.name ?? "캐릭터"}
+            />
+          </S.CharacterArea>
+          <S.CharacterName>{equippedCharacter?.name ?? "-"}</S.CharacterName>
+          <S.ExpBarWrapper>
+            <S.ExpBar>
+              <S.ExpFill $percent={(exp / MAX_EXP) * 100} />
+            </S.ExpBar>
+            <S.ExpText>
+              <S.ExpCurrent>{exp}</S.ExpCurrent>/{MAX_EXP.toLocaleString()}
+            </S.ExpText>
+          </S.ExpBarWrapper>
+        </S.CharacterSection>
+      </S.TopSection>
+
+      <S.Sheet>
+        <S.SheetHandle />
+        <S.SearchWrapper>
+          <SearchBar
+            placeholder="캐릭터 이름을 검색해주세요."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
           />
-        </S.CharacterArea>
-        <S.CharacterName>{equippedCharacter?.name ?? "-"}</S.CharacterName>
-        <S.ExpBarWrapper>
-          <S.ExpBar>
-            <S.ExpFill $percent={(exp / MAX_EXP) * 100} />
-          </S.ExpBar>
-          <S.ExpText>
-            <S.ExpCurrent>{exp}</S.ExpCurrent>/{MAX_EXP.toLocaleString()}
-          </S.ExpText>
-        </S.ExpBarWrapper>
-      </S.CharacterSection>
+        </S.SearchWrapper>
 
-      <S.SearchWrapper>
-        <S.SearchInput
-          placeholder="캐릭터 목록을 검색해주세요."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <S.SearchIcon />
-      </S.SearchWrapper>
-
-      <S.TabRow>
-        {["전체캐릭터", "보유캐릭터"].map((tab) => (
-          <S.Tab
-            key={tab}
-            $active={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </S.Tab>
-        ))}
-      </S.TabRow>
-
-      <S.ScrollArea>
-        {loading && <S.CardName>불러오는 중...</S.CardName>}
-        {error && <S.CardName>{error}</S.CardName>}
-        {!loading && !error && filtered.length === 0 && (
-          <S.CardName>표시할 캐릭터가 없습니다.</S.CardName>
-        )}
-        <S.Grid>
-          {filtered.map((character) => (
-            <S.CharacterCard key={character.id}>
-              <S.CardImage src={character.image} alt={character.name} />
-              <S.CardName>{character.name}</S.CardName>
-              {character.owned ? (
-                <S.ActionButton
-                  $equipped={equipped === character.id}
-                  disabled={equipping}
-                  onClick={() => handleEquip(character)}
-                >
-                  {equipped === character.id ? "장착중" : "장착하기"}
-                </S.ActionButton>
-              ) : (
-                <S.ActionButton
-                  $buy
-                  onClick={() => {
-                    setSelectedCharacter(character);
-                    setShowBuyModal(true);
-                  }}
-                >
-                  {character.price
-                    ? `${character.price}P 구매하기`
-                    : "장착하기"}
-                </S.ActionButton>
-              )}
-              <S.DetailButton
-                disabled={detailLoading}
-                onClick={() => handleShowDetail(character)}
-              >
-                상세보기
-              </S.DetailButton>
-            </S.CharacterCard>
+        <S.TabRow>
+          {["전체캐릭터", "보유캐릭터"].map((tab) => (
+            <S.Tab
+              key={tab}
+              $active={activeTab === tab}
+              onClick={() => setActiveTab(tab)}
+            >
+              {tab}
+            </S.Tab>
           ))}
-        </S.Grid>
-      </S.ScrollArea>
+        </S.TabRow>
+
+        <S.ScrollArea>
+          {loading && <S.CardName>불러오는 중...</S.CardName>}
+          {error && <S.CardName>{error}</S.CardName>}
+          {!loading && !error && filtered.length === 0 && (
+            <S.CardName>표시할 캐릭터가 없습니다.</S.CardName>
+          )}
+          <S.Grid>
+            {filtered.map((character) => (
+              <S.CharacterCard key={character.id}>
+                <S.CardImage src={character.image} alt={character.name} />
+                <S.CardName>{character.name}</S.CardName>
+                {character.owned ? (
+                  <S.ActionButton
+                    $equipped={equipped === character.id}
+                    disabled={equipping}
+                    onClick={() => handleEquip(character)}
+                  >
+                    {equipped === character.id ? "장착중" : "장착하기"}
+                  </S.ActionButton>
+                ) : (
+                  <S.ActionButton
+                    $buy
+                    onClick={() => {
+                      setSelectedCharacter(character);
+                      setShowBuyModal(true);
+                    }}
+                  >
+                    {character.price
+                      ? <>
+                          <S.CharacterCost>{character.price}P</S.CharacterCost> 구매하기
+                        </>
+                      : "장착하기"}
+                  </S.ActionButton>
+                )}
+                <S.DetailButton
+                  disabled={detailLoading}
+                  onClick={() => handleShowDetail(character)}
+                >
+                  상세보기
+                </S.DetailButton>
+              </S.CharacterCard>
+            ))}
+          </S.Grid>
+        </S.ScrollArea>
+      </S.Sheet>
       {showBuyModal && selectedCharacter && (
         <BuyModal
           character={selectedCharacter}
