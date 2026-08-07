@@ -1,24 +1,43 @@
-import styled from 'styled-components';
+import styled from "styled-components";
+import { SemiBold_16 } from "../../styles/Fonts";
 
 export const Wrapper = styled.header`
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 14px 20px 8px;
+  justify-content: flex-end;
+  height: 48px;
+  padding: 0 20px;
   background-color: var(--White);
-  border-bottom: 1px #F1F1F1 solid;
+  border-bottom: 1px var(--Gray_1) solid;
 `;
 
 export const Logo = styled.h1`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-family: "Jalnan2";
   font-size: 14px;
   font-weight: 400;
-  line-height : 28px;
-  color: #FF974D;
+  line-height: 28px;
+  color: var(--Main);
   word-wrap: break-word;
-  margin: 0 auto;
-  letter-spacing: -0.3px;
+  margin: 0;
   text-align: center;
+  white-space: nowrap;
+`;
+
+export const Title = styled.h1`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  ${SemiBold_16};
+  color: var(--Black);
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
 `;
 
 export const ChatButton = styled.button`
@@ -28,13 +47,3 @@ export const ChatButton = styled.button`
   justify-content: center;
   color: var(--Black);
 `;
-
-/* export const NotificationDot = styled.span`
-  position: absolute;
-  top: -1px;
-  right: -1px;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: ${colors.primary};
-`; */ 
