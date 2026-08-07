@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import * as S from "./PartyDetail.style";
+import * as S from "./JoinedView.style";
 import CtaButton from "../../../components/Button/CtaButton";
 import {
   getPartyMonthlyStats,
@@ -104,46 +104,61 @@ function JoinedView({ detail }) {
 
   return (
     <>
-      <S.Body>
-        <S.StatsRow>
-          <S.StatItem>
+      <S.StatsRow>
+        <S.StatItem>
+          <S.StatBackground>
             <S.TrophyIcon />
-            <S.StatLabel>월간 랭킹</S.StatLabel>
-            <S.StatValue>
-              {monthlyStats ? `${monthlyStats.rank}위` : "-"}
-            </S.StatValue>
-          </S.StatItem>
-          <S.StatItem>
+          </S.StatBackground>
+          <S.StatLabel>월간 랭킹</S.StatLabel>
+          <S.StatValue>
+            {monthlyStats ? `${monthlyStats.rank}위` : "-"}
+          </S.StatValue>
+        </S.StatItem>
+        <S.StatItem>
+          <S.StatBackground>
+            <S.FireIcon />
+          </S.StatBackground>
+          <S.StatLabel>연속 달성</S.StatLabel>
+          <S.StatValue>
+            {monthlyStats?.todayQuestCompleted ? "1일" : "-"}
+          </S.StatValue>
+        </S.StatItem>
+        <S.StatItem>
+          <S.StatBackground>
             <S.DartIcon />
-            <S.StatLabel>퀘스트 달성</S.StatLabel>
-            <S.StatValue>
-              {monthlyStats
-                ? monthlyStats.todayQuestCompleted
-                  ? "완료"
-                  : "미완료"
-                : "-"}
-            </S.StatValue>
-          </S.StatItem>
-          <S.StatItem>
+          </S.StatBackground>
+          <S.StatLabel>퀘스트 달성</S.StatLabel>
+          <S.StatValue>
+            {monthlyStats
+              ? monthlyStats.todayQuestCompleted
+                ? "완료"
+                : "미완료"
+              : "-"}
+          </S.StatValue>
+        </S.StatItem>
+        <S.StatItem>
+          <S.StatBackground>
             <S.SmileIcon />
-            <S.StatLabel>월별 인증 횟수</S.StatLabel>
-            <S.StatValue>
-              {monthlyStats ? `${monthlyStats.monthlyParticipationCount}회` : "-"}
-            </S.StatValue>
-          </S.StatItem>
-        </S.StatsRow>
+          </S.StatBackground>
+          <S.StatLabel>월별 인증 횟수</S.StatLabel>
+          <S.StatValue>
+            {monthlyStats ? `${monthlyStats.monthlyParticipationCount}회` : "-"}
+          </S.StatValue>
+        </S.StatItem>
+      </S.StatsRow>
+      <S.StatDivider />
+      <S.Body>
+        <S.QuestCtaGroup>
+          <S.Section>
+            <S.SectionTitle>파티 지정퀘스트 현황</S.SectionTitle>
+            <S.QuestItem>
+              {isVerified ? <S.QuestIcon /> : <S.EmptyCheckbox />}
+              <S.QuestText>{detail.quest}</S.QuestText>
+            </S.QuestItem>
+          </S.Section>
 
-        <S.SectionDivider />
-
-        <S.Section>
-          <S.SectionTitle>파티 지정퀘스트 현황</S.SectionTitle>
-          <S.QuestItem>
-            {isVerified ? <S.QuestIcon /> : <S.EmptyCheckbox />}
-            <S.QuestText>{detail.quest}</S.QuestText>
-          </S.QuestItem>
-        </S.Section>
-
-        <CtaButton text="인증하기" onClick={() => setShowVerifySheet(true)} />
+          <CtaButton text="인증하기" onClick={() => setShowVerifySheet(true)} />
+        </S.QuestCtaGroup>
 
         <S.SectionDivider />
 
@@ -160,7 +175,8 @@ function JoinedView({ detail }) {
             <S.RecordMore
               onClick={() => navigate(`/party/${partyId}/certified`)}
             >
-              전체보기 &gt;
+              <S.MoreText>전체보기</S.MoreText>
+              <S.MoreIcon />
             </S.RecordMore>
           </S.RecordHeader>
           <S.RecordRow>

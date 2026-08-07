@@ -6,8 +6,9 @@ import {
   SemiBold_16,
   Medium_14,
   Regular_12,
-  Bold_14,
+  Regular_14,
   Medium_12,
+  Bold_18,
 } from "../../../styles/Fonts";
 
 export const Container = styled.div`
@@ -18,7 +19,7 @@ export const Container = styled.div`
 `;
 
 export const Header = styled.div`
-  padding: 0.75rem 1.25rem;
+  padding: 0.8125rem 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -51,7 +52,7 @@ export const Body = styled.div`
   padding: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1.25rem;
 `;
 
 export const FilterWrapper = styled.div`
@@ -62,8 +63,8 @@ export const FilterButton = styled.button`
   ${Medium_14};
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.375rem 0.75rem;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--Gray_2);
   border-radius: 0.5rem;
   background: white;
@@ -74,7 +75,7 @@ export const FilterButton = styled.button`
 export const ChevronIcon = styled(Chevron)`
   width: 1rem;
   height: 1rem;
-  color: var(--Black);
+  color: var(--Gray_6);
 `;
 
 export const Overlay = styled.div`
@@ -85,13 +86,13 @@ export const Overlay = styled.div`
 
 export const FilterMenu = styled.div`
   position: absolute;
-  top: 2.5rem;
+  top: 56px;
   left: 0;
   background: white;
   border-radius: 0.5rem;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.15);
   z-index: 100;
-  min-width: 8rem;
+  width: 9.6875rem;
   overflow: hidden;
 `;
 
@@ -100,8 +101,8 @@ export const FilterMenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.25rem 1rem;
-  color: ${({ $active }) => ($active ? "var(--Black)" : "var(--Black)")};
+  padding: 0.5rem 1rem;
+  color: var(--Black);
   cursor: pointer;
   &:hover {
     background: var(--Gray_0);
@@ -132,29 +133,34 @@ export const SectionTitle = styled.h3`
 `;
 
 export const DateText = styled.span`
-  ${Regular_12};
+  ${Medium_12};
   color: var(--Gray_5);
 `;
 
 export const ProgressRow = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: end;
 `;
 
 export const ProgressLabel = styled.span`
-  ${Medium_12};
-  color: var(--Gray_6);
+  ${Regular_14};
+  color: var(--Gray_4);
+`;
+
+export const MainColorLabel = styled.span`
+  color: var(--Main);
 `;
 
 export const ProgressPercent = styled.span`
-  ${Bold_14};
+  ${Bold_18};
   color: var(--Main);
 `;
 
 export const ProgressBar = styled.div`
   width: 100%;
-  height: 6px;
-  background: var(--Gray_1);
+  height: 5px;
+  background: #ededed;
   border-radius: 999px;
   overflow: hidden;
 `;
@@ -166,17 +172,28 @@ export const ProgressFill = styled.div`
   border-radius: 999px;
 `;
 
+export const Divider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: var(--Gray_1);
+`;
+
 export const DateSection = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 26px;
 `;
 
 export const DateLabel = styled.p`
   ${SemiBold_16};
   color: var(--Black);
+  align-items: center;
 `;
 
+export const DateSubLabel = styled.span`
+  ${Medium_14};
+  color: var(--Gray_4);
+`;
 export const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -198,22 +215,20 @@ export const MemberImage = styled.img`
 `;
 
 export const MemberName = styled.p`
-  ${Medium_12};
+  ${Medium_14};
   color: var(--Black);
-  text-align: center;
 `;
 
 export const MemberTime = styled.p`
   ${Regular_12};
-  color: var(--Gray_5);
-  text-align: center;
+  color: var(--Gray_4);
+  white-space: nowrap;
 `;
 
 export const MemberInfo = styled.div`
   display: flex;
   flex-direction: column;
   align-items: start;
-  gap: 0.375rem;
 `;
 
 export const MemberWrapper = styled.div`
@@ -226,6 +241,7 @@ export const ProfileImage = styled.img`
   height: 1.5rem;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid var(--Gray_2);
 `;
 
 export const CertImage = styled.img`
@@ -233,18 +249,20 @@ export const CertImage = styled.img`
   aspect-ratio: 1;
   object-fit: cover;
   border-radius: 4px;
+  border: 1px solid var(--Gray_2);
 `;
 
 export const PendingBox = styled.div`
   width: 100%;
   aspect-ratio: 1;
   border-radius: 4px;
-  background: var(--Gray_1);
+  background: var(--Gray_0);
+  border: 1px solid var(--Gray_2);
   display: flex;
   align-items: center;
   justify-content: center;
   ${Regular_12};
-  color: var(--Gray_4);
+  color: var(--Gray_5);
   text-align: center;
   white-space: pre-line;
 `;

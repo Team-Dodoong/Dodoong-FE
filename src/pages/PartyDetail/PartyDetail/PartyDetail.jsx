@@ -5,6 +5,8 @@ import NotJoinedView from "./NotJoinedView";
 import JoinedView from "./JoinedView";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
 import { getPartyDetail, leaveParty, deleteParty } from "../../../api/partyApi";
+import { getPartyImage } from "../../../utils/partyImage";
+import defaultPartyImage from "../../../assets/img_party_background_basic.png";
 
 const CATEGORY_LABELS = {
   STUDY: "공부",
@@ -36,7 +38,7 @@ function PartyDetail() {
       title: party.name,
       isLocked: !party.isPublic,
       members: `${party.currentMembers}/${party.maxMembers}`,
-      image: party.imageUrl,
+      image: getPartyImage(party.imageUrl, defaultPartyImage),
       introduction: party.description,
       quest: party.questContent,
       isJoined: party.isJoined,
@@ -133,15 +135,21 @@ function PartyDetail() {
   }
 
   return (
-    <S.Container>
-      <S.ScrollArea>
+    <S.Container $full={detail.isJoined}>
+      <S.ScrollArea $full={detail.isJoined}>
         <S.ImageSection>
           <S.CoverImage src={detail.image} alt="cover" />
           <S.ImageOverlay />
           <S.HeaderIcons>
             <S.BackIcon onClick={() => navigate(-1)} />
             <S.HeaderRight>
-              <S.ChatIcon onClick={() => navigate(`/party/chat/${partyId}`)} />
+              <S.ChatIcon
+                onClick={
+                  detail.isJoined
+                    ? () => navigate(`/party/chat/${partyId}`)
+                    : undefined
+                }
+              />
               <S.ShareIcon />
               <S.MoreIcon onClick={() => setShowMoreMenu(true)} />
             </S.HeaderRight>
@@ -181,7 +189,11 @@ function PartyDetail() {
         <>
           <S.Overlay $menu onClick={() => setShowMoreMenu(false)} />
           <S.MenuContainer>
-            {detail.isOwner ? (
+            {!detail.isJoined ? (
+              <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                파티 숨기기
+              </S.MenuItem>
+            ) : detail.isOwner ? (
               <>
                 <S.MenuItem
                   onClick={() => {

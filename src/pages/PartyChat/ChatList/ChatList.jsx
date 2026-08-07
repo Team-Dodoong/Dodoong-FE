@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import * as S from "./ChatList.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
-import defaultChatImage from "../../../assets/character_두비.png";
+import defaultChatImage from "../../../assets/img_party_background_basic.png";
 import { getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
+import { getPartyImage } from "../../../utils/partyImage";
 
 const LONG_PRESS_DELAY = 500;
 
@@ -59,7 +60,7 @@ function ChatList() {
           count: room.memberCount,
           message: room.lastMessage ?? "아직 메시지가 없습니다.",
           time: formatChatTime(room.lastMessageAt),
-          image: room.partyImageUrl ?? defaultChatImage,
+          image: getPartyImage(room.partyImageUrl, defaultChatImage),
         }));
         setChats(list);
       } catch (err) {
