@@ -52,7 +52,9 @@ function ChatRoom() {
   const [leaving, setLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState(null);
   const bottomRef = useRef(null);
+  const messageListRef = useRef(null);
   const syncedRealtimeCountRef = useRef(0);
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const {
     messages: realtimeMessages,
     sendMessage,
@@ -121,6 +123,12 @@ function ChatRoom() {
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleMessageListScroll = () => {
+    const el = messageListRef.current;
+    if (!el) return;
+    setIsAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 40);
+  };
 
   const handleLoadMore = async () => {
     if (!hasNext || loadingMore) return;
@@ -212,7 +220,7 @@ function ChatRoom() {
         <S.ExitIcon onClick={() => setShowLeaveModal(true)} />
       </S.Header>
 
-      <S.MessageList>
+      <S.MessageList ref={messageListRef} onScroll={handleMessageListScroll}>
         {loading && <S.NoticeText>불러오는 중...</S.NoticeText>}
         {error && <S.NoticeText>{error}</S.NoticeText>}
         {hasNext && (
@@ -246,13 +254,16 @@ function ChatRoom() {
         <div ref={bottomRef} />
       </S.MessageList>
 
-      <S.ScrollButton
-        onClick={() =>
-          bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-        }
-      >
-        <S.ChevronIcon />
-      </S.ScrollButton>
+      {!isAtBottom && (
+        <S.ScrollButton
+          onClick={() => {
+            bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+            setIsAtBottom(true);
+          }}
+        >
+          <S.ChevronIcon />
+        </S.ScrollButton>
+      )}
 
       <S.InputWrapper>
         <S.Input
