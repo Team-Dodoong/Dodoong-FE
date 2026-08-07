@@ -39,6 +39,12 @@ function Certified() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     let ignore = false;
@@ -126,7 +132,10 @@ function Certified() {
                 </S.SectionRow>
                 <S.ProgressRow>
                   <S.ProgressLabel>
-                    {data.verifiedMemberCount}/{data.totalMemberCount}
+                    <S.MainColorLabel>
+                      {data.verifiedMemberCount}
+                    </S.MainColorLabel>
+                    /{data.totalMemberCount}
                   </S.ProgressLabel>
                   <S.ProgressPercent>{percent}%</S.ProgressPercent>
                 </S.ProgressRow>
@@ -134,11 +143,16 @@ function Certified() {
                   <S.ProgressFill $percent={percent} />
                 </S.ProgressBar>
               </S.Section>
-
+              <S.Divider />
               <S.DateSection>
                 <S.DateLabel>
-                  {formatDateLabel(data.date)} {data.verifiedMemberCount}/
-                  {data.totalMemberCount}
+                  {formatDateLabel(data.date)}{" "}
+                  <S.DateSubLabel>
+                    <S.MainColorLabel>
+                      {data.verifiedMemberCount}
+                    </S.MainColorLabel>
+                    /{data.totalMemberCount}
+                  </S.DateSubLabel>
                 </S.DateLabel>
                 <S.Grid>
                   {filteredRecords.map((record) => (
@@ -154,7 +168,9 @@ function Certified() {
                         <S.MemberInfo>
                           <S.MemberName>{record.nickname}</S.MemberName>
                           <S.MemberTime>
-                            {formatTime(record.verifiedAt)}
+                            {record.verified
+                              ? formatTime(record.verifiedAt)
+                              : formatTime(now)}
                           </S.MemberTime>
                         </S.MemberInfo>
                       </S.MemberWrapper>
