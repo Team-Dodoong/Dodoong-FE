@@ -7,6 +7,11 @@ import SearchBar from "../../../components/SearchBar/SearchBar";
 import podium1 from "./images/podium_1.png";
 import podium2 from "./images/podium_2.png";
 import podium3 from "./images/podium_3.png";
+import Rank1Icon from "./images/ic_1_rank.svg?react";
+import Rank2Icon from "./images/ic_2_rank.svg?react";
+import Rank3Icon from "./images/ic_3_rank.svg?react";
+
+const RANK_ICONS = { 1: Rank1Icon, 2: Rank2Icon, 3: Rank3Icon };
 
 function Ranking() {
   const navigate = useNavigate();
@@ -109,20 +114,28 @@ function Ranking() {
       </S.Podium>
 
       <S.BottomSheet>
-        <SearchBar
-          placeholder="유저 이름을 검색해주세요."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <S.SheetHandle />
+        <S.SearchBarWrapper>
+          <SearchBar
+            placeholder="유저 이름을 검색해주세요."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </S.SearchBarWrapper>
 
         <S.RankList>
-          {top3.map((member) => (
-            <S.RankItem key={member.rank}>
-              <S.RankBadge $rank={member.rank}>{member.rank}</S.RankBadge>
-              <S.RankItemName>{member.name}</S.RankItemName>
-              <S.RankScore>{member.score}점</S.RankScore>
-            </S.RankItem>
-          ))}
+          {top3.map((member) => {
+            const RankIcon = RANK_ICONS[member.rank];
+            return (
+              <S.RankItem key={member.rank}>
+                <S.RankBadgeIcon>
+                  <RankIcon />
+                </S.RankBadgeIcon>
+                <S.RankItemName>{member.name}</S.RankItemName>
+                <S.RankScore>{member.score}점</S.RankScore>
+              </S.RankItem>
+            );
+          })}
 
           {(search ? filtered : rest).map((member) => (
             <S.RankItem key={member.rank}>
