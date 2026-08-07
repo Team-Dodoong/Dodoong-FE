@@ -3,10 +3,9 @@ import { useNavigate } from "react-router-dom";
 import * as S from "./ChatList.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
-import defaultChatImage from "../../../assets/img_party_background_basic.png";
+import defaultChatImage from "../../../assets/character_두비.png";
 import { getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
-import { getPartyImage } from "../../../utils/partyImage";
 
 const LONG_PRESS_DELAY = 500;
 
@@ -60,7 +59,7 @@ function ChatList() {
           count: room.memberCount,
           message: room.lastMessage ?? "아직 메시지가 없습니다.",
           time: formatChatTime(room.lastMessageAt),
-          image: getPartyImage(room.partyImageUrl, defaultChatImage),
+          image: room.partyImageUrl ?? defaultChatImage,
         }));
         setChats(list);
       } catch (err) {
@@ -173,8 +172,10 @@ function ChatList() {
             <S.ChatImage src={chat.image} alt={chat.name} />
             <S.ChatInfo>
               <S.ChatTop>
-                <S.ChatName>{chat.name}</S.ChatName>
-                <S.ChatCount>{chat.count}</S.ChatCount>
+                <S.InfoWrapper>
+                  <S.ChatName>{chat.name}</S.ChatName>
+                  <S.ChatCount>{chat.count}</S.ChatCount>
+                </S.InfoWrapper>
                 <S.ChatTime>{chat.time}</S.ChatTime>
               </S.ChatTop>
               <S.ChatMessage>{chat.message}</S.ChatMessage>

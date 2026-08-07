@@ -21,6 +21,8 @@ export const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 3rem;
+  border-bottom: 1px solid var(--Gray_1);
 `;
 
 export const BackIcon = styled(Back)`
@@ -52,7 +54,8 @@ export const ChatItem = styled.div`
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.875rem 1.25rem;
+  padding: 1rem;
+  padding-right: 1.25rem;
   position: relative;
   cursor: pointer;
   &:active {
@@ -66,6 +69,7 @@ export const ChatImage = styled.img`
   border-radius: 0.25rem;
   object-fit: cover;
   flex-shrink: 0;
+  border: 1px solid var(--Gray_2);
 `;
 
 export const ChatInfo = styled.div`
@@ -76,40 +80,54 @@ export const ChatInfo = styled.div`
 export const ChatTop = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-bottom: 0.25rem;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 `;
 
 export const ChatName = styled.span`
-  ${Medium_14};
+  ${SemiBold_16};
   color: var(--Black);
-  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
 export const ChatCount = styled.span`
-  ${Regular_12};
-  color: var(--Gray_4);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--Gray_9);
+  padding: 0.125rem 0.25rem;
+  background: var(--Gray_1);
+  border-radius: 0.25rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+`;
+
+export const InfoWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 0.5rem;
+  overflow: hidden;
 `;
 
 export const ChatTime = styled.span`
-  ${Regular_12};
-  color: var(--Gray_4);
+  font-size: 0.625rem;
+  font-weight: 400;
+  color: var(--Gray_6);
   white-space: nowrap;
 `;
 
 export const ChatMessage = styled.p`
   ${Regular_12};
-  color: var(--Gray_5);
+  color: var(--Gray_7);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `;
 
 export const LeaveButton = styled.button`
-  ${SemiBold_12};
+  ${Medium_14};
   position: absolute;
   right: 1.25rem;
   top: 50%;
@@ -121,4 +139,8 @@ export const LeaveButton = styled.button`
   padding: 1rem;
   cursor: pointer;
   z-index: 10;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  &:hover {
+    background: var(--Gray_0);
+  }
 `;
