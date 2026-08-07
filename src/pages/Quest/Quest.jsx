@@ -310,7 +310,6 @@ function QuestPage() {
       )}
 
       <FloatingButton onClick={handleAddQuest} />
-      <BottomNav active="quest" onNavigate={(key) => navigate(`/${key}`)} />
 
       {showLevelUp && (
         <LevelUpModal

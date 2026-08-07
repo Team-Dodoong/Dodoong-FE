@@ -48,7 +48,12 @@ const Layout = () => {
       <Outlet />
 
       {/* 모든 페이지 하단에 공통으로 노출될 네비게이션 바 */}
-      {showBottomNav && <BottomNav />}
+      {showBottomNav && (
+        <BottomNav
+          active={activeNav}
+          onNavigate={(key) => navigate(`/${key}`)}
+        />
+      )}
     </div>
   );
 };

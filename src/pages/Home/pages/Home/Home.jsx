@@ -1,44 +1,43 @@
 // import { motion, useAnimation } from 'framer-motion';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import Header from '../../../../components/Header/Header'
-import BottomNav from '../../../../components/BottomNav/BottomNav';
-import PointBadge from '../../../../components/PointBadge/PointBadge';
-import BottomSheet from '../Home/components/BottomSheet/BottomSheet';
-import CharacterCard from './components/CharacterCard/CharacterCard';
-import StreakTracker from './components/StreakTracker/StreakTracker';
-import LevelUpModal from './components/LevelUpModal/LevelUpModal';
-import FloatingAddButton from './components/FloatingAddButton/FloatingAddButton';
+import Header from "../../../../components/Header/Header";
+import BottomNav from "../../../../components/BottomNav/BottomNav";
+import PointBadge from "../../../../components/PointBadge/PointBadge";
+import BottomSheet from "../Home/components/BottomSheet/BottomSheet";
+import CharacterCard from "./components/CharacterCard/CharacterCard";
+import StreakTracker from "./components/StreakTracker/StreakTracker";
+import LevelUpModal from "./components/LevelUpModal/LevelUpModal";
+import FloatingAddButton from "./components/FloatingAddButton/FloatingAddButton";
 
-
-import * as S from './Home.style';
-import bgGradient from '../../../../assets/Rectangle 3410.png';
+import * as S from "./Home.style";
+import bgGradient from "../../../../assets/Rectangle 3410.png";
 
 // 🟢 1. 필요한 API 불러오기
-import { getMyInfo } from '../../../../api/memberApi';
+import { getMyInfo } from "../../../../api/memberApi";
 import {
   getDailyQuestsByDate,
   toggleCheckDailyQuest,
   postponeDailyQuest,
   deleteDailyQuest,
   deleteRoutine,
-} from '../../../../api/dailyQuestApi';
-import { getStreaks } from '../../../../api/streakApi';
-import { getEquippedCharacter } from '../../../../api/characterApi';
-import { getCharacterHelloImage } from '../../../../utils/characterImage';
+} from "../../../../api/dailyQuestApi";
+import { getStreaks } from "../../../../api/streakApi";
+import { getEquippedCharacter } from "../../../../api/characterApi";
+import { getCharacterHelloImage } from "../../../../utils/characterImage";
 
 // 오늘 날짜 구하기 (YYYY-MM-DD)
 const getTodayString = () => {
   const today = new Date();
   const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 };
 
 // 🟢 [추가] 요일 계산 헬퍼
-const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 // 오늘 요일 가져오기 (예: 'Mon')
 const getTodayName = () => DAYS_OF_WEEK[new Date().getDay()];
@@ -46,14 +45,14 @@ const getTodayName = () => DAYS_OF_WEEK[new Date().getDay()];
 // streakDays 일수에 따라 활성화될 요일 배열 생성
 const getCheckedDays = (streakDays, lastCheckedDate) => {
   if (!streakDays || streakDays <= 0 || !lastCheckedDate) return [];
-  
+
   // 날짜 문자열 파싱 (YYYY-MM-DD 대응)
-  const [year, month, day] = lastCheckedDate.split('-').map(Number);
+  const [year, month, day] = lastCheckedDate.split("-").map(Number);
   const lastDate = new Date(year, month - 1, day);
-  
+
   const lastDayIndex = lastDate.getDay(); // 마지막 체크 날짜의 요일 인덱스
   const checkedList = [];
-  
+
   for (let i = 0; i < streakDays && i < 7; i++) {
     const targetIndex = (lastDayIndex - i + 7) % 7;
     checkedList.unshift(DAYS_OF_WEEK[targetIndex]);
@@ -64,8 +63,8 @@ const getCheckedDays = (streakDays, lastCheckedDate) => {
 function Home() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('daily'); // 'daily' | 'party'
-  
+  const [activeTab, setActiveTab] = useState("daily"); // 'daily' | 'party'
+
   // 🟢 목데이터 대신 API 데이터 상태로 관리
   const [dailyQuests, setDailyQuests] = useState([]);
   const [partyQuests, setPartyQuests] = useState([
@@ -131,7 +130,7 @@ function Home() {
           setLastCheckedDate(streakRes.data.lastCheckedDate || null); // 추가
         }
       } catch (error) {
-        console.error('Home 데이터 불러오기 실패:', error);
+        console.error("Home 데이터 불러오기 실패:", error);
       } finally {
         setLoading(false);
       }
@@ -157,7 +156,7 @@ function Home() {
       } catch (error) {
         if (ignore) return;
         if (error.response?.status !== 404) {
-          console.error('장착 캐릭터 조회 실패:', error);
+          console.error("장착 캐릭터 조회 실패:", error);
         }
         setEquippedCharacter(null);
       }
@@ -169,7 +168,7 @@ function Home() {
     };
   }, []);
 
-  const quests = activeTab === 'daily' ? dailyQuests : partyQuests;
+  const quests = activeTab === "daily" ? dailyQuests : partyQuests;
 
   // 레벨업 처리
   /* const handleLevelUp = async () => {
@@ -191,10 +190,10 @@ function Home() {
 
   // 🟢 3. 퀘스트 체크 / 체크 해제 API 연동
   const handleToggle = async (id) => {
-    if (activeTab === 'party') {
+    if (activeTab === "party") {
       // 파티 퀘스트 토글 로직
       setPartyQuests((prev) =>
-        prev.map((q) => (q.id === id ? { ...q, checked: !q.checked } : q))
+        prev.map((q) => (q.id === id ? { ...q, checked: !q.checked } : q)),
       );
       return;
     }
@@ -206,12 +205,12 @@ function Home() {
 
     // UI 먼저 변경 (Optimistic UI)
     setDailyQuests((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, checked: newCheckedState } : q))
+      prev.map((q) => (q.id === id ? { ...q, checked: newCheckedState } : q)),
     );
 
     try {
       const res = await toggleCheckDailyQuest(id, newCheckedState);
-      
+
       // 경험치/코인 변경 반영 (API 응답 데이터 활용)
       if (res.data) {
         const { level, experience, leveledUp } = res.data;
@@ -228,16 +227,18 @@ function Home() {
         }
       }
     } catch (error) {
-      console.error('퀘스트 체크 상태 변경 실패:', error);
+      console.error("퀘스트 체크 상태 변경 실패:", error);
       // 실패 시 다시 롤백
       setDailyQuests((prev) =>
-        prev.map((q) => (q.id === id ? { ...q, checked: targetQuest.checked } : q))
+        prev.map((q) =>
+          q.id === id ? { ...q, checked: targetQuest.checked } : q,
+        ),
       );
     }
   };
 
   const handleEdit = (id) => {
-    navigate('/questdetail', { state: { id } });
+    navigate("/questdetail", { state: { id } });
   };
 
   // 🟢 4. 일정 내일로 미루기 API 연동
@@ -247,7 +248,7 @@ function Home() {
       // 오늘의 퀘스트 목록에서 제거
       setDailyQuests((prev) => prev.filter((q) => q.id !== id));
     } catch (error) {
-      console.error('일정 미루기 실패:', error);
+      console.error("일정 미루기 실패:", error);
     }
   };
 
@@ -257,7 +258,7 @@ function Home() {
       await deleteDailyQuest(id);
       setDailyQuests((prev) => prev.filter((q) => q.id !== id));
     } catch (error) {
-      console.error('퀘스트 삭제 실패:', error);
+      console.error("퀘스트 삭제 실패:", error);
     }
   };
 
@@ -272,16 +273,16 @@ function Home() {
       }
       setDailyQuests((prev) => prev.filter((q) => q.id !== id));
     } catch (error) {
-      console.error('루틴/퀘스트 완전 삭제 실패:', error);
+      console.error("루틴/퀘스트 완전 삭제 실패:", error);
     }
   };
 
   const handleLeaveParty = (id) => {
-    console.log('파티탈퇴', id);
+    console.log("파티탈퇴", id);
   };
 
   const handleAddQuest = () => {
-    navigate('/floatingadd_questdetail', { state: { type: activeTab } });
+    navigate("/floatingadd_questdetail", { state: { type: activeTab } });
   };
 
   if (loading) {
@@ -289,36 +290,36 @@ function Home() {
   }
 
   // 🟢 퀘스트 목록 재조회 함수 추가
-const refetchQuests = async () => {
-  try {
-    const todayStr = getTodayString();
-    const questsRes = await getDailyQuestsByDate(todayStr);
-    const fetchedQuests = (questsRes.data?.quests || []).map((q) => ({
-      id: q.dailyQuestId,
-      dailyQuestId: q.dailyQuestId, // 💡 두 식별자 모두 챙겨두면 안전합니다.
-      title: q.content,
-      checked: q.isChecked,
-      isRoutine: q.isRoutine,
-      routineId: q.routineId,
-      category: q.questCategory,
-    }));
-    setDailyQuests(fetchedQuests);
-  } catch (error) {
-    console.error('퀘스트 목록 재조회 실패:', error);
-  }
-};
+  const refetchQuests = async () => {
+    try {
+      const todayStr = getTodayString();
+      const questsRes = await getDailyQuestsByDate(todayStr);
+      const fetchedQuests = (questsRes.data?.quests || []).map((q) => ({
+        id: q.dailyQuestId,
+        dailyQuestId: q.dailyQuestId, // 💡 두 식별자 모두 챙겨두면 안전합니다.
+        title: q.content,
+        checked: q.isChecked,
+        isRoutine: q.isRoutine,
+        routineId: q.routineId,
+        category: q.questCategory,
+      }));
+      setDailyQuests(fetchedQuests);
+    } catch (error) {
+      console.error("퀘스트 목록 재조회 실패:", error);
+    }
+  };
 
   return (
     <S.Wrapper>
       <Header />
 
-      <S.Content $bgImage={bgGradient} >
+      <S.Content $bgImage={bgGradient}>
         {/* 포인트 동적 연결 */}
         <PointBadge point={userInfo?.coin ?? 0} />
 
         <CharacterCard
-          userName={userInfo?.nickname || '사용자'}
-          characterName={equippedCharacter?.name || '두비'}
+          userName={userInfo?.nickname || "사용자"}
+          characterName={equippedCharacter?.name || "두비"}
           characterImage={equippedCharacter?.image}
           exp={userInfo?.experience ?? 0}
           maxExp={1000} // 레벨별 필요 경험치에 맞게 설정
@@ -330,7 +331,6 @@ const refetchQuests = async () => {
           today={getTodayName()}
         />
       </S.Content>
-
 
       <BottomSheet
         activeTab={activeTab}
@@ -345,14 +345,12 @@ const refetchQuests = async () => {
         onSuccess={refetchQuests}
       />
 
-
       <FloatingAddButton onClick={handleAddQuest} />
-      <BottomNav active="home" onNavigate={(key) => navigate(`/${key}`)} />
 
       {showLevelUp && (
-        <LevelUpModal 
+        <LevelUpModal
           level={userInfo?.level ?? 1}
-          onConfirm={() => setShowLevelUp(false)} 
+          onConfirm={() => setShowLevelUp(false)}
         />
       )}
     </S.Wrapper>
