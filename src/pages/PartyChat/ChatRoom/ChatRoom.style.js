@@ -150,7 +150,7 @@ export const OtherBubble = styled.div`
 
 export const ScrollButton = styled.button`
   position: absolute;
-  bottom: 5rem;
+  bottom: 6.5rem;
   right: 0.75rem;
   width: 2.5rem;
   height: 2.5rem;
