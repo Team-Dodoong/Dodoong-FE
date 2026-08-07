@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getPartyMonthlyRanking } from "../../../api/partyApi";
-import { getCharacterHelloImage } from "../../../utils/characterImage";
+import {
+  getCharacterHelloImage,
+  getCharacterImage,
+} from "../../../utils/characterImage";
 import * as S from "./Ranking.style";
 import SearchBar from "../../../components/SearchBar/SearchBar";
 import podium1 from "./images/podium_1.png";
@@ -88,7 +91,7 @@ function Ranking() {
               <>
                 <S.RankName>{top3[1].name}</S.RankName>
                 <S.CharacterImage
-                  src={getCharacterHelloImage(top3[1].characterId)}
+                  src={getCharacterImage(top3[1].characterId)}
                   alt="2등"
                 />
               </>
@@ -114,7 +117,7 @@ function Ranking() {
               <>
                 <S.RankName>{top3[2].name}</S.RankName>
                 <S.CharacterImage
-                  src={getCharacterHelloImage(top3[2].characterId)}
+                  src={getCharacterImage(top3[2].characterId)}
                   alt="3등"
                 />
               </>
