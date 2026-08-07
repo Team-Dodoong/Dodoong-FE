@@ -1,5 +1,5 @@
 import { useState } from "react";
-import * as S from "./PartyDetail.style";
+import * as S from "./NotJoinedView.style";
 import CtaButton from "../../../components/Button/CtaButton";
 import { joinParty } from "../../../api/partyApi";
 
@@ -8,6 +8,7 @@ function NotJoinedView({ detail, onJoined }) {
   const [showPasswordMenu, setShowPasswordMenu] = useState(false);
   const [value, setValue] = useState("");
   const [joining, setJoining] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   const handleJoin = async (partyPassword) => {
     setJoining(true);
@@ -17,9 +18,14 @@ function NotJoinedView({ detail, onJoined }) {
       setShowApplyMenu(false);
       setShowPasswordMenu(false);
       setValue("");
+      setPasswordError(false);
       onJoined?.();
     } catch (err) {
-      alert(err.response?.data?.message ?? "파티 가입에 실패했습니다.");
+      if (showPasswordMenu) {
+        setPasswordError(true);
+      } else {
+        alert(err.response?.data?.message ?? "파티 가입에 실패했습니다.");
+      }
     } finally {
       setJoining(false);
     }
@@ -28,10 +34,17 @@ function NotJoinedView({ detail, onJoined }) {
   const handleApply = () => {
     if (detail.isLocked) {
       setShowApplyMenu(false);
+      setPasswordError(false);
       setShowPasswordMenu(true);
     } else {
       handleJoin(null);
     }
+  };
+
+  const closePasswordMenu = () => {
+    setShowPasswordMenu(false);
+    setValue("");
+    setPasswordError(false);
   };
 
   return (
@@ -92,11 +105,16 @@ function NotJoinedView({ detail, onJoined }) {
               value={value}
               onChange={(e) => {
                 if (e.target.value.length <= 4) setValue(e.target.value);
+                setPasswordError(false);
               }}
               maxLength={4}
+              $isError={passwordError}
             />
+            <S.ErrorMessage $show={passwordError}>
+              *비밀번호가 일치하지 않습니다
+            </S.ErrorMessage>
             <S.ButtonWrapper>
-              <S.ApplyButton $cancel onClick={() => setShowPasswordMenu(false)}>
+              <S.ApplyButton $cancel onClick={closePasswordMenu}>
                 취소
               </S.ApplyButton>
               <S.ApplyButton

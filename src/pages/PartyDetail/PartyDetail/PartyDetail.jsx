@@ -135,15 +135,21 @@ function PartyDetail() {
   }
 
   return (
-    <S.Container>
-      <S.ScrollArea>
+    <S.Container $full={detail.isJoined}>
+      <S.ScrollArea $full={detail.isJoined}>
         <S.ImageSection>
           <S.CoverImage src={detail.image} alt="cover" />
           <S.ImageOverlay />
           <S.HeaderIcons>
             <S.BackIcon onClick={() => navigate(-1)} />
             <S.HeaderRight>
-              <S.ChatIcon onClick={() => navigate(`/party/chat/${partyId}`)} />
+              <S.ChatIcon
+                onClick={
+                  detail.isJoined
+                    ? () => navigate(`/party/chat/${partyId}`)
+                    : undefined
+                }
+              />
               <S.ShareIcon />
               <S.MoreIcon onClick={() => setShowMoreMenu(true)} />
             </S.HeaderRight>
@@ -183,7 +189,11 @@ function PartyDetail() {
         <>
           <S.Overlay $menu onClick={() => setShowMoreMenu(false)} />
           <S.MenuContainer>
-            {detail.isOwner ? (
+            {!detail.isJoined ? (
+              <S.MenuItem onClick={() => setShowMoreMenu(false)}>
+                파티 숨기기
+              </S.MenuItem>
+            ) : detail.isOwner ? (
               <>
                 <S.MenuItem
                   onClick={() => {
