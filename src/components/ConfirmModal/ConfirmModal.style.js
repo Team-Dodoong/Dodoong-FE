@@ -21,7 +21,7 @@ export const Modal = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
 `;
 
 export const ModalTitle = styled.p`
@@ -29,7 +29,6 @@ export const ModalTitle = styled.p`
   color: var(--Black);
   text-align: center;
   white-space: pre-line;
-  line-height: 1.6;
 `;
 
 export const ModalSubTitle = styled.p`
