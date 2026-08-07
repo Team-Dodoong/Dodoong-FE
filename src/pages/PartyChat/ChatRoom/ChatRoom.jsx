@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useChatRoom } from "../../../hooks/useChatRoom";
 import * as S from "./ChatRoom.style";
 import ConfirmModal from "../../../components/ConfirmModal/ConfirmModal";
-import defaultAvatar from "../../../assets/character_두비.png";
+import defaultAvatar from "../../../assets/img_basic_profile.png";
 import { getChatHistory, getChatRooms } from "../../../api/chatApi";
 import { leaveParty } from "../../../api/partyApi";
 import { getMyInfo } from "../../../api/memberApi";
