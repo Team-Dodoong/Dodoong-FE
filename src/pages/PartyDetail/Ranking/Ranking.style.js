@@ -17,8 +17,8 @@ export const Container = styled.div`
 
 export const Header = styled.div`
   padding: 0.8125rem 1.25rem;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   border-bottom: 1px solid var(--Gray_1);
 `;
@@ -28,11 +28,13 @@ export const BackIcon = styled(Back)`
   height: 1.5rem;
   color: var(--Gray_5);
   cursor: pointer;
+  justify-self: start;
 `;
 
 export const HeaderTitle = styled.h3`
   ${SemiBold_16};
   color: var(--Black);
+  justify-self: center;
 `;
 
 export const MyRankButton = styled.button`
@@ -41,6 +43,7 @@ export const MyRankButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+  justify-self: end;
 `;
 
 export const Podium = styled.div`
