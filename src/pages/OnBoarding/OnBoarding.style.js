@@ -62,7 +62,7 @@ export const StepZeroTitle = styled.h2`
   line-height: 1.4;
   color: #000000;
   margin-top: 48px;
-  margin-bottom: 268px;
+  margin-bottom: 200px;
   word-wrap: break-word;
 `;
 
