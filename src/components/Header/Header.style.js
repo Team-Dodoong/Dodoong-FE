@@ -26,6 +26,7 @@ export const ChatButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--Black);
 `;
 
 /* export const NotificationDot = styled.span`
