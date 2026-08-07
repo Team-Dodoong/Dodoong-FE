@@ -41,7 +41,26 @@ function QuestPage() {
 
   const [activeTab, setActiveTab] = useState("daily");
   const [dailyQuests, setDailyQuests] = useState([]);
-  const [partyQuests, setPartyQuests] = useState([]);
+  const [partyQuests, setPartyQuests] = useState([
+  {
+      id: 1,
+      dailyQuestId: 1,
+      title: "[운동 한시간인증] 런닝 1시간 인증하기",
+      checked: false,
+      isRoutine: false,
+      routineId: null,
+      questCategory: "운동",
+    },
+    {
+      id: 2,
+      dailyQuestId: 2,
+      title: "[코딩테스트짱이되자] 코테 문제 1문제 풀기",
+      checked: false,
+      isRoutine: false,
+      routineId: null,
+      questCategory: "공부",
+    },
+]);
   const [isLoading, setIsLoading] = useState(false);
 
   const [calendarRefreshKey, setCalendarRefreshKey] = useState(0);

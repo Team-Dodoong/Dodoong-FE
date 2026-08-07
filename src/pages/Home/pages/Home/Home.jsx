@@ -68,7 +68,26 @@ function Home() {
   
   // 🟢 목데이터 대신 API 데이터 상태로 관리
   const [dailyQuests, setDailyQuests] = useState([]);
-  const [partyQuests, setPartyQuests] = useState([]);
+  const [partyQuests, setPartyQuests] = useState([
+    {
+      id: 1,
+      dailyQuestId: 1,
+      title: "[운동 한시간인증] 런닝 1시간 인증하기",
+      checked: false,
+      isRoutine: false,
+      routineId: null,
+      questCategory: "운동",
+    },
+    {
+      id: 2,
+      dailyQuestId: 2,
+      title: "[코딩테스트짱이되자] 코테 문제 1문제 풀기",
+      checked: false,
+      isRoutine: false,
+      routineId: null,
+      questCategory: "공부",
+    },
+  ]);
 
   // 회원, 캐릭터 데이터, 스트릭 일수
   const [userInfo, setUserInfo] = useState(null);
