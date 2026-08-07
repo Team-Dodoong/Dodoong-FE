@@ -116,6 +116,8 @@ export const OtherContent = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  max-width: 70%;
+  min-width: 0;
 `;
 
 export const OtherName = styled.p`
@@ -129,9 +131,11 @@ export const OtherBubble = styled.div`
   color: var(--Black);
   padding: 0.625rem 0.875rem;
   border-radius: 0 1rem 1rem 1rem;
-  max-width: 70%;
+  width: fit-content;
+  max-width: 100%;
   line-height: 1.5;
   word-break: break-word;
+  white-space: pre-line;
 `;
 
 export const ScrollButton = styled.button`

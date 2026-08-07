@@ -9,6 +9,16 @@ import { leaveParty } from "../../../api/partyApi";
 import { getMyInfo } from "../../../api/memberApi";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const OTHER_MESSAGE_LINE_LENGTH = 15;
+
+const breakEveryNChars = (text, size) => {
+  if (!text) return text;
+  const lines = [];
+  for (let i = 0; i < text.length; i += size) {
+    lines.push(text.slice(i, i + size));
+  }
+  return lines.join("\n");
+};
 
 const formatDateDivider = (isoString) => {
   const date = new Date(isoString);
@@ -226,7 +236,9 @@ function ChatRoom() {
               <S.Avatar src={item.avatar} alt={item.name} />
               <S.OtherContent>
                 <S.OtherName>{item.name}</S.OtherName>
-                <S.OtherBubble>{item.text}</S.OtherBubble>
+                <S.OtherBubble>
+                  {breakEveryNChars(item.text, OTHER_MESSAGE_LINE_LENGTH)}
+                </S.OtherBubble>
               </S.OtherContent>
             </S.OtherMessageRow>
           );
