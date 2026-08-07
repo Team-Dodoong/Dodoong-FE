@@ -9,7 +9,7 @@ import { leaveParty } from "../../../api/partyApi";
 import { getMyInfo } from "../../../api/memberApi";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
-const OTHER_MESSAGE_LINE_LENGTH = 15;
+const MESSAGE_LINE_LENGTH = 15;
 
 const breakEveryNChars = (text, size) => {
   if (!text) return text;
@@ -196,6 +196,7 @@ function ChatRoom() {
 
   const displayItems = [];
   let lastDateKey = null;
+  let lastGroupKey = null;
   messages.forEach((msg) => {
     const dateKey = new Date(msg.createdAt).toDateString();
     if (dateKey !== lastDateKey) {
@@ -205,8 +206,26 @@ function ChatRoom() {
         text: formatDateDivider(msg.createdAt),
       });
       lastDateKey = dateKey;
+      lastGroupKey = null;
     }
-    displayItems.push({ ...msg, kind: msg.type });
+
+    const minuteKey = Math.floor(new Date(msg.createdAt).getTime() / 60000);
+    const groupKey = `${msg.type}-${msg.name}-${minuteKey}`;
+    const grouped = groupKey === lastGroupKey;
+
+    displayItems.push({
+      ...msg,
+      kind: msg.type,
+      groupKey,
+      showHeader: msg.type === "other" ? !grouped : undefined,
+    });
+    lastGroupKey = groupKey;
+  });
+
+  displayItems.forEach((item, index) => {
+    if (item.kind !== "other" && item.kind !== "me") return;
+    const next = displayItems[index + 1];
+    item.isLastInGroup = next?.groupKey !== item.groupKey;
   });
 
   return (
@@ -235,17 +254,23 @@ function ChatRoom() {
           if (item.kind === "me") {
             return (
               <S.MyMessageRow key={item.id}>
-                <S.MyBubble>{item.text}</S.MyBubble>
+                <S.MyBubble $last={item.isLastInGroup}>
+                  {breakEveryNChars(item.text, MESSAGE_LINE_LENGTH)}
+                </S.MyBubble>
               </S.MyMessageRow>
             );
           }
           return (
             <S.OtherMessageRow key={item.id}>
-              <S.Avatar src={item.avatar} alt={item.name} />
+              {item.showHeader ? (
+                <S.Avatar src={item.avatar} alt={item.name} />
+              ) : (
+                <S.AvatarSpacer />
+              )}
               <S.OtherContent>
-                <S.OtherName>{item.name}</S.OtherName>
-                <S.OtherBubble>
-                  {breakEveryNChars(item.text, OTHER_MESSAGE_LINE_LENGTH)}
+                {item.showHeader && <S.OtherName>{item.name}</S.OtherName>}
+                <S.OtherBubble $last={item.isLastInGroup}>
+                  {breakEveryNChars(item.text, MESSAGE_LINE_LENGTH)}
                 </S.OtherBubble>
               </S.OtherContent>
             </S.OtherMessageRow>
