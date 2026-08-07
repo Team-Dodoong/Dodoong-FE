@@ -1,4 +1,5 @@
-import api from './instance'
+import api from "./instance";
+import axios from "axios";
 
 /**
  * ✅ 회원가입 API
@@ -21,7 +22,6 @@ export const signup = async (userData) => {
   }
 };
 
-
 /**
  * ✅ 로그인 API
  * @param {Object} credentials - { loginId: string, password: string }
@@ -35,7 +35,10 @@ export const login = async (credentials) => {
   } catch (error) {
     // 서버 오류 또는 인증 실패 시 (400 Bad Request 등)
     if (error.response) {
-      console.error("로그인 실패:", error.response.data.message || "로그인 정보가 올바르지 않습니다.");
+      console.error(
+        "로그인 실패:",
+        error.response.data.message || "로그인 정보가 올바르지 않습니다.",
+      );
     } else {
       console.error("로그인 요청 중 오류 발생:", error.message);
     }
@@ -58,7 +61,8 @@ export const logout = async () => {
     if (error.response) {
       console.error(
         "로그아웃 실패:",
-        error.response.data.message || "로그아웃 요청 처리 중 오류가 발생했습니다."
+        error.response.data.message ||
+          "로그아웃 요청 처리 중 오류가 발생했습니다.",
       );
     } else {
       console.error("로그아웃 요청 중 오류 발생:", error.message);
@@ -82,7 +86,8 @@ export const reissueToken = async () => {
     if (error.response) {
       console.error(
         "토큰 재발급 실패:",
-        error.response.data.message || "리프레시 토큰이 만료되었거나 존재하지 않습니다."
+        error.response.data.message ||
+          "리프레시 토큰이 만료되었거나 존재하지 않습니다.",
       );
     } else {
       console.error("토큰 재발급 요청 중 오류 발생:", error.message);
@@ -91,13 +96,11 @@ export const reissueToken = async () => {
   }
 };
 
-
 /**
  * ✅ 내 회원 정보 조회 API
  * 쿠키에 담긴 accessToken을 이용하여 현재 로그인된 회원의 정보를 조회합니다.
  * @returns {Promise<Object>} - { memberId, loginId, nickname, profileImageUrl, introduction, level, experience, coin }
  */
-
 
 export const getMyInfo = async () => {
   try {
@@ -109,7 +112,7 @@ export const getMyInfo = async () => {
     if (error.response) {
       console.error(
         "회원 정보 조회 실패:",
-        error.response.data.message || "회원 정보를 불러올 수 없습니다."
+        error.response.data.message || "회원 정보를 불러올 수 없습니다.",
       );
     } else {
       console.error("회원 정보 조회 요청 중 오류 발생:", error.message);
@@ -126,14 +129,20 @@ export const getMyInfo = async () => {
  */
 export const getProfileUploadUrl = async (contentType) => {
   try {
-    const response = await api.post("/api/members/me/profile-image/upload-url", {
-      contentType,
-    });
+    const response = await api.post(
+      "/api/members/me/profile-image/upload-url",
+      {
+        contentType,
+      },
+    );
     // response.data.data -> { uploadUrl, profileImageKey }
     return response.data.data;
   } catch (error) {
     if (error.response) {
-      console.error("업로드 URL 발급 실패:", error.response.data.message || "URL 발급 실패");
+      console.error(
+        "업로드 URL 발급 실패:",
+        error.response.data.message || "URL 발급 실패",
+      );
     } else {
       console.error("업로드 URL 발급 요청 중 오류 발생:", error.message);
     }
@@ -142,9 +151,30 @@ export const getProfileUploadUrl = async (contentType) => {
 };
 
 /**
+ * ✅ S3 프로필 이미지 직접 업로드
+ * @param {string} uploadUrl - Presigned URL
+ * @param {File} file - 업로드할 이미지 파일
+ * @param {string} contentType - 이미지 MIME 타입
+ * @returns {Promise}
+ */
+export const uploadProfileImageToS3 = async (uploadUrl, file, contentType) => {
+  try {
+    await axios.put(uploadUrl, file, {
+      headers: {
+        "Content-Type": contentType,
+      },
+    });
+
+    return true;
+  } catch (error) {
+    console.error("S3 이미지 업로드 실패:", error);
+    throw error;
+  }
+};
+
+/**
  * ✅ 프로필 설정 API
- * @param {Object} profileData - { nickname: string, introduction: string }
- * @returns {Promise<Object>} - { nickname, profileImageUrl, introduction }
+ * @param {Object} profileData
  */
 export const updateProfile = async (profileData) => {
   try {
@@ -153,14 +183,16 @@ export const updateProfile = async (profileData) => {
     return response.data;
   } catch (error) {
     if (error.response) {
-      console.error("프로필 수정 실패:", error.response.data.message || "프로필 수정 중 오류가 발생했습니다.");
+      console.error(
+        "프로필 수정 실패:",
+        error.response.data.message || "프로필 수정 중 오류가 발생했습니다.",
+      );
     } else {
       console.error("프로필 수정 요청 중 오류 발생:", error.message);
     }
     throw error;
   }
 };
-
 
 /**
  * ✅ 회원 탈퇴 API
@@ -177,7 +209,7 @@ export const deleteAccount = async () => {
     if (error.response) {
       console.error(
         "회원 탈퇴 실패:",
-        error.response.data.message || "회원 탈퇴 처리 중 오류가 발생했습니다."
+        error.response.data.message || "회원 탈퇴 처리 중 오류가 발생했습니다.",
       );
     } else {
       console.error("회원 탈퇴 요청 중 오류 발생:", error.message);

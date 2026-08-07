@@ -1,22 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import * as S from './ProfileEdit.style';
-import BackIcon from '../../../assets/ic_back_24.svg?react';
-import MyPageProfileImage from '../../../assets/mypage-profile-image.png' ;
-import { getMyInfo, updateProfile } from '../../../api/memberApi' ;
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import * as S from "./ProfileEdit.style";
+import BackIcon from "../../../assets/ic_back_24.svg?react";
+import MyPageProfileImage from "../../../assets/mypage-profile-image.png";
+import {
+  getMyInfo,
+  getProfileUploadUrl,
+  uploadProfileImageToS3,
+  updateProfile,
+} from "../../../api/memberApi";
 
 const ProfileEdit = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
 
-
-  const [nickname, setNickname] = useState('');
-  const [intro, setIntro] = useState('');
+  const [nickname, setNickname] = useState("");
+  const [intro, setIntro] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [loading, setLoading] = useState(true);
-
-
 
   // 2. 초기 회원 데이터 불러오기
   useEffect(() => {
@@ -27,8 +29,8 @@ const ProfileEdit = () => {
         const data = response.data || response;
 
         if (data) {
-          setNickname(data.nickname || '');
-          setIntro(data.introduction || '');
+          setNickname(data.nickname || "");
+          setIntro(data.introduction || "");
           setPreviewImage(data.profileImageUrl || null);
         }
       } catch (error) {
@@ -59,17 +61,34 @@ const ProfileEdit = () => {
     }
 
     try {
+      let profileImageKey = null;
+
+      if (imageFile) {
+        const contentType = imageFile.type;
+
+        const { uploadUrl, profileImageKey: issuedProfileImageKey } =
+          await getProfileUploadUrl(contentType);
+
+        await uploadProfileImageToS3(uploadUrl, imageFile, contentType);
+
+        profileImageKey = issuedProfileImageKey;
+      }
+
       const profileData = {
-        nickname: nickname,
+        nickname,
         introduction: intro,
+        profileImageKey,
       };
 
-      // memberApi.js의 updateProfile(profileData, imageFile) 호출
-      await updateProfile(profileData, imageFile);
+      await updateProfile(profileData);
+
       alert("프로필이 성공적으로 수정되었습니다.");
-      navigate(-1); // 이전 페이지(계정 정보 or 마이페이지)로 이동
+      navigate(-1);
     } catch (error) {
       console.error("프로필 수정 실패:", error);
+      console.error("응답:", error.response?.data);
+      console.error("상태코드:", error.response?.status);
+
       alert("프로필 수정에 실패했습니다.");
     }
   };
@@ -85,18 +104,17 @@ const ProfileEdit = () => {
         <S.CancelButton onClick={() => navigate(-1)}>취소</S.CancelButton>
       </S.Header>
 
-
       {/* 아바타 클릭 시 파일 업로드창 열기 */}
       <S.AvatarContainer onClick={() => fileInputRef.current?.click()}>
         <S.Avatar src={previewImage || MyPageProfileImage} alt="프로필" />
         <S.AddBadge>+</S.AddBadge>
         {/* 숨겨진 file input */}
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          onChange={handleImageChange} 
-          accept="image/*" 
-          style={{ display: 'none' }} 
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleImageChange}
+          accept="image/*"
+          style={{ display: "none" }}
         />
       </S.AvatarContainer>
 
@@ -106,12 +124,14 @@ const ProfileEdit = () => {
           <S.Count>{nickname.length}/16</S.Count>
         </S.LabelRow>
         <S.InputWrapper>
-          <S.Input 
-            value={nickname} 
-            onChange={(e) => setNickname(e.target.value)} 
-            maxLength={16} 
+          <S.Input
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            maxLength={16}
           />
-          {nickname && <S.ClearButton onClick={() => setNickname('')}>×</S.ClearButton>}
+          {nickname && (
+            <S.ClearButton onClick={() => setNickname("")}>×</S.ClearButton>
+          )}
         </S.InputWrapper>
       </S.FormGroup>
 
@@ -120,10 +140,10 @@ const ProfileEdit = () => {
           <S.Label>나의 소개글</S.Label>
         </S.LabelRow>
         <S.TextAreaWrapper>
-          <S.TextArea 
-            placeholder="소개글을 입력해 주세요" 
-            value={intro} 
-            onChange={(e) => setIntro(e.target.value)} 
+          <S.TextArea
+            placeholder="소개글을 입력해 주세요"
+            value={intro}
+            onChange={(e) => setIntro(e.target.value)}
           />
         </S.TextAreaWrapper>
       </S.FormGroup>
