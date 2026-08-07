@@ -7,7 +7,6 @@ import {
   Medium_14,
   Regular_12,
   Regular_14,
-  Bold_14,
   Medium_12,
   Bold_18,
 } from "../../../styles/Fonts";
@@ -223,6 +222,7 @@ export const MemberName = styled.p`
 export const MemberTime = styled.p`
   ${Regular_12};
   color: var(--Gray_4);
+  white-space: nowrap;
 `;
 
 export const MemberInfo = styled.div`
