@@ -1,16 +1,16 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const PickerContainer = styled.div`
   position: absolute;
-  top: 40px;
-  left: 0;
+  top: 50px;
+  left: 1rem;
   display: flex;
   align-items: center;
   gap: 12px;
   background: #ffffff;
   padding: 12px 16px;
-  border-radius: 16px;
-  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 0.5rem;
+  box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
   z-index: 100;
 `;
 
@@ -22,12 +22,12 @@ export const DropdownWrapper = styled.div`
 `;
 
 export const SelectButton = styled.button`
-  background: #f8f8f8;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
-  font-weight: 600;
+  background: #ffffff;
+  border: 1px solid var(--Gray_2);
+  border-radius: 0.25rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -64,8 +64,8 @@ export const DropdownList = styled.ul`
 export const DropdownItem = styled.li`
   padding: 8px 14px;
   font-size: 14px;
-  color: ${({ $isSelected }) => ($isSelected ? '#FF8A3D' : '#333333')};
-  font-weight: ${({ $isSelected }) => ($isSelected ? '700' : '400')};
+  color: ${({ $isSelected }) => ($isSelected ? "#FF8A3D" : "#333333")};
+  font-weight: ${({ $isSelected }) => ($isSelected ? "700" : "400")};
   display: flex;
   justify-content: space-between;
   cursor: pointer;
@@ -73,4 +73,9 @@ export const DropdownItem = styled.li`
   &:hover {
     background-color: #f5f5f5;
   }
+`;
+
+export const DropdownIcon = styled.img`
+  width: 1rem;
+  height: 1rem;
 `;

@@ -1,6 +1,5 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 import { Regular_14 } from "../../../styles/Fonts";
-
 
 export const Container = styled.div`
   position: relative;
@@ -140,8 +139,12 @@ export const TextArea = styled.textarea`
   border-radius: 6px;
   box-sizing: border-box;
   ${Regular_14}
-  color: var(--Gray_4);
+  color: var(--black);
   resize: none;
+
+  &::placeholder {
+    color: var(--Gray_4);
+  }
 
   &:focus {
     border-color: #111111;

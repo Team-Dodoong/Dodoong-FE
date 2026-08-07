@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import * as S from './YearMonthPicker.style';
+import React, { useState } from "react";
+import * as S from "./YearMonthPicker.style";
+import IconDropDown from "../../../../assets/ic-dropdown.svg";
 
 function YearMonthPicker({ currentYear, currentMonth, onChange }) {
   const [isYearOpen, setIsYearOpen] = useState(false);
@@ -11,8 +12,13 @@ function YearMonthPicker({ currentYear, currentMonth, onChange }) {
   return (
     <S.PickerContainer>
       <S.DropdownWrapper>
-        <S.SelectButton onClick={() => { setIsYearOpen(!isYearOpen); setIsMonthOpen(false); }}>
-          {currentYear} <span>▼</span>
+        <S.SelectButton
+          onClick={() => {
+            setIsYearOpen(!isYearOpen);
+            setIsMonthOpen(false);
+          }}
+        >
+          {currentYear} <S.DropdownIcon src={IconDropDown} alt="dropdown" />
         </S.SelectButton>
         <S.Label>년</S.Label>
 
@@ -27,7 +33,7 @@ function YearMonthPicker({ currentYear, currentMonth, onChange }) {
                   setIsYearOpen(false);
                 }}
               >
-                {y} {y === currentYear && '✓'}
+                {y} {y === currentYear && "✓"}
               </S.DropdownItem>
             ))}
           </S.DropdownList>
@@ -35,8 +41,13 @@ function YearMonthPicker({ currentYear, currentMonth, onChange }) {
       </S.DropdownWrapper>
 
       <S.DropdownWrapper>
-        <S.SelectButton onClick={() => { setIsMonthOpen(!isMonthOpen); setIsYearOpen(false); }}>
-          {currentMonth} <span>▼</span>
+        <S.SelectButton
+          onClick={() => {
+            setIsMonthOpen(!isMonthOpen);
+            setIsYearOpen(false);
+          }}
+        >
+          {currentMonth} <S.DropdownIcon src={IconDropDown} alt="dropdown" />
         </S.SelectButton>
         <S.Label>월</S.Label>
 
@@ -51,7 +62,7 @@ function YearMonthPicker({ currentYear, currentMonth, onChange }) {
                   setIsMonthOpen(false);
                 }}
               >
-                {m} {m === currentMonth && '✓'}
+                {m} {m === currentMonth && "✓"}
               </S.DropdownItem>
             ))}
           </S.DropdownList>

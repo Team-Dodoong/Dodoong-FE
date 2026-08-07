@@ -5,7 +5,7 @@ import Login from "./pages/Login/Login.jsx";
 import OnBoarding from "./pages/OnBoarding/OnBoarding.jsx";
 import Home from "./pages/Home/pages/Home/Home.jsx";
 import QuestDetail from "./pages/Home/pages/QuestDetail/QuestDetail.jsx";
-import FloatingAddButtonPage from "./pages/Quest/QuestDetail/QuestDetail.jsx"
+import FloatingAddButtonPage from "./pages/Quest/QuestDetail/QuestDetail.jsx";
 import Quest from "./pages/Quest/Quest.jsx";
 import Character from "./pages/Character/Character.jsx";
 import Party from "./pages/Party/Party/Party.jsx";
@@ -32,6 +32,7 @@ const Layout = () => {
     location.pathname !== "/profile/servicewithdraw" &&
     location.pathname !== "/questdetail" &&
     location.pathname !== "/floatingadd_questdetail" &&
+    location.pathname !== "/profile/edit" &&
     !location.pathname.startsWith("/party/");
 
   return (

@@ -7,7 +7,7 @@
 import { css } from "styled-components";
 
 export const Regular_12 = css`
-  font-family: "Pretendard Variable";
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 12px;
   line-height: 140%;
   font-weight: 400;
@@ -15,7 +15,7 @@ export const Regular_12 = css`
 `;
 
 export const Regular_14 = css`
-  font-family: "Pretendard Variable";
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 14px;
   line-height: 140%;
   font-weight: 400;
@@ -24,7 +24,7 @@ export const Regular_14 = css`
 `;
 
 export const R_16 = css`
-  font-family: "Pretendard Variable";
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 16px;
   line-height: 140%;
   font-weight: 400;
@@ -32,7 +32,7 @@ export const R_16 = css`
 `;
 
 export const Medium_12 = css`
-  font-family: Pretendard-Medium;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 12px;
   line-height: 140%;
   font-weight: 500;
@@ -40,7 +40,7 @@ export const Medium_12 = css`
 `;
 
 export const Medium_12_Tag = css`
-  font-family: Pretendard-Medium;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 12px;
   letter-spacing: -4%;
   font-weight: 500;
@@ -48,7 +48,7 @@ export const Medium_12_Tag = css`
 `;
 
 export const Medium_14 = css`
-  font-family: Pretendard-Medium;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 14px;
   line-height: 140%;
   letter-spacing: -4%;
@@ -57,7 +57,7 @@ export const Medium_14 = css`
 `;
 
 export const Medium_16 = css`
-  font-family: Pretendard-Medium;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 16px;
   line-height: 140%;
   font-weight: 500;
@@ -65,7 +65,7 @@ export const Medium_16 = css`
 `;
 
 export const SemiBold_12 = css`
-  font-family: Pretendard-SemiBold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 12px;
   line-height: 120%;
   letter-spacing: -4%;
@@ -74,7 +74,7 @@ export const SemiBold_12 = css`
 `;
 
 export const SemiBold_14 = css`
-  font-family: Pretendard-SemiBold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 14px;
   line-height: 140%;
   font-weight: 600;
@@ -82,7 +82,7 @@ export const SemiBold_14 = css`
 `;
 
 export const SemiBold_16 = css`
-  font-family: Pretendard-SemiBold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 16px;
   line-height: 140%;
   letter-spacing: -4%;
@@ -91,7 +91,7 @@ export const SemiBold_16 = css`
 `;
 
 export const Bold_14 = css`
-  font-family: Pretendard-Bold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 14px;
   line-height: 140%;
   letter-spacing: -4%;
@@ -100,7 +100,7 @@ export const Bold_14 = css`
 `;
 
 export const Bold_16 = css`
-  font-family: Pretendard-Bold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 16px;
   line-height: 140%;
   letter-spacing: -2.5%;
@@ -109,7 +109,7 @@ export const Bold_16 = css`
 `;
 
 export const Bold_18 = css`
-  font-family: Pretendard-Bold;
+  font-family: "Pretendard Variable", "Pretendard", sans-serif;
   font-size: 18px;
   line-height: 140%;
   letter-spacing: -4%;

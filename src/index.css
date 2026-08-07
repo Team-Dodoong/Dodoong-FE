@@ -19,13 +19,18 @@ body {
   min-height: 100vh;
   margin: 0 auto;
   background: #fff;
-
-  border: 1px solid #a9a9a9;
 }
 
 body {
   overflow-x: hidden;
   font-family: "Pretendard Variable", "Pretendard", sans-serif;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 button {
@@ -49,4 +54,3 @@ ol {
   font-weight: normal;
   src: url("./styles/Jalnan2.otf") format("opentype");
 }
-

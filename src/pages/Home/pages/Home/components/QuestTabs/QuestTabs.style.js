@@ -1,5 +1,4 @@
-import styled from 'styled-components';
-
+import styled from "styled-components";
 
 export const Wrapper = styled.section`
   width: 100%;
@@ -22,22 +21,22 @@ export const DragHandle = styled.span`
   height: 4px;
   margin: 10px auto 0;
   border-radius: 999px;
-  background-color: #E5E5EA;
+  background-color: #e5e5ea;
 `;
 
 export const TabRow = styled.div`
   display: flex;
   margin-top: 4px;
-  border-bottom: 1px solid #E5E5EA;
+  border-bottom: 1px solid #e5e5ea;
 `;
 
 export const Tab = styled.button`
   flex: 1;
   padding: 14px 0;
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 1rem;
+  font-weight: 600;
 
-  color: ${({ $active }) => ($active ? '#1A1A1A' : '#C7C7CC')};
+  color: ${({ $active }) => ($active ? "#1A1A1A" : "#C7C7CC")};
   border-bottom: 2px solid
-    ${({ $active }) => ($active ? '#FF9142' : 'transparent')};
+    ${({ $active }) => ($active ? "#FF9142" : "transparent")};
 `;

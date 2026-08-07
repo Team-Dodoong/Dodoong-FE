@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const PageWrapper = styled.div`
   position: relative;
@@ -31,7 +31,7 @@ export const ControlHeader = styled.div`
 `;
 
 export const DateSelectBtn = styled.button`
-  font-size: 20px;
+  font-size: 1.5rem;
   font-weight: 700;
   background: none;
   border: none;
@@ -40,11 +40,17 @@ export const DateSelectBtn = styled.button`
   gap: 6px;
   cursor: pointer;
   color: #111111;
+  margin-left: 1rem;
 
   span {
     font-size: 12px;
     color: #888888;
   }
+`;
+
+export const DropdownIcon = styled.img`
+  width: 1.25rem;
+  height: 1.25rem;
 `;
 
 export const ToggleViewBtn = styled.button`
