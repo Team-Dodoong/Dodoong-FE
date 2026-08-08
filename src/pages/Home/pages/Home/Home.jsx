@@ -322,7 +322,7 @@ function Home() {
           characterName={equippedCharacter?.name || "두비"}
           characterImage={equippedCharacter?.image}
           exp={userInfo?.experience ?? 0}
-          maxExp={1000} // 레벨별 필요 경험치에 맞게 설정
+          maxExp={400} // 레벨별 필요 경험치에 맞게 설정
         />
 
         <StreakTracker
