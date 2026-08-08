@@ -1,16 +1,5 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://api.dodoong.p-e.kr/api/:path*"
-    },
-    {
-      "source": "/ws",
-      "destination": "https://api.dodoong.p-e.kr/ws"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/"
-    }
+  "rewrites" : [
+    {"source" : "/(.*)", "destination":"/"}
   ]
 }

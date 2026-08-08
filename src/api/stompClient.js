@@ -2,33 +2,18 @@ import { Client } from "@stomp/stompjs";
 
 let client = null;
 
-function getWebSocketUrl() {
-  // 로컬 개발
-  if (import.meta.env.DEV) {
-    return import.meta.env.VITE_WS_URL;
-  }
-
-  // 배포
-  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-
-  return `${protocol}//${window.location.host}/ws`;
-}
-
 export function getStompClient() {
-  if (client) {
-    return client;
-  }
+  if (client) return client;
 
   client = new Client({
-    brokerURL: getWebSocketUrl(),
-    reconnectDelay: 5000,
-    heartbeatIncoming: 10000,
-    heartbeatOutgoing: 10000,
+    brokerURL: import.meta.env.VITE_WS_URL,
+    reconnectDelay: 5000, // 끊기면 5초 뒤 재연결
+    heartbeatIncoming: 10000, // 서버 → 나 heartbeat
+    heartbeatOutgoing: 10000, // 나 → 서버 heartbeat
 
+    // 디버그 로그 (개발할 때만)
     debug: (msg) => {
-      if (import.meta.env.DEV) {
-        console.log("[STOMP]", msg);
-      }
+      if (import.meta.env.DEV) console.log("[STOMP]", msg);
     },
   });
 
@@ -36,17 +21,14 @@ export function getStompClient() {
 }
 
 export async function activateStomp() {
-  const stompClient = getStompClient();
-
-  if (stompClient.active) {
-    await stompClient.deactivate();
+  const c = getStompClient();
+  // 이전 로그인 세션의 연결이 남아있으면 끊고 새 쿠키로 다시 연결
+  if (c.active) {
+    await c.deactivate();
   }
-
-  stompClient.activate();
+  c.activate();
 }
 
 export function deactivateStomp() {
-  if (client?.active) {
-    client.deactivate();
-  }
+  if (client?.active) client.deactivate();
 }
