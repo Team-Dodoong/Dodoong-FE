@@ -26,10 +26,6 @@ export async function activateStomp() {
   if (c.active) {
     await c.deactivate();
   }
-
-  const token = localStorage.getItem("token");
-  c.connectHeaders = token ? { Authorization: `Bearer ${token}` } : {};
-
   c.activate();
 }
 
